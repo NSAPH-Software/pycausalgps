@@ -15,7 +15,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="TBD",
-    license="TBD",
+    license="GPL-3",
     packages=find_packages(exclude=['docs*', 'tests*']),
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
