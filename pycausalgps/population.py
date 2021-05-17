@@ -11,6 +11,7 @@ class Population(Dataset):
         pass
 
     def generate_pseudo_pop(self):
+        # returns pseudo_pop object.
         pass
     
     def compile_pseudo_pop(self):
@@ -31,6 +32,4 @@ class Population(Dataset):
     def create_weighting(self):
         pass
 
-    def generate_synthetic_data(self):
-        pass
 
