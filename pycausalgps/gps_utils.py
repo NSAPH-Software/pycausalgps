@@ -5,8 +5,22 @@ import pandas as pd
 from .dataset import Dataset
 
 
-def gen_synthetic_population(sample_size, seed_val=300, outcome_sd=10,
+def generate_syn_pop(sample_size, seed_val=300, outcome_sd=10,
                              gps_spec=1, cova_spec=1):
+    """
+    Generates synthetic data
+
+    Inputs:
+        | sample_size: Number of required data samples.
+        | seed_val: seed value for generating reproducible data.
+        | outcome_sd: TBD
+        | gps_spec: TBD
+        | cova_spec: TBD
+
+    >>> md = generate_syn_pop(100)
+    >>> len(md.data)
+    100
+    """
     
 
     random.seed(seed_val)

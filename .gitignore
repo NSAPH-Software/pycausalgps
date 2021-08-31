@@ -111,3 +111,5 @@ bin/
 *.sqlite
 .vscode/*
 src/*
+
+.pytest_cache/*

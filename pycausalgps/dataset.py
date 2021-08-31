@@ -4,9 +4,7 @@ dataset.py
 The core module for the Dataset class.
 """
 
-
 import pandas as pd
-
 
 class Dataset:
     """ Dataset class """
