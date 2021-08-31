@@ -2,6 +2,8 @@ import random
 import numpy as np
 import pandas as pd
 
+from .dataset import Dataset
+
 
 def gen_synthetic_population(sample_size, seed_val=300, outcome_sd=10,
                              gps_spec=1, cova_spec=1):
@@ -99,7 +101,7 @@ def gen_synthetic_population(sample_size, seed_val=300, outcome_sd=10,
                                    'cf5':cf5,
                                    'cf6':cf6})
 
-    return simulated_data
+    return Dataset(simulated_data)
 
 if __name__ == "__main__":
     sim_data = gen_synthetic_population(1000, gps_spec=1)
