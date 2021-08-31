@@ -101,7 +101,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="git_branching.html">Git Branching Model</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Modules</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dataset-py">dataset.py</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Community</span></p>
 <ul>
@@ -201,7 +204,64 @@
 <div class="section" id="modules">
 <h1>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h1>
 <p>This section includes modules that are used in this project.</p>
+<span class="target" id="module-pycausalgps.dataset"></span><div class="section" id="dataset-py">
+<h2>dataset.py<a class="headerlink" href="#dataset-py" title="Permalink to this headline">¶</a></h2>
+<p>The core module for the Dataset class.</p>
+<dl class="py class">
+<dt id="pycausalgps.dataset.Dataset">
+<em class="property">class </em><code class="sig-prename descclassname">pycausalgps.dataset.</code><code class="sig-name descname">Dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycausalgps.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dataset class</p>
+<dl class="py method">
+<dt id="pycausalgps.dataset.Dataset.read_from_disk">
+<code class="sig-name descname">read_from_disk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">'csv'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/dataset.html#Dataset.read_from_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycausalgps.dataset.Dataset.read_from_disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads data from disk based on the provided format.</p>
+<dl>
+<dt>Inputs:</dt><dd><div class="line-block">
+<div class="line">path: path to the file. It should include the file name.</div>
+<div class="line">format: format of the file. Supported formats: csv</div>
 </div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pycausalgps.dataset.Dataset.write_to_disk">
+<code class="sig-name descname">write_to_disk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">'csv'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/dataset.html#Dataset.write_to_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycausalgps.dataset.Dataset.write_to_disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes data from disk based on the provided format.</p>
+<dl>
+<dt>Inputs:</dt><dd><div class="line-block">
+<div class="line">path: path to the file. It should include the file name.</div>
+<div class="line">format: format of the file. Supported formats: csv</div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span class="target" id="module-pycausalgps.gps_utils"></span><dl class="py function">
+<dt id="pycausalgps.gps_utils.generate_syn_pop">
+<code class="sig-prename descclassname">pycausalgps.gps_utils.</code><code class="sig-name descname">generate_syn_pop</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample_size</span></em>, <em class="sig-param"><span class="n">seed_val</span><span class="o">=</span><span class="default_value">300</span></em>, <em class="sig-param"><span class="n">outcome_sd</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">gps_spec</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">cova_spec</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps_utils.html#generate_syn_pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycausalgps.gps_utils.generate_syn_pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates synthetic data</p>
+<dl>
+<dt>Inputs:</dt><dd><div class="line-block">
+<div class="line">sample_size: Number of required data samples.</div>
+<div class="line">seed_val: seed value for generating reproducible data.</div>
+<div class="line">outcome_sd: TBD</div>
+<div class="line">gps_spec: TBD</div>
+<div class="line">cova_spec: TBD</div>
+</div>
+</dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">generate_syn_pop</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">mydata</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="go">1002</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<span class="target" id="module-pycausalgps.gps_plot_utils"></span></div>
 
 
            </div>
@@ -217,7 +277,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021.
+        &#169; Copyright Harvard University 2021.
 
     </p>
   </div>

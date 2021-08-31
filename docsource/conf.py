@@ -24,7 +24,7 @@ sys.path.append(os.path.join(os.path.dirname(__name__), '..'))
 # -- Project information -----------------------------------------------------
 
 project = 'pycausalgps'
-copyright = '2021'
+copyright = 'Harvard University 2021'
 author = 'Naeem Khoshnevis'
 
 # The full version, including alpha/beta/rc tags
