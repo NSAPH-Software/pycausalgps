@@ -1,6 +1,10 @@
 pycausalgps
 ===========
 
+.. image:: https://github.com/fasrc/pycausalgps/workflows/Python\ package/badge.svg?branch=main&event=push
+    :target: https://github.com/fasrc/pycausalgps/actions
+    :alt: Test Status
+
 *Causal Inference with Generalized Propensity Score*
 
 

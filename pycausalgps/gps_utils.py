@@ -1,7 +1,10 @@
+from logging import Logger
 import random
 import numpy as np
 import pandas as pd
 
+
+from .log import LOGGER
 from .dataset import Dataset
 
 
@@ -22,6 +25,7 @@ def generate_syn_pop(sample_size, seed_val=300, outcome_sd=10,
     100
     """
     
+    LOGGER.warning("Testing the logger.")
 
     random.seed(seed_val)
 
