@@ -88,4 +88,4 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # to inlcude private methods in the documentation. 
-napoleon_include_private_with_doc = True
+napoleon_include_private_with_doc = True 

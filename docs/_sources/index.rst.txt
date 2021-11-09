@@ -31,10 +31,10 @@ Short summary.
    :maxdepth: 2
    :caption: Developers
 
+   setup_env_dev
    documentation
    git_branching
    modules
-
 
 .. toctree::
    :glob:
@@ -43,6 +43,10 @@ Short summary.
    
    contact
    CHANGELOG
+
+
+
+
 
 
 Indices and tables

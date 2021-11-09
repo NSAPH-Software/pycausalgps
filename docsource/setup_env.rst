@@ -58,7 +58,7 @@ want to use the code inside `Jupyter Notebook <https://jupyter.org>`_
 - Step 5: Register the kernel on Jupyter Notebook:
 
 Make sure that you have activated the virtual environment (Please see Step 2). 
-Next, install *ipykernel* (read more `here<https://ipython.readthedocs.io/en/stable/install/kernel_install.html#kernels-for-different-environments>`_):
+Next, install *ipykernel* (read more `here <https://ipython.readthedocs.io/en/stable/install/kernel_install.html#kernels-for-different-environments>`_):
 
 .. code-block:: console
 
