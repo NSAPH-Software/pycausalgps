@@ -25,8 +25,6 @@ def generate_syn_pop(sample_size, seed_val=300, outcome_sd=10,
     100
     """
     
-    LOGGER.warning("Testing the logger.")
-
     random.seed(seed_val)
 
     mean = [0,0,0,0]
@@ -122,5 +120,5 @@ def generate_syn_pop(sample_size, seed_val=300, outcome_sd=10,
     return Dataset(simulated_data)
 
 if __name__ == "__main__":
-    sim_data = gen_synthetic_population(1000, gps_spec=1)
+    sim_data = generate_syn_pop(1000, gps_spec=1)
     print(sim_data)
