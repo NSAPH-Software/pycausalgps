@@ -5,7 +5,7 @@ The core module for the ProjectController class.
 """
 
 
-from .database import DataBase
+from .database import Database
 from .project import Project
 
 import pickle
@@ -23,7 +23,7 @@ class ProjectController:
     def __init__(self, db_path):
 
             self.db_path = db_path
-            self.db = DataBase(dbname=self.db_path, cache_size=1000)
+            self.db = Database(dbname=self.db_path, cache_size=1000)
             self.connected = True
             self.projects_list = list()
             self.update_project_list()
@@ -40,22 +40,31 @@ class ProjectController:
 
         p_obj = Project(pr_name=project_name, db_path=self.db_path)
         c_pr = self.db.get_value("PROJECTS_LIST")
-        pickle.dumps(p_obj)
         if p_obj.hash_value in c_pr:
-            print("Project has been already submitted to the database."+\
+            print("Project has been already submitted to the database. "+\
                   "Ignoring this command.")
         else:
             c_pr.append(p_obj.hash_value)      
             self.db.set_value("PROJECTS_LIST", c_pr)
             self.projects_list.append(p_obj.hash_value)
             self.db.set_value(p_obj.hash_value, p_obj)
+            print(f"Project {project_name} has been successfully added to the database.")
 
     def remove_project(self, project_name):
-        pass
+        c_pr = self.db.get_value("PROJECTS_LIST")
+        p_obj = Project(pr_name=project_name, db_path=self.db_path)
+        if p_obj.hash_value in c_pr:
+            c_pr.remove(p_obj.hash_value)
+            self.db.set_value("PROJECTS_LIST", c_pr)
+            del p_obj
+            print(f"Project '{project_name}' has been successfully deleted.")
+        else:
+            print(f"Project '{project_name}' is not defined. Ignoring this command.")
 
     def summary(self):
         
         try:
+           self.update_project_list()
            print(f"Number of projects in the database: "+ 
                  f"{len(self.projects_list)}\n")
            for project in self.projects_list:
