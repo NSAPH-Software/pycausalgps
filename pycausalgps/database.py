@@ -4,8 +4,10 @@ database.py
 The core module for the Database class.
 """
 
+from linecache import cache
 from sqlitedict import SqliteDict
 from collections import OrderedDict
+from itertools import islice
 
 from .log import LOGGER
 
@@ -15,17 +17,15 @@ class Database:
 
     _instance = None
 
-
-    def __new__(cls, dbname, cache_size):
+    def __new__(cls, dbname):
         if not cls._instance:
             cls._instance = super(Database, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, dbname, cache_size = 10000):
+    def __init__(self, dbname):
 
             self.name = f'{dbname}'
-            self.connected = True
-            self.cache_size = cache_size
+            self.cache_size = 1000
             self.cache = OrderedDict()
 
     def __str__(self):
@@ -116,6 +116,17 @@ class Database:
         else:
             return value
 
+    def cache_summary(self):
+        print(f"Current cache size: {self.cache_size}")
+
+    def update_cache_size(self, new_size):
+        self.cache_size = new_size
+        if self.cache_size > new_size:
+            keys = list(islice(self.cache, new_size))
+            tmp_cache = OrderedDict()
+            for key in keys:
+                tmp_cache[key] = self.cache[key]
+            self.cache = tmp_cache
 
     def close_db(self):
         """ Commits changes to the database, closes the database, clears the 
@@ -123,5 +134,4 @@ class Database:
         """
 
         self.cache = None
-        self.connected = False
         LOGGER.info(f"Database ({self.name}) is closed.")
