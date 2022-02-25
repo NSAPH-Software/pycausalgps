@@ -4,8 +4,6 @@ database.py
 The core module for the Database class.
 """
 
-from linecache import cache
-from logging import Logger
 from sqlitedict import SqliteDict
 from collections import OrderedDict
 from itertools import islice
@@ -24,10 +22,11 @@ class Database:
             self.name = db_path
             
 
-            if Database._cache is None:
-                print("The cashe initiation command was run.")
+            if Database._cache is None:       
                 Database._cache_size = 1000
                 Database._cache = OrderedDict()
+                LOGGER.debug(f"In memory cache has been initiated"+\
+                             f"with size: {Database._cache_size}.")
 
     def __str__(self):
         return f"SQLitedict Database: {self.name}"
@@ -120,7 +119,7 @@ class Database:
             return value
 
     def cache_summary(self):
-        print(f"Current cache size: {Database._cache_size}")
+        print(f"Current cache upper limit: {Database._cache_size}")
 
     def update_cache_size(self, new_size):
         Database._cache_size = new_size
@@ -135,6 +134,5 @@ class Database:
         """ Commits changes to the database, closes the database, clears the 
         cache.
         """
-
         Database._cache = None
         LOGGER.info(f"Database ({self.name}) is closed.")
