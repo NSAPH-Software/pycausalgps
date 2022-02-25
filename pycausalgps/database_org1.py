@@ -5,7 +5,6 @@ The core module for the Database class.
 """
 
 from linecache import cache
-from logging import Logger
 from sqlitedict import SqliteDict
 from collections import OrderedDict
 from itertools import islice
@@ -16,24 +15,24 @@ from .log import LOGGER
 class Database:
     """ Database class"""
 
-    _cache = None
-    _cache_size = None 
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(Database, cls).__new__(cls)
+        return cls._instance
 
     def __init__(self, db_path):
 
             self.name = db_path
-            
-
-            if Database._cache is None:
-                print("The cashe initiation command was run.")
-                Database._cache_size = 1000
-                Database._cache = OrderedDict()
+            self.cache_size = 1000
+            self.cache = OrderedDict()
 
     def __str__(self):
         return f"SQLitedict Database: {self.name}"
 
     def __repr__(self):
-        return f"Database({self.name},{Database._cache_size})"
+        return f"Database({self.name},{self.cache_size})"
 
     def set_value(self, key, value):
         """ 
@@ -48,7 +47,7 @@ class Database:
         try:
             db = SqliteDict(self.name, autocommit=True)
             db[key] = value
-            del Database._cache[key]
+            del self.cache[key]
         except KeyError:
             LOGGER.debug(f"Tried to delete non-existing {key} on the cache.")
         except Exception:
@@ -68,7 +67,7 @@ class Database:
             db = SqliteDict(self.name, autocommit=True)
             del db[key]   
             try: 
-                del Database._cache[key]
+                del self.cache[key]
             except:
                 pass         
             LOGGER.debug(f"Value {key} is removed from database.")
@@ -91,9 +90,8 @@ class Database:
         """
         value = None
         try:
-            value = Database._cache[key]
+            value = self.cache[key]
             LOGGER.debug(f"Key: {key}. Value is loaded from the cache.")
-            LOGGER.debug(f"In memory cache size: {len(Database._cache)}")
         except:
             LOGGER.debug(f"Key: {key}. Value is not found in the cache.")
 
@@ -103,11 +101,11 @@ class Database:
                 db = SqliteDict(self.name, autocommit=True)
                 tmp = db[key]
                 #print(f"Database value for key: {key} is: {tmp}")
-                if len(Database._cache) >  Database._cache_size:
-                    Database._cache.popitem(last=False)
+                if len(self.cache) >  self.cache_size:
+                    self.cache.popitem(last=False)
                     LOGGER.debug(f"cache size is more than limit"
-                     f"{Database._cache_size}. An item removed, and new item added.")
-                Database._cache[key] = tmp
+                     f"{self.cache_size}. An item removed, and new item added.")
+                self.cache[key] = tmp
                 return tmp
             except Exception:
                 LOGGER.debug(f"The requested key ({key}) is not in the"
@@ -120,21 +118,21 @@ class Database:
             return value
 
     def cache_summary(self):
-        print(f"Current cache size: {Database._cache_size}")
+        print(f"Current cache size: {self.cache_size}")
 
     def update_cache_size(self, new_size):
-        Database._cache_size = new_size
-        if Database._cache_size > new_size:
-            keys = list(islice(Database._cache, new_size))
+        self.cache_size = new_size
+        if self.cache_size > new_size:
+            keys = list(islice(self.cache, new_size))
             tmp_cache = OrderedDict()
             for key in keys:
-                tmp_cache[key] = Database._cache[key]
-            Database._cache = tmp_cache
+                tmp_cache[key] = self.cache[key]
+            self.cache = tmp_cache
 
     def close_db(self):
         """ Commits changes to the database, closes the database, clears the 
         cache.
         """
 
-        Database._cache = None
+        self.cache = None
         LOGGER.info(f"Database ({self.name}) is closed.")
