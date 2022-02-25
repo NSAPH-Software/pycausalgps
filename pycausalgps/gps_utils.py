@@ -5,7 +5,6 @@ import pandas as pd
 
 
 from .log import LOGGER
-from .dataset import Dataset
 
 
 def generate_syn_pop(sample_size, seed_val=300, outcome_sd=10,
@@ -117,7 +116,7 @@ def generate_syn_pop(sample_size, seed_val=300, outcome_sd=10,
                                    'cf5':cf5,
                                    'cf6':cf6})
 
-    return Dataset(simulated_data)
+    return simulated_data
 
 if __name__ == "__main__":
     sim_data = generate_syn_pop(1000, gps_spec=1)

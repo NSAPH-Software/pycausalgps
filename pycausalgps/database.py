@@ -65,17 +65,24 @@ class Database:
         """
         try:
             db = SqliteDict(self.name, autocommit=True)
+            reserved_keys = db["RESERVED_KEYS"]
+            if key in reserved_keys:
+                LOGGER.debug(f"An attempt to remove {key} was recorded.")
+                print("Reserved keys are not removable.")
+                return
+            
             del db[key]   
             try: 
                 del Database._cache[key]
-            except:
-                pass         
+            except Exception as e:
+                print(e)         
             LOGGER.debug(f"Value {key} is removed from database.")
+        except KeyError:
+            LOGGER.warning(f"Tried to delete '{key}' on the database."
+             " No such keys on the database.")
+        finally:
             db.commit()
             db.close()
-        except KeyError:
-            LOGGER.warning(f"Tried to delete {key} on the database."
-             "Something went wrong.")
 
     def get_value(self, key):
         """ Returns the value in the following order:
@@ -98,10 +105,8 @@ class Database:
 
         if not value:
             try:
-                print(f"Database name: {self.name}")
                 db = SqliteDict(self.name, autocommit=True)
                 tmp = db[key]
-                #print(f"Database value for key: {key} is: {tmp}")
                 if len(Database._cache) >  Database._cache_size:
                     Database._cache.popitem(last=False)
                     LOGGER.debug(f"cache size is more than limit"
