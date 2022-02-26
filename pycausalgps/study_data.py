@@ -111,18 +111,3 @@ class StudyData:
         GPS object."""
 
         pass
-
-          
-
-
-
-
-
-    
- 
-
-
-
-
-
-

@@ -106,5 +106,3 @@ class ProjectController:
             return self.db.get_value(pr_name_dict[pr_name])
         else:
             print("Project is not defined.")
-
-
