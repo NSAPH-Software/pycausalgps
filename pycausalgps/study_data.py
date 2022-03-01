@@ -8,6 +8,8 @@ import hashlib
 from logging import Logger
 import pickle
 
+from sklearn.metrics import classification_report
+
 from pycausalgps.log import LOGGER
 
 class StudyData:
@@ -16,7 +18,8 @@ class StudyData:
     pr_db = None
     processing_labels = dict()
     label_types = {
-        'gps_xgb': {'ntrees': 10}
+        'gps_xgb': {'max_depth': 'Maximum depth of a tree (default = 6).',
+                    'eta': 'Learning rate (default = 0.3).'}
     }
 
 
@@ -70,11 +73,26 @@ class StudyData:
         except Exception as e:
             print(e)
 
+
+
+    @classmethod
+    def valid_processing_labels(cls):
+        if cls.label_types:
+            for item in cls.label_types:
+                print(f"{item} --> {cls.label_types[item]}")
+
+    @classmethod
+    def current_processing_labels(cls):
+        if cls.processing_labels:
+            for item in cls.processing_labels:
+                print(f"{item} --> {cls.processing_labels[item]}")
+
+
     @classmethod
     def add_processing_label(cls, label_name, label_type, params):
         """ Creates a processing label"""
 
-        if label_name in cls.processing_label:
+        if label_name in cls.processing_labels:
             LOGGER.warning(f"Label name: {label_name} has been used."+\
                            f"Try another name.")
             return
