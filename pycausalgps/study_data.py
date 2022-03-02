@@ -18,7 +18,8 @@ class StudyData:
     pr_db = None
     processing_labels = dict()
     label_types = {
-        'gps_xgb': {'max_depth': 'Maximum depth of a tree (default = 6).',
+        'gps_xgb': {'approach' : 'xgboost',
+                    'max_depth': 'Maximum depth of a tree (default = 6).',
                     'eta': 'Learning rate (default = 0.3).'}
     }
 
@@ -122,10 +123,24 @@ class StudyData:
         cls.processing_labels[label_name] = [label_type, params]
 
 
-
-    @staticmethod
-    def _apply(study_data, label_name):
+    def _apply(self, label_name):
         """ Applies the requested processing label on the record. Returns a 
         GPS object."""
 
-        pass
+        if label_name not in StudyData.processing_labels:
+            LOGGER.warning(f"Processing lable: '{label_name}' is not defined.")
+
+        # def extract_params(params):
+        #     return params
+
+        # p = extract_params(**StudyData.processing_labels[label_name][1])
+        # print(p)
+
+        # collect parameteres for the processing label
+        params = StudyData.processing_labels[label_name][1]
+
+        # create a GPS object and store it gps values and database.
+
+        # gps_obj = GPS(train = self._confounder, target = self._exposure)
+
+     
