@@ -134,3 +134,18 @@ class Project:
             for item in self.study_data:
                 st_data = self.db.get_value(item)
                 print(st_data.st_d_name)
+
+    def plot_gps(self, study_data_name, processing_param):
+
+        # step one get data.
+        # - which will end up retireving the GPSobj  
+        # - Getting data flow:
+        #    - Pick study data and retyireve it from database
+        #    - Based on study data hash and processing_params hash look for GPSobj
+        #    - If not found, compute GPS and put it in the database.
+        #    - Else retreive it. 
+        # step two print value.
+        # - GPSobj.plot()
+        pass
+
+
