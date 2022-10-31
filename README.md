@@ -1,6 +1,13 @@
-# causalGPS
+# pycausalgps
 
-Short summary
+Causal Inference with Generalized Propensity Score
+
+## Setting Up Environment
+
+
+## 
+
+
 
 
 ## Documentation

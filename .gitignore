@@ -113,3 +113,8 @@ bin/
 src/*
 
 .pytest_cache/*
+scripts/*
+scripts2/*
+
+*.db
+

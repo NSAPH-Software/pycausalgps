@@ -93,6 +93,8 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="setup_env.html">Setting Up Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gps.html">Estimating Generalized Propensity Score (GPS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gps.html#computing-gps-values">Computing GPS Values</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
@@ -100,7 +102,11 @@
 <li class="toctree-l1"><a class="reference internal" href="setup_env_dev.html">Development Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="git_branching.html">Git Branching Model</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Modules</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#gps-py">gps.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#database-py">database.py</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Community</span></p>
 <ul>
@@ -199,7 +205,7 @@
 <p>This section includes modules that are used in this project.</p>
 <span class="target" id="module-pycausalgps.gps_utils"></span><dl class="py function">
 <dt class="sig sig-object py" id="pycausalgps.gps_utils.generate_syn_pop">
-<span class="sig-prename descclassname"><span class="pre">pycausalgps.gps_utils.</span></span><span class="sig-name descname"><span class="pre">generate_syn_pop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outcome_sd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gps_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cova_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps_utils.html#generate_syn_pop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps_utils.generate_syn_pop" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pycausalgps.gps_utils.</span></span><span class="sig-name descname"><span class="pre">generate_syn_pop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed_val</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outcome_sd</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gps_spec</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cova_spec</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.core.frame.DataFrame</span></span></span><a class="reference internal" href="_modules/pycausalgps/gps_utils.html#generate_syn_pop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps_utils.generate_syn_pop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates synthetic data</p>
 <dl>
 <dt>Inputs:</dt><dd><div class="line-block">
@@ -212,13 +218,183 @@
 </dd>
 </dl>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">generate_syn_pop</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">md</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">md</span><span class="p">)</span>
 <span class="go">100</span>
 </pre></div>
 </div>
 </dd></dl>
 
-<span class="target" id="module-pycausalgps.gps_plot_utils"></span></section>
+<span class="target" id="module-pycausalgps.gps"></span><section id="gps-py">
+<h2>gps.py<a class="headerlink" href="#gps-py" title="Permalink to this headline">¶</a></h2>
+<p>The core module for the GPS class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pycausalgps.gps.ComputeGPS">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pycausalgps.gps.</span></span><span class="sig-name descname"><span class="pre">ComputeGPS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#ComputeGPS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.ComputeGPS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a GPS object based on provided parameters.</p>
+<p>GPS object supports continutes treatment with numerical or categorical
+confounders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pandas DataFrame</em>) – The dataframe represents confounders, which in the prediction model
+represents input data. Columns should be either
+numerical or categorical.</p></li>
+<li><p><strong>y</strong> (<em>pandas DataFrame</em>) – The dataframe represetns treatment, which in the prediction model
+represents target data.</p></li>
+<li><p><strong>params</strong> (<em>dictionary</em>) – Includes dictionary of parameters that are required for different
+approaches. The following parameters should be included:</p></li>
+<li><p><strong>gps_model</strong> – Indicates the type of model for estimating gps value. Available models
+are: parametric, non-parametric.</p></li>
+<li><p><strong>approach</strong> – <dl class="simple">
+<dt>Prediction model approach. Implemented model:</dt><dd><ul>
+<li><p>xgboost</p></li>
+</ul>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Other parameters in params input dictionary is related to the selected
+<em>gps_model</em> and <em>approach</em>. The following table represents required parameters
+for xgboost.</p>
+<blockquote>
+<div><dl class="simple">
+<dt><strong>test_size</strong>:</dt><dd><p>The percentage of input data that is used for testing</p>
+</dd>
+<dt><strong>n_estimator</strong>:</dt><dd><p>Number of xgboost estimator</p>
+</dd>
+<dt><strong>learning_rate</strong>:</dt><dd><p>Learning rate of xgboost.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycausalgps.gps_utils</span>  <span class="kn">import</span> <span class="n">generate_syn_pop</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">generate_syn_pop</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;cf5&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cf5</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;approach&#39;</span><span class="p">:</span><span class="s2">&quot;xgboost&quot;</span><span class="p">,</span> <span class="s1">&#39;gps_model&#39;</span><span class="p">:</span> <span class="s1">&#39;parametric&#39;</span><span class="p">,</span> <span class="s1">&#39;test_size&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span><span class="s1">&#39;n_estimator&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;learning_rate&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">conf</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;cf1&quot;</span><span class="p">,</span><span class="s2">&quot;cf2&quot;</span><span class="p">,</span><span class="s2">&quot;cf3&quot;</span><span class="p">,</span><span class="s2">&quot;cf4&quot;</span><span class="p">,</span><span class="s2">&quot;cf5&quot;</span><span class="p">,</span><span class="s2">&quot;cf6&quot;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">treat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;treat&quot;</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gp</span> <span class="o">=</span> <span class="n">ComputeGPS</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">conf</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">treat</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gp</span><span class="o">.</span><span class="n">compute_gps</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">gp</span><span class="o">.</span><span class="n">gps</span><span class="p">)</span>
+<span class="go">500</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.gps.ComputeGPS.compute_gps">
+<span class="sig-name descname"><span class="pre">compute_gps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#ComputeGPS.compute_gps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.ComputeGPS.compute_gps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns Generalized Propensity Score (GPS) value based on input
+parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.gps.ComputeGPS.xgb_train_it">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">xgb_train_it</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#ComputeGPS.xgb_train_it"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.ComputeGPS.xgb_train_it" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates XGBoost regressor model and returns predicted value for
+all input data.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<span class="target" id="module-pycausalgps.database"></span><section id="database-py">
+<h2>database.py<a class="headerlink" href="#database-py" title="Permalink to this headline">¶</a></h2>
+<p>The core module for the Database class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pycausalgps.database.Database">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pycausalgps.database.</span></span><span class="sig-name descname"><span class="pre">Database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/database.html#Database"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.database.Database" title="Permalink to this definition">¶</a></dt>
+<dd><p>Database class</p>
+<dl class="field-list simple">
+<dt class="field-odd">Db_path</dt>
+<dd class="field-odd"><p>str
+Path to the database file.</p>
+</dd>
+</dl>
+<p>The Database class takes care of the access to the database. It is a wrapper class for the sqlitedict package. The Database class has a in-memory cache to speed up the access to the recentely used values. User can update the cache size.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycausalgps.database</span> <span class="kn">import</span> <span class="n">Database</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span> <span class="o">=</span> <span class="n">Database</span><span class="p">(</span><span class="s2">&quot;test.db&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s2">&quot;key1&quot;</span><span class="p">,</span> <span class="s2">&quot;value1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s2">&quot;key1&quot;</span><span class="p">)</span>
+<span class="go">&#39;value1&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">delete_value</span><span class="p">(</span><span class="s2">&quot;key1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s2">&quot;key1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">update_cache_size</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db</span><span class="o">.</span><span class="n">close_db</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.database.Database._init_reserved_keys">
+<span class="sig-name descname"><span class="pre">_init_reserved_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/database.html#Database._init_reserved_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.database.Database._init_reserved_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the reserved keys in the database.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.database.Database.cache_summary">
+<span class="sig-name descname"><span class="pre">cache_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/database.html#Database.cache_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.database.Database.cache_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the summary of the cache. It includes the length, limit and
+human readible cache size.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.database.Database.close_db">
+<span class="sig-name descname"><span class="pre">close_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/database.html#Database.close_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.database.Database.close_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commits changes to the database, closes the database, clears the
+cache.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.database.Database.delete_value">
+<span class="sig-name descname"><span class="pre">delete_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/database.html#Database.delete_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.database.Database.delete_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the key, and its value from both in-memory dictionary and
+on-disk database. If the key is not found, simply ignores it.</p>
+<p>Inputs:
+| key: hash value (generated by the package)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.database.Database.get_value">
+<span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/database.html#Database.get_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.database.Database.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value in the following order:</p>
+<div class="line-block">
+<div class="line">1) It will look for the value in the cache and return it, if not found</div>
+<div class="line">2) will look for the value in the disk and return it, if not found</div>
+<div class="line">3) will return None.</div>
+</div>
+<p>Inputs:
+| key: hash value (generated by the package)</p>
+<p>Outputs:
+| If found, value, else returns None.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.database.Database.set_value">
+<span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/database.html#Database.set_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.database.Database.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the key and given value in the database. If the key exists,
+it will override the value. In that case, it will remove the key from
+the in-memory dictionary. It will be loaded again with the get_value
+command if needed.
+Inputs:
+| key: hash value (generated by the package)
+| value: Any python object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.database.Database.update_cache_size">
+<span class="sig-name descname"><span class="pre">update_cache_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/database.html#Database.update_cache_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.database.Database.update_cache_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the cache size. If the new size is smaller than the current size,
+it will remove the oldest items from the cache.
+Inputs:
+| new_size: new cache size (this is the number of items, not the size on the disk)</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
 
 
            </div>

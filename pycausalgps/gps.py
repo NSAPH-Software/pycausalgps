@@ -32,17 +32,13 @@ class ComputeGPS:
         represents target data. 
     params: dictionary
         Includes dictionary of parameters that are required for different
-        approaches. 
-
-        **gps_model**: 
-           Indicates the type of model for estimating gps value. Available models
-           are: 
-               - parametric
-               - non-parametric.
-
-        **approach**: 
-            Prediction model approach. Implemented model:
-               - xgboost
+        approaches. The following parameters should be included:
+    gps_model: 
+        Indicates the type of model for estimating gps value. Available models
+        are: parametric, non-parametric.
+    approach: 
+        Prediction model approach. Implemented model:
+            - xgboost
 
     Notes
     -----
@@ -62,15 +58,13 @@ class ComputeGPS:
 
     Examples
     --------
-
+    >>> from pycausalgps.gps_utils  import generate_syn_pop
     >>> data = generate_syn_pop(500)
     >>> data['cf5'] = data.cf5.astype('category')
-    >>> params = {'approach':"xgboost", 'gps_model': 'parametric', 
-    >>>           'test_size': 0.2, 'random_state': 1,
-    >>>           'n_estimator': 1000, 'learning_rate': 0.01}
+    >>> params = {'approach':"xgboost", 'gps_model': 'parametric', 'test_size': 0.2, 'random_state': 1,'n_estimator': 1000, 'learning_rate': 0.01}
     >>> conf = data[["cf1","cf2","cf3","cf4","cf5","cf6"]]
     >>> treat = data[["treat"]]
-    >>> gp = GPS(X=conf, y=treat, params=params)
+    >>> gp = ComputeGPS(X=conf, y=treat, params=params)
     >>> gp.compute_gps()
     >>> len(gp.gps)
     500
@@ -83,6 +77,7 @@ class ComputeGPS:
         self.y = y
         self.params = params
         self.gps = None
+        self.training_report = None
 
 
     def compute_gps(self):
@@ -164,12 +159,15 @@ class ComputeGPS:
         prediction = xgb.predict(X_val)
         r_s = r2_score(prediction, y_val)
         rmse = np.sqrt(mean_squared_error(prediction, y_val))
-        print(f"R2 score: {r_s}, RMSE: {rmse}")
+        
+        training_report = {'r2_score': r_s, 'rmse': rmse}
+
+        #print(f"R2 score: {r_s}, RMSE: {rmse}")
 
         # Fit on entire data
         predict_all = xgb.predict(input)
 
-        return(predict_all)
+        return(predict_all, training_report)
 
 
 class GPSObject:

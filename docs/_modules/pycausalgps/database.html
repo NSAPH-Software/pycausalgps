@@ -1,0 +1,429 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pycausalgps.database &mdash; pycausalgps 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pycausalgps
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Researchers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../setup_env.html">Setting Up Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gps.html">Estimating Generalized Propensity Score (GPS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../gps.html#computing-gps-values">Computing GPS Values</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../setup_env_dev.html">Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../git_branching.html">Git Branching Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contact.html">Contact Us</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../CHANGELOG.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pycausalgps</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pycausalgps.database</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pycausalgps.database</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">database.py</span>
+<span class="sd">===========</span>
+<span class="sd">The core module for the Database class.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">islice</span>
+<span class="kn">from</span> <span class="nn">sqlitedict</span> <span class="kn">import</span> <span class="n">SqliteDict</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span> <span class="nn">pycausalgps.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
+<span class="kn">from</span> <span class="nn">pycausalgps.utils</span> <span class="kn">import</span> <span class="n">human_readible_size</span>
+
+<div class="viewcode-block" id="Database"><a class="viewcode-back" href="../../modules.html#pycausalgps.database.Database">[docs]</a><span class="k">class</span> <span class="nc">Database</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Database class</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+
+<span class="sd">    :db_path: str</span>
+<span class="sd">        Path to the database file.  </span>
+
+<span class="sd">    The Database class takes care of the access to the database. It is a wrapper class for the sqlitedict package. The Database class has a in-memory cache to speed up the access to the recentely used values. User can update the cache size. </span>
+
+<span class="sd">    Examples:  </span>
+<span class="sd">    ---------</span>
+
+<span class="sd">    &gt;&gt;&gt; from pycausalgps.database import Database  </span>
+<span class="sd">    &gt;&gt;&gt; db = Database(&quot;test.db&quot;)  </span>
+<span class="sd">    &gt;&gt;&gt; db.set_value(&quot;key1&quot;, &quot;value1&quot;)  </span>
+<span class="sd">    &gt;&gt;&gt; db.get_value(&quot;key1&quot;)  </span>
+<span class="sd">    &#39;value1&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; db.delete_value(&quot;key1&quot;)  </span>
+<span class="sd">    &gt;&gt;&gt; db.get_value(&quot;key1&quot;)  </span>
+<span class="sd">    &gt;&gt;&gt; db.update_cache_size(100)  </span>
+<span class="sd">    &gt;&gt;&gt; db.close_db()  </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_cache</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_cache_size</span> <span class="o">=</span> <span class="kc">None</span> 
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        Initializes the database.</span>
+<span class="sd">        Inputs:</span>
+<span class="sd">            | db_path: path to the database file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">db_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_reserved_keys</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">Database</span><span class="o">.</span><span class="n">_cache</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>       
+            <span class="n">Database</span><span class="o">.</span><span class="n">_cache_size</span> <span class="o">=</span> <span class="mi">1000</span>
+            <span class="n">Database</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In memory cache has been initiated &quot;</span><span class="o">+</span>\
+                         <span class="sa">f</span><span class="s2">&quot;with size: </span><span class="si">{</span><span class="n">Database</span><span class="o">.</span><span class="n">_cache_size</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;SQLitedict Database: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Database(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">Database</span><span class="o">.</span><span class="n">_cache_size</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+<div class="viewcode-block" id="Database.set_value"><a class="viewcode-back" href="../../modules.html#pycausalgps.database.Database.set_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        Sets the key and given value in the database. If the key exists,</span>
+<span class="sd">        it will override the value. In that case, it will remove the key from</span>
+<span class="sd">        the in-memory dictionary. It will be loaded again with the get_value</span>
+<span class="sd">        command if needed.</span>
+<span class="sd">        Inputs:</span>
+<span class="sd">        | key: hash value (generated by the package)</span>
+<span class="sd">        | value: Any python object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">db</span> <span class="o">=</span> <span class="n">SqliteDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">db</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">del</span> <span class="n">Database</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tried to delete non-existing </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> on the cache.&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tried to set </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> on the database.&quot;</span>
+             <span class="s2">&quot;Something went wrong.&quot;</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> </div>
+
+<div class="viewcode-block" id="Database.delete_value"><a class="viewcode-back" href="../../modules.html#pycausalgps.database.Database.delete_value">[docs]</a>    <span class="k">def</span> <span class="nf">delete_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Deletes the key, and its value from both in-memory dictionary and</span>
+<span class="sd">        on-disk database. If the key is not found, simply ignores it.</span>
+<span class="sd">        </span>
+<span class="sd">        Inputs:</span>
+<span class="sd">        | key: hash value (generated by the package)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">db</span> <span class="o">=</span> <span class="n">SqliteDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">reserved_keys</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;RESERVED_KEYS&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">reserved_keys</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An attempt to remove </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> was recorded.&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> is a Reserved key. Reserved keys are not removable.&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+            
+            <span class="k">del</span> <span class="n">db</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>   
+            <span class="k">try</span><span class="p">:</span> 
+                <span class="k">del</span> <span class="n">Database</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>         
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Value </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> is removed from database.&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tried to delete &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; on the database.&quot;</span>
+             <span class="s2">&quot; No such keys on the database.&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Database.get_value"><a class="viewcode-back" href="../../modules.html#pycausalgps.database.Database.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the value in the following order:</span>
+<span class="sd">        </span>
+<span class="sd">        | 1) It will look for the value in the cache and return it, if not found</span>
+<span class="sd">        | 2) will look for the value in the disk and return it, if not found</span>
+<span class="sd">        | 3) will return None.</span>
+<span class="sd">        </span>
+<span class="sd">        Inputs:</span>
+<span class="sd">        | key: hash value (generated by the package)</span>
+
+<span class="sd">        Outputs:</span>
+<span class="sd">        | If found, value, else returns None.         </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">Database</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Key: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">. Value is loaded from the cache.&quot;</span><span class="p">)</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In memory cache size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">Database</span><span class="o">.</span><span class="n">_cache</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Key: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">. Value is not found in the cache.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">db</span> <span class="o">=</span> <span class="n">SqliteDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">Database</span><span class="o">.</span><span class="n">_cache</span><span class="p">)</span> <span class="o">&gt;</span>  <span class="n">Database</span><span class="o">.</span><span class="n">_cache_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">Database</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">popitem</span><span class="p">(</span><span class="n">last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cache size is more than limit&quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Database</span><span class="o">.</span><span class="n">_cache_size</span><span class="si">}</span><span class="s2">. An item removed, and new item added.&quot;</span><span class="p">)</span>
+                <span class="n">Database</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+                <span class="k">return</span> <span class="n">tmp</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The requested key (</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">) is not in the&quot;</span>
+                 <span class="s2">&quot; database. Returns None.&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+                <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="Database.cache_summary"><a class="viewcode-back" href="../../modules.html#pycausalgps.database.Database.cache_summary">[docs]</a>    <span class="k">def</span> <span class="nf">cache_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        Returns the summary of the cache. It includes the length, limit and </span>
+<span class="sd">        human readible cache size.  </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Cache length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">Database</span><span class="o">.</span><span class="n">_cache</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;Cache limit: </span><span class="si">{</span><span class="n">Database</span><span class="o">.</span><span class="n">_cache_size</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;Cache size: </span><span class="si">{</span><span class="n">human_readible_size</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">getsizeof</span><span class="p">(</span><span class="n">Database</span><span class="o">.</span><span class="n">_cache</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span></div>
+      
+
+
+<div class="viewcode-block" id="Database.update_cache_size"><a class="viewcode-back" href="../../modules.html#pycausalgps.database.Database.update_cache_size">[docs]</a>    <span class="k">def</span> <span class="nf">update_cache_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the cache size. If the new size is smaller than the current size,</span>
+<span class="sd">        it will remove the oldest items from the cache.</span>
+<span class="sd">        Inputs:</span>
+<span class="sd">        | new_size: new cache size (this is the number of items, not the size on the disk)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Database</span><span class="o">.</span><span class="n">_cache_size</span> <span class="o">=</span> <span class="n">new_size</span>
+        <span class="k">if</span> <span class="n">Database</span><span class="o">.</span><span class="n">_cache_size</span> <span class="o">&gt;</span> <span class="n">new_size</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">islice</span><span class="p">(</span><span class="n">Database</span><span class="o">.</span><span class="n">_cache</span><span class="p">,</span> <span class="n">new_size</span><span class="p">))</span>
+            <span class="n">tmp_cache</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                <span class="n">tmp_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Database</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">Database</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="n">tmp_cache</span></div>
+
+<div class="viewcode-block" id="Database.close_db"><a class="viewcode-back" href="../../modules.html#pycausalgps.database.Database.close_db">[docs]</a>    <span class="k">def</span> <span class="nf">close_db</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Commits changes to the database, closes the database, clears the </span>
+<span class="sd">        cache.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Database</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Database (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">) is closed.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Database._init_reserved_keys"><a class="viewcode-back" href="../../modules.html#pycausalgps.database.Database._init_reserved_keys">[docs]</a>    <span class="k">def</span> <span class="nf">_init_reserved_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initializes the reserved keys in the database. &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">db</span> <span class="o">=</span> <span class="n">SqliteDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">db</span><span class="p">[</span><span class="s2">&quot;RESERVED_KEYS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;RESERVED_KEYS&quot;</span><span class="p">,</span> <span class="s2">&quot;PROJECTS_LIST&quot;</span><span class="p">]</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reserved keys are initialized.&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reserved keys are already initialized.&quot;</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">Database</span><span class="p">(</span><span class="s2">&quot;test.db&quot;</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s2">&quot;myvalue_1&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">))</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">delete_value</span><span class="p">(</span><span class="s2">&quot;myvalue_1&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s2">&quot;myvalue_1&quot;</span><span class="p">))</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">cache_summary</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">update_cache_size</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">cache_summary</span><span class="p">()</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">close_db</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright Harvard University 2021
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

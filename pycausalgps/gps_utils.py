@@ -1,4 +1,3 @@
-from logging import Logger
 import random
 import numpy as np
 import pandas as pd
@@ -7,8 +6,8 @@ import pandas as pd
 from .log import LOGGER
 
 
-def generate_syn_pop(sample_size, seed_val=300, outcome_sd=10,
-                             gps_spec=1, cova_spec=1):
+def generate_syn_pop(sample_size: int, seed_val:int, outcome_sd:int,
+                             gps_spec:int, cova_spec:int) -> pd.DataFrame:
     """
     Generates synthetic data
 
@@ -20,7 +19,7 @@ def generate_syn_pop(sample_size, seed_val=300, outcome_sd=10,
         | cova_spec: TBD
 
     >>> md = generate_syn_pop(100)
-    >>> len(md.data)
+    >>> len(md)
     100
     """
     
@@ -108,7 +107,8 @@ def generate_syn_pop(sample_size, seed_val=300, outcome_sd=10,
         raise ValueError(f"cova_spec:  {cova_spec} is not a valid value.")
 
     
-    simulated_data = pd.DataFrame({'Y':Y, 'treat':treat,
+    simulated_data = pd.DataFrame({'Y':Y, 
+                                   'treat':treat,
                                    'cf1':cf[0,:],
                                    'cf2':cf[1,:],
                                    'cf3':cf[2,:],

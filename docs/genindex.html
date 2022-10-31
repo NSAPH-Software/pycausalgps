@@ -90,6 +90,8 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="setup_env.html">Setting Up Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gps.html">Estimating Generalized Propensity Score (GPS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gps.html#computing-gps-values">Computing GPS Values</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
@@ -169,15 +171,61 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#G"><strong>G</strong></a>
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#G"><strong>G</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#X"><strong>X</strong></a>
  
 </div>
+<h2 id="_">_</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules.html#pycausalgps.database.Database._init_reserved_keys">_init_reserved_keys() (pycausalgps.database.Database method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules.html#pycausalgps.database.Database.cache_summary">cache_summary() (pycausalgps.database.Database method)</a>
+</li>
+      <li><a href="modules.html#pycausalgps.database.Database.close_db">close_db() (pycausalgps.database.Database method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules.html#pycausalgps.gps.ComputeGPS.compute_gps">compute_gps() (pycausalgps.gps.ComputeGPS method)</a>
+</li>
+      <li><a href="modules.html#pycausalgps.gps.ComputeGPS">ComputeGPS (class in pycausalgps.gps)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules.html#pycausalgps.database.Database">Database (class in pycausalgps.database)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules.html#pycausalgps.database.Database.delete_value">delete_value() (pycausalgps.database.Database method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules.html#pycausalgps.gps_utils.generate_syn_pop">generate_syn_pop() (in module pycausalgps.gps_utils)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules.html#pycausalgps.database.Database.get_value">get_value() (pycausalgps.database.Database method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -189,7 +237,9 @@
     module
 
       <ul>
-        <li><a href="modules.html#module-pycausalgps.gps_plot_utils">pycausalgps.gps_plot_utils</a>
+        <li><a href="modules.html#module-pycausalgps.database">pycausalgps.database</a>
+</li>
+        <li><a href="modules.html#module-pycausalgps.gps">pycausalgps.gps</a>
 </li>
         <li><a href="modules.html#module-pycausalgps.gps_utils">pycausalgps.gps_utils</a>
 </li>
@@ -201,10 +251,17 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    pycausalgps.gps_plot_utils
+    pycausalgps.database
 
       <ul>
-        <li><a href="modules.html#module-pycausalgps.gps_plot_utils">module</a>
+        <li><a href="modules.html#module-pycausalgps.database">module</a>
+</li>
+      </ul></li>
+      <li>
+    pycausalgps.gps
+
+      <ul>
+        <li><a href="modules.html#module-pycausalgps.gps">module</a>
 </li>
       </ul></li>
   </ul></td>
@@ -216,6 +273,30 @@
         <li><a href="modules.html#module-pycausalgps.gps_utils">module</a>
 </li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules.html#pycausalgps.database.Database.set_value">set_value() (pycausalgps.database.Database method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules.html#pycausalgps.database.Database.update_cache_size">update_cache_size() (pycausalgps.database.Database method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules.html#pycausalgps.gps.ComputeGPS.xgb_train_it">xgb_train_it() (pycausalgps.gps.ComputeGPS static method)</a>
+</li>
   </ul></td>
 </tr></table>
 
