@@ -24,6 +24,7 @@ Short summary.
 
    setup_env
    quickstart
+   gps
    faq
 
 .. toctree::

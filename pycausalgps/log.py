@@ -7,8 +7,13 @@ The core module for logging instance.
 import sys
 import logging
 
-LOGGER = logging.getLogger(__package__)
+LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
+
+# Per each data access sqlitedict generates a log message.
+# This is to suppress those messages.
+logging.getLogger("sqlitedict").disabled = True
+
 
 logger_file = logging.FileHandler("logfile.log")
 logger_console = logging.StreamHandler(sys.stdout)

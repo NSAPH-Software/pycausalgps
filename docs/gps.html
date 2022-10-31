@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estimating Generalized Propensity Score (GPS) &mdash; pycausalgps 0.0.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Frequently Asked Questions" href="faq.html" />
+    <link rel="prev" title="Quickstart" href="quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> pycausalgps
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Researchers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="setup_env.html">Setting Up Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Estimating Generalized Propensity Score (GPS)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#parametric">Parametric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#non-parametric">Non-parametric</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#computing-gps-values">Computing GPS Values</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="setup_env_dev.html">Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="git_branching.html">Git Branching Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact Us</a></li>
+<li class="toctree-l1"><a class="reference internal" href="CHANGELOG.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pycausalgps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Estimating Generalized Propensity Score (GPS)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/gps.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="estimating-generalized-propensity-score-gps">
+<h1>Estimating Generalized Propensity Score (GPS)<a class="headerlink" href="#estimating-generalized-propensity-score-gps" title="Permalink to this headline"></a></h1>
+<p>The conditional probability of assignment to a particular treatment given a vector
+of observed covariates is called propensity score (Rosenbaum and Rubin 1983).
+The extended version of the propensity score is called the generalized propensity
+score (Hirano and Imbens 2004). Users can compute a generalized propensity
+score (GPS) using the <cite>ComputeGPS</cite> class. There are two models implemented to
+estimate GPS (<cite>gps_models</cite>):</p>
+<div class="section" id="parametric">
+<h2>Parametric<a class="headerlink" href="#parametric" title="Permalink to this headline"></a></h2>
+<p>A parametric model is standard linear regression model.</p>
+<p>TODO: mathematical equation</p>
+<div class="math notranslate nohighlight">
+\[GPS\]</div>
+</div>
+<div class="section" id="non-parametric">
+<h2>Non-parametric<a class="headerlink" href="#non-parametric" title="Permalink to this headline"></a></h2>
+<p>A non-parametric model refers to a flexible machine-learning model.</p>
+<p>TODO: mathematical equation</p>
+<div class="math notranslate nohighlight">
+\[GPS\]</div>
+</div>
+</div>
+<div class="section" id="computing-gps-values">
+<h1>Computing GPS Values<a class="headerlink" href="#computing-gps-values" title="Permalink to this headline"></a></h1>
+<p>The ComputeGPS class can be used to generate GPS values. The following represents
+a simple example.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pycausalgps.gps_utils</span> <span class="kn">import</span> <span class="n">generate_syn_pop</span>
+<span class="kn">from</span> <span class="nn">pycausalgps.gps</span> <span class="kn">import</span> <span class="n">ComputeGPS</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">generate_syn_pop</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;cf5&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cf5</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;approach&#39;</span><span class="p">:</span><span class="s2">&quot;xgboost1&quot;</span><span class="p">,</span> <span class="s1">&#39;gps_model&#39;</span><span class="p">:</span> <span class="s1">&#39;parametric&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;test_size&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+          <span class="s1">&#39;n_estimator&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;learning_rate&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">}</span>
+
+<span class="n">conf</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;cf1&quot;</span><span class="p">,</span><span class="s2">&quot;cf2&quot;</span><span class="p">,</span><span class="s2">&quot;cf3&quot;</span><span class="p">,</span><span class="s2">&quot;cf4&quot;</span><span class="p">,</span><span class="s2">&quot;cf5&quot;</span><span class="p">,</span><span class="s2">&quot;cf6&quot;</span><span class="p">]]</span>
+<span class="n">treat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;treat&quot;</span><span class="p">]]</span>
+
+<span class="n">gp</span> <span class="o">=</span> <span class="n">ComputeGPS</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">conf</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">treat</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+<span class="n">gp</span><span class="o">.</span><span class="n">compute_gps</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">gp</span><span class="o">.</span><span class="n">gps</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="quickstart.html" class="btn btn-neutral float-left" title="Quickstart" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="faq.html" class="btn btn-neutral float-right" title="Frequently Asked Questions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Harvard University 2021.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
