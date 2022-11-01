@@ -4,18 +4,26 @@ project_controller.py
 The core module for the ProjectController class.
 """
 
-
-from logging import warning
-
 import os
 import yaml
 
-from project import Project
-from database import Database
 from pycausalgps.log import LOGGER
+from pycausalgps.project import Project
+from pycausalgps.database import Database
 
 
 class ProjectController:
+    """ ProjectController class
+    The ProjectController class is used to manage projects. It provides suite of
+    methods to add, remove, and connect to projects. It also provides a summary
+    method to print the list of projects. Each project is defined by a folder with
+    a project.yaml file.
+
+    Attributes:
+    -----------
+    | db_path: str
+
+    """
 
     _instance = None
 
@@ -39,12 +47,10 @@ class ProjectController:
         else:
             self.projects_list = self.db.get_value("PROJECTS_LIST")
 
-    # def _update_reserved_keys(self):
-    #     self.db.set_value("RESERVED_KEYS", ["RESERVED_KEYS", "PROJECTS_LIST"])
-
     def connect_to_project(self, folder_path=None):
         """
         Connect to a project. If the project is not defined, it will be created.
+        The project is defined by a folder with a project.yaml file inside.
 
         Parameters
         ----------
@@ -65,12 +71,15 @@ class ProjectController:
             print("Please provide a yaml file path for the project.")
             return
         
+        # sanity check for the project parameters are defined inside the 
+        # Project class.
         p_obj = Project(project_params=project_params, db_path=self.db_path)
    
         c_pr = self.db.get_value("PROJECTS_LIST")
 
         if p_obj.hash_value in c_pr:
-            print("Project has been already submitted to the database. ")
+            print("Project has been already submitted to the database. " +\
+                  "Retrieving the project object from the database.")
             p_obj = self.db.get_value(p_obj.hash_value)
         else:
             c_pr.append(p_obj.hash_value)     
@@ -79,19 +88,22 @@ class ProjectController:
 
             # Add project to the database
             self.db.set_value(p_obj.hash_value, p_obj)
-
-            # This step is not efficient. It adds set value back into cache. 
-            # However, I keep it until a better solution.
-
-            # if self.db.get_value(p_obj.hash_value).hash_value != p_obj.hash_value:
-            #     print("Something is wrong with storing object on database.") 
-
             print(f"Project {project_params.get('name')} has been successfully added to the database.")
 
     def remove_project(self, project_name):
+        """
+        Remove a project from the database, the list of projects, and the
+        in-memory cache. Run pc.summary() to see the list of projects.  
+
+        Parameters:
+        -----------
+        | project_name: str
+
+        """
+
+
         self._update_project_list()
 
-        
         # retrerive project hash value
         pr_name_dict = {}
         for project_hash in self.projects_list:
@@ -121,6 +133,10 @@ class ProjectController:
             print(f"Project '{project_name}' is not defined.")
 
     def summary(self):
+        """
+        Print the number of available projects with project names. 
+
+        """
         
         try:
            self._update_project_list()
@@ -134,6 +150,18 @@ class ProjectController:
 
 
     def get_project(self, pr_name):
+        """
+        Get a project object from the database.
+
+        Parameters:
+        -----------
+        | pr_name: str
+
+        Returns:
+        --------
+        | project: Project
+
+        """
         
         self._update_project_list()
         pr_name_dict = {}

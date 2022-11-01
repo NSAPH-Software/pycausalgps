@@ -1,14 +1,14 @@
 pycausalgps
 ===========
 
-.. image:: https://github.com/fasrc/pycausalgps/workflows/Python\ package/badge.svg?branch=main&event=push
-    :target: https://github.com/fasrc/pycausalgps/actions
+.. image:: https://github.com/nsaph-software/pycausalgps/workflows/Python\ package/badge.svg?branch=develop&event=push
+    :target: https://github.com/nsaph-software/pycausalgps/actions
     :alt: Test Status
 
 *Causal Inference with Generalized Propensity Score*
 
 
-Short summary.
+pycausalgps is a Python package that provides end-to-end causal inference solutions with continuous exposures. 
 
 .. toctree::
    :glob:

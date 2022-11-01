@@ -114,7 +114,7 @@ src/*
 
 .pytest_cache/*
 scripts/*
-scripts2/*
+notebooks/*
 
 *.db
 

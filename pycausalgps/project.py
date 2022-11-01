@@ -3,9 +3,26 @@ project.py
 ================================================
 The core module for the Project class.
 
-Parameters
-----------
-params : dict
+"""
+
+import os
+import yaml
+import hashlib
+from os import path
+import pandas as pd
+
+from pycausalgps.log import LOGGER
+from pycausalgps.database import Database
+from pycausalgps.gps import GeneralizedPropensityScore
+
+class Project:
+    """ Project Class
+    The Project class generates a project object with collecting the project's
+    details. 
+
+    Parameters
+    ----------
+    project_params : dict
     The parameters of the project. It should contain the following mandotary keys:
     | name: str
     | id: int
@@ -13,35 +30,30 @@ params : dict
     | data.exposure_path: str
     | data.covariate_path: str
 
-"""
+    Notes
+    -----
+    The project object does not load the data. It only stores the paths to the data.
 
-from matplotlib import projections
-import yaml
-from os import path
-import pandas as pd
-import hashlib
+    Examples
+    --------
 
-from log import LOGGER
-
-from database import Database
-from study_data import StudyData
-import os
-from gps import GeneralizedPropensityScore
-
-class Project:
-    """ Project Class
-    p1 = Project(params, db_path)
+    >>> from pycausalgps.project import Project
+    >>> project_params = {"name": "test_project", "id": 1,
+                          "data": {"outcome_path": "data/outcome.csv", 
+                                   "exposure_path": "data/exposure.csv", 
+                                   "covariate_path": "data/covariate.csv"}}
+    >>> project = Project(project_params = project_params, db_path = "test.db")
     """
 
     def __init__(self, project_params, db_path):
         
         self.project_params = project_params
+        self._check_params()
         self.pr_name = self.project_params.get("name")
         self.pr_id = self.project_params.get("id")
         self.pr_db_path = db_path
         self.hash_value = None
         self.gps_list = list()
-        self._check_params()
         self._add_hash()
         self.db = None
         self._connect_to_database()
@@ -74,6 +86,14 @@ class Project:
         pass
 
     def compute_gps(self, gps_params_path):
+        """ Compute GPS
+        This function computes the GPS for the project.
+
+        Parameters
+        ----------
+        | gps_params_path : str 
+
+        """
         # This includes loading a yaml file with gps parameters.
         # and creating a gps object.
         # The gps object will have access to the data (exposure and covariates.).  
@@ -103,7 +123,9 @@ class Project:
         # create gps objects based on the parameters. 
         # TODO
 
-        gps = GeneralizedPropensityScore(self.project_params, gps_params)
+        gps = GeneralizedPropensityScore(self.project_params, 
+                                         gps_params, 
+                                         db_path=self.pr_db_path)
         
         # check if the gps is already in the database.
         if gps.hash_value in self.gps_list:
@@ -189,23 +211,17 @@ class Project:
         # 2) database
         # 3) Any other controller list  and graph. 
     
-    
-    def remove_study_data(self, st_data_name):
-        pass
-
 
     def __str__(self) -> str:
 
         return f"Project name: {self.pr_name} \n" +\
-                     f"Project id: {self.pr_id} \n" +\
-                     f"Project database: {self.pr_db_path} \n" +\
-                     f"Number of gps objects: {len(self.gps_list)} \n"
+               f"Project id: {self.pr_id} \n" +\
+               f"Project database: {self.pr_db_path} \n" +\
+               f"Number of gps objects: {len(self.gps_list)} \n"
 
 
     def __repr__(self) -> str:
         return (f"Project({self.pr_name})")
-
-
 
     def _add_hash(self):
         
