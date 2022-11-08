@@ -49,6 +49,9 @@ class GeneralizedPropensityScore:
         self.db_path = db_path
         self.gps_id = None
         self.gps = None
+        self.e_gps_pred = None
+        self.e_gps_std_pred = None
+        self.w_resid = None
         self.hash_value = None
         self._generate_hash()
         self.training_report = dict()
@@ -83,7 +86,7 @@ class GeneralizedPropensityScore:
 
     def __str__(self):
         return f"GPS object with id: {self.gps_id} \n" +\
-               f"GPS parameters: {yaml.dump(self.gps_params, default_flow_style=False)} \n" +\
+               f"GPS parameters: \n {yaml.dump(self.gps_params, default_flow_style=False)} \n" +\
                f" ----- *** -----  \n" +\
                f"Training reports: \n {yaml.dump(self.training_report, default_flow_style=False)} \n"
 
@@ -121,7 +124,8 @@ class GeneralizedPropensityScore:
         lib_name = self.gps_params.get("gps_params").get("pred_model").get("libs").get("name")
 
         if lib_name == "xgboost":
-            self.gps = self._compute_gps_xgboost(X = covariate_data, 
+            self.gps, self.e_gps_pred, self.e_gps_std_pred, *self.w_resid = \
+                self._compute_gps_xgboost(X = covariate_data, 
                                                  y = exposure_data)
         else:
             LOGGER.warning(f" GPS computing approach (approach): "+\
@@ -164,13 +168,13 @@ class GeneralizedPropensityScore:
             e_gps_tmp = (e_gps_pred - y.to_numpy())
             e_gps_std = np.std(e_gps_tmp)
             gps = norm.pdf(y.to_numpy().squeeze(), e_gps_pred, e_gps_std)
-            return (gps)
+            return gps, e_gps_pred, e_gps_std
 
         elif self.gps_params.get("gps_params").get("model") == "non-parametric":
 
-            e_gps_pred = self.xgb_train_it(X_, y.squeeze(), self.gps_params)
+            e_gps_pred, training_report = self.xgb_train_it(X_, y.squeeze(), self.gps_params)
             target = np.abs(e_gps_pred - y.squeeze())
-            e_gps_std_pred = self.xgb_train_it(X_, target, self.gps_params)
+            e_gps_std_pred, training_report = self.xgb_train_it(X_, target, self.gps_params)
            
             # compute residule
             w_resid = (y.squeeze() - e_gps_pred)/e_gps_std_pred
@@ -178,7 +182,7 @@ class GeneralizedPropensityScore:
             # compute kernel density estimate ("gaussian")
             kernel = stats.gaussian_kde(w_resid)
             gps = kernel(w_resid)
-            return(gps)
+            return gps, e_gps_pred, e_gps_std_pred, w_resid
         else:
             LOGGER.warning(f"gps_model: '{self.params['gps_model']}' is not defined."+\
                            f" Available models: parametric, non-parametric.")
