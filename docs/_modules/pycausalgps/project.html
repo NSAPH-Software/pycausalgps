@@ -366,7 +366,32 @@
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The project has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gps_list</span><span class="p">)</span><span class="si">}</span><span class="s2"> gps: &quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gps_list</span><span class="p">:</span>
                 <span class="n">gps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">gps</span><span class="p">)</span></div>
+                <span class="nb">print</span><span class="p">(</span><span class="n">gps</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Project.get_gps"><a class="viewcode-back" href="../../modules.html#pycausalgps.project.Project.get_gps">[docs]</a>    <span class="k">def</span> <span class="nf">get_gps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gps_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a project object from the database.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        -----------</span>
+<span class="sd">        gps_id: str</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        --------</span>
+<span class="sd">        | gps: GeneralizedPropensityScore</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">gps_id_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">gps_hash</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gps_list</span><span class="p">:</span>
+               <span class="n">gps_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">gps_hash</span><span class="p">)</span>
+               <span class="n">gps_id_dict</span><span class="p">[</span><span class="n">gps_obj</span><span class="o">.</span><span class="n">gps_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">gps_hash</span>
+
+        <span class="k">if</span> <span class="n">gps_id</span> <span class="ow">in</span> <span class="n">gps_id_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">gps_id_dict</span><span class="p">[</span><span class="n">gps_id</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;A GPS object with id:</span><span class="si">{</span><span class="n">gps_id</span><span class="si">}</span><span class="s2"> is not defined.&quot;</span><span class="p">)</span></div></div>
         
 
 

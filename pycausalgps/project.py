@@ -279,6 +279,31 @@ class Project:
             for item in self.gps_list:
                 gps = self.db.get_value(item)
                 print(gps)
+
+
+    def get_gps(self, gps_id):
+        """
+        Get a project object from the database.
+
+        Parameters:
+        -----------
+        gps_id: str
+
+        Returns:
+        --------
+        | gps: GeneralizedPropensityScore
+
+        """
+
+        gps_id_dict = {}
+        for gps_hash in self.gps_list:
+               gps_obj = self.db.get_value(gps_hash)
+               gps_id_dict[gps_obj.gps_id] = gps_hash
+
+        if gps_id in gps_id_dict.keys():
+            return self.db.get_value(gps_id_dict[gps_id])
+        else:
+            print(f"A GPS object with id:{gps_id} is not defined.")
         
 
 

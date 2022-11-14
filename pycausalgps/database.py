@@ -168,8 +168,6 @@ class Database:
                f"Cache limit: {Database._cache_size} \n" \
                f"Cache size: {human_readible_size(sys.getsizeof(Database._cache))}"
       
-
-
     def update_cache_size(self, new_size):
         """
         Updates the cache size. If the new size is smaller than the current size,

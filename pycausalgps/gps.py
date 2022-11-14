@@ -17,6 +17,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
 
 from pycausalgps.log import LOGGER
+from pycausalgps.database import Database
+from pycausalgps.pseudo_population import PseudoPopulation
 
 class GeneralizedPropensityScore:
     """Create a GPS object based on provided parameters.
@@ -28,12 +30,12 @@ class GeneralizedPropensityScore:
     ----------
     project_params : dict
         A dictionary of project parameters. Including:  
-        | name: project name  
-        | id: project id  
-        | data: a dictionary of data parameters. Including:  
-            | exposure_path: path to exposure data
-            | covariate_path: path to covariate data
-            | outcome_path: path to outcome data
+            | name: project name  
+            | id: project id  
+            | data: a dictionary of data parameters. Including:  
+                | exposure_path: path to exposure data
+                | covariate_path: path to covariate data
+                | outcome_path: path to outcome data
     
     gps_params : dict
         A dictionary of gps parameters.
@@ -53,9 +55,10 @@ class GeneralizedPropensityScore:
         self.e_gps_std_pred = None
         self.w_resid = None
         self.hash_value = None
-        self._generate_hash()
         self.training_report = dict()
         self.pseudo_population_list = list()
+        self._connect_to_database()
+        self._generate_hash()
 
     def load_data(self):
         """
@@ -72,7 +75,11 @@ class GeneralizedPropensityScore:
         covariate_path = self.project_params.get("data").get("covariate_path")
 
         # load exposure data
-        exposure_data = pd.read_csv(exposure_path)
+        try:
+            exposure_data = pd.read_csv(exposure_path)
+        except Exception as e:
+            LOGGER.error(f"Error while loading exposure data: {e}")
+            raise e
         LOGGER.debug(f"Exposure data shape: {exposure_data.shape}")
 
         # load covariate data
@@ -107,9 +114,12 @@ class GeneralizedPropensityScore:
                 hash_string.encode('utf-8')).hexdigest()
             # generating random id for gps object by a short hash
             self.gps_id = hashlib.shake_256(self.hash_value.encode()).hexdigest(8)      
+            self.gps_params["hash_value"] = self.hash_value
+            self.gps_params["gps_id"] = self.gps_id
         else:
             LOGGER.warning("Project hash value is not assigned. " +\
-                           "This can happen becuase of running the class individually")
+                           "This can happen becuase of running the class individually. " +\
+                           "Hash value cannot be generated. ")
 
 
     def compute_gps(self):
@@ -137,29 +147,34 @@ class GeneralizedPropensityScore:
 
         # select columns that needs to be included.
         # TODO: add checks to make sure that all columns exist.
-        X = X[self.gps_params.get("gps_params").get("pred_model").get("covariate_column")]
+        num_cols = self.gps_params.get("gps_params").get("pred_model").get("covariate_column_num")
+        X_num = X[self.gps_params.get("gps_params").get("pred_model").get("covariate_column_num")]
         y = y[self.gps_params.get("gps_params").get("pred_model").get("exposure_column")]
         
-        
-        # Pick columns with categorical data
-        cat_cols = list(X.select_dtypes(
-            include=["category"]).columns.values)
+        cat_cols = self.gps_params.get("gps_params").get("pred_model").get("covariate_column_cat")
+        X_cat = X[cat_cols]
 
-        # Pick columns with numerical data
-        num_cols = list(X.select_dtypes(
-            include=[np.number]).columns.values)
+        # Pandas read these comlumns as object.
+        for cl in cat_cols:
+            X_cat.loc[:,cl] = X_cat.loc[:,cl].astype('category')
         
+        if X_num.select_dtypes(include=['object']).shape[1] > 0:
+            raise ValueError("Covariate data contains non-numeric columns. ")
+    
         # encoding categorical data and merge
         if len(cat_cols) > 0:
             X_cat = pd.get_dummies(X[cat_cols], columns=cat_cols)
-            X_ = X[num_cols]
-            X_ = X.join(X_cat)
+            X_ = X_num
+            X_ = X_.join(X_cat)
         else:
-            X_ = X
+            X_ = X_num
 
         # normalize numerical data
-        standard = preprocessing.StandardScaler().fit(X_[num_cols])
-        X_[num_cols] = standard.transform(X_[num_cols])
+        standard = preprocessing.StandardScaler().fit(X_.loc[:,num_cols])
+        # TODO: Added the following line to avoid SettingWithCopyWarning. 
+        # Need to check if this is the right way to do it.
+        X_ = X_.copy()
+        X_.loc[:,num_cols] = standard.transform(X_.loc[:,num_cols])       
 
         if self.gps_params.get("gps_params").get("model") == "parametric":
 
@@ -221,15 +236,56 @@ class GeneralizedPropensityScore:
 
         return  predict_all, training_report
 
-    def compute_pseudo_population(self, ps_pop_params):
+    def compute_pseudo_population(self, pspop_params_path):
         """ Computes pseudo population based on the GPS values and 
         pseudo population parameters."""
 
-        # read ps_pop_params
+        # This include loading a yaml file with pseudo population parameters.
+
+        # read pspop_params
+
+        if pspop_params_path is not None:
+            try:
+                with open(pspop_params_path, 'r') as f:
+                    pspop_params = yaml.safe_load(f)
+            except Exception as e:
+                LOGGER.warning(f"Could not load pspop_params from {pspop_params_path}.")
+                LOGGER.warning(e)
+                return
+        else:
+            LOGGER.warning(f"pspop_params_path is not defined.")
+            return
+
+        # TODO: compute the combination of the parameters. In this section, if the 
+        # user provides a list of approaches, we need to open a new object for each of 
+        # them. 
 
         # read data. 
+        # Required data:
+        # 1. from gps object: gps, e_gps_pred, e_gps_std, w_resid
+        # 2. from pspop_params: pspop_params.get("pspop_params").get("approach")
 
-        # check data. 
+        # Generate the object to get the hash value.
+        ps_pop = PseudoPopulation(self.project_params, self.gps_params, 
+                                  pspop_params, self.db_path)
+
+        # check if the ps_pop is already computed. If yes, load it.
+        # Why we load from the database? Because we want to avoid recomputing
+        # the pseudo population if it is already computed.
+        if ps_pop.hash_value in self.pseudo_population_list:
+            LOGGER.info(f"Pseudo population is already computed, retireving it from the database.")
+            try:
+                ps_pop = self.db.get_value(ps_pop.hash_value)
+            except Exception as e:
+                print(e)
+                return
+        else:
+            # compute ps_pop
+            ps_pop.generate_pseudo_population()
+            self.pseudo_population_list.append(ps_pop.hash_value)
+            self.db.set_value(ps_pop.hash_value, ps_pop)
+            
+
 
         # if matching, use matching approach. 
 
@@ -241,7 +297,51 @@ class GeneralizedPropensityScore:
 
         # Add pseudo population to the pseudo population list.
 
+    def pspop_summary(self):
+        """ Prints the summary of the pseudo population."""
+        if len(self.pseudo_population_list) == 0:
+            print ("The GPS object does not have any pseudo population.")
+        else:
+            print(f"The GPS object has {len(self.pseudo_population_list)} pseudo population: ")
+            for item in self.pseudo_population_list:
+                pspop = self.db.get_value(item)
+                print(pspop.pspop_id)
 
+
+
+    def _connect_to_database(self):
+        if self.db_path is None:
+            raise Exception("Database is not defined.")
+            
+        self.db = Database(self.db_path)
+
+
+
+
+    def get_pseudo_population(self, pspop_id):
+        """
+        Returns the pseudo population object based on the pspop_id.
+
+        Parameters
+        ----------
+        pspop_id : str
+            The id of the pseudo population.
+
+        Returns
+        -------
+        pspop_obj : PseudoPopulation
+
+        """
+
+        pspop_id_dict = {}
+        for pspop_hash in self.pseudo_population_list:
+               pspop_obj = self.db.get_value(pspop_hash)
+               pspop_id_dict[pspop_obj.pspop_id] = pspop_hash
+
+        if pspop_id in pspop_id_dict.keys():
+            return self.db.get_value(pspop_id_dict[pspop_id])
+        else:
+            print(f"A GPS object with id:{pspop_id} is not defined.")
 
 if __name__ == "__main__":
 

@@ -60,6 +60,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#project-controller-py">project_controller.py</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#project-py">project.py</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gps-py">gps.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pseudo-population-py">pseudo_population.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rfunctions-py">rfunctions.py</a></li>
 </ul>
 </li>
 </ul>
@@ -317,6 +319,16 @@ This function computes the GPS for the project.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.project.Project.get_gps">
+<span class="sig-name descname"><span class="pre">get_gps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gps_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/project.html#Project.get_gps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.project.Project.get_gps" title="Permalink to this definition"></a></dt>
+<dd><p>Get a project object from the database.</p>
+<p>gps_id: str</p>
+<div class="line-block">
+<div class="line">gps: GeneralizedPropensityScore</div>
+</div>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -332,17 +344,17 @@ confounders.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>project_params</strong> (<em>dict</em>) – <p>A dictionary of project parameters. Including:
-| name: project name
-| id: project id
-| data: a dictionary of data parameters. Including:</p>
-<blockquote>
-<div><div class="line-block">
-<div class="line">exposure_path: path to exposure data</div>
-<div class="line">covariate_path: path to covariate data</div>
-<div class="line">outcome_path: path to outcome data</div>
+<li><p><strong>project_params</strong> (<em>dict</em>) – <dl>
+<dt>A dictionary of project parameters. Including:</dt><dd><div class="line-block">
+<div class="line">name: project name</div>
+<div class="line">id: project id</div>
+<div class="line">data: a dictionary of data parameters. Including:
+| exposure_path: path to exposure data
+| covariate_path: path to covariate data
+| outcome_path: path to outcome data</div>
 </div>
-</div></blockquote>
+</dd>
+</dl>
 </p></li>
 <li><p><strong>gps_params</strong> (<em>dict</em>) – A dictionary of gps parameters.</p></li>
 <li><p><strong>db_path</strong> (<em>str</em>) – Path to the database.</p></li>
@@ -364,9 +376,26 @@ parameters.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.compute_pseudo_population">
-<span class="sig-name descname"><span class="pre">compute_pseudo_population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ps_pop_params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.compute_pseudo_population"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.compute_pseudo_population" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">compute_pseudo_population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pspop_params_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.compute_pseudo_population"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.compute_pseudo_population" title="Permalink to this definition"></a></dt>
 <dd><p>Computes pseudo population based on the GPS values and
 pseudo population parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.get_pseudo_population">
+<span class="sig-name descname"><span class="pre">get_pseudo_population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pspop_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.get_pseudo_population"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.get_pseudo_population" title="Permalink to this definition"></a></dt>
+<dd><p>Returns the pseudo population object based on the pspop_id.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pspop_id</strong> (<em>str</em>) – The id of the pseudo population.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>pspop_obj</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>PseudoPopulation</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -379,12 +408,58 @@ work with them.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.pspop_summary">
+<span class="sig-name descname"><span class="pre">pspop_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.pspop_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.pspop_summary" title="Permalink to this definition"></a></dt>
+<dd><p>Prints the summary of the pseudo population.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.xgb_train_it">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xgb_train_it</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.xgb_train_it"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.xgb_train_it" title="Permalink to this definition"></a></dt>
 <dd><p>Creates XGBoost regressor model and returns predicted value for
 all input data.</p>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<span class="target" id="module-pycausalgps.pseudo_population"></span><div class="section" id="pseudo-population-py">
+<h2>pseudo_population.py<a class="headerlink" href="#pseudo-population-py" title="Permalink to this headline"></a></h2>
+<p>The core module for the PseudoPopulation class.</p>
+</div>
+<span class="target" id="module-pycausalgps.rscripts.rfunctions"></span><div class="section" id="rfunctions-py">
+<h2>rfunctions.py<a class="headerlink" href="#rfunctions-py" title="Permalink to this headline"></a></h2>
+<p>Main module to define the R functions to be used in the package.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pycausalgps.rscripts.rfunctions.compute_absolute_weighted_corr">
+<span class="sig-prename descclassname"><span class="pre">pycausalgps.rscripts.rfunctions.</span></span><span class="sig-name descname"><span class="pre">compute_absolute_weighted_corr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_cat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.core.frame.DataFrame</span></span></span><a class="reference internal" href="_modules/pycausalgps/rscripts/rfunctions.html#compute_absolute_weighted_corr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.rscripts.rfunctions.compute_absolute_weighted_corr" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the absolute weighted correlation using R’s wCorr package.</p>
+<p>params:</p>
+<div class="line-block">
+<div class="line">w: A vector of exposure values.</div>
+<div class="line">vw: A vector of weights.</div>
+<div class="line">c_num: A dataframe of numerical covariates.</div>
+<div class="line">c_cat: A dataframe of categorical covariates.</div>
+</div>
+<p>returns:</p>
+<div class="line-block">
+<div class="line">A dataframe of absolute weighted correlation values.</div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pycausalgps.rscripts.rfunctions.compute_density">
+<span class="sig-prename descclassname"><span class="pre">pycausalgps.rscripts.rfunctions.</span></span><span class="sig-name descname"><span class="pre">compute_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="reference internal" href="_modules/pycausalgps/rscripts/rfunctions.html#compute_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.rscripts.rfunctions.compute_density" title="Permalink to this definition"></a></dt>
+<dd><p>Kernel density estimation.
+params:</p>
+<div class="line-block">
+<div class="line">x0: A vectore of values to compute the density function.</div>
+<div class="line">x1: A vector of values to evaluate the density function.</div>
+</div>
+<p>returns:</p>
+<div class="line-block">
+<div class="line">A vector of density values the same size as x1.</div>
+</div>
 </dd></dl>
 
 </div>
