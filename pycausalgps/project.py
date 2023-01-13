@@ -25,20 +25,21 @@ class Project:
     project_params : dict
     The parameters of the project. It should contain the following mandotary keys:
     | name: str
-    | id: int
+    | project_id: int
     | data.outcome_path: str
     | data.exposure_path: str
     | data.covariate_path: str
 
     Notes
     -----
-    The project object does not load the data. It only stores the paths to the data.
+    The project object does not load the data. It only stores the paths to the 
+    data. Other than mandatory keys, the project_params can contain other keys. 
 
     Examples
     --------
 
     >>> from pycausalgps.project import Project
-    >>> project_params = {"name": "test_project", "id": 1,
+    >>> project_params = {"name": "test_project", "project_id": 1,
                           "data": {"outcome_path": "data/outcome.csv", 
                                    "exposure_path": "data/exposure.csv", 
                                    "covariate_path": "data/covariate.csv"}}
@@ -50,7 +51,7 @@ class Project:
         self.project_params = project_params
         self._check_params()
         self.pr_name = self.project_params.get("name")
-        self.pr_id = self.project_params.get("id")
+        self.pr_id = self.project_params.get("project_id")
         self.pr_db_path = db_path
         self.hash_value = None
         self.gps_list = list()
@@ -59,20 +60,23 @@ class Project:
         self._connect_to_database()
 
     def _check_params(self):
+        #TODO: In case of raising exceptions, refer the users to the documentation.
         
-        required_keys = ["name", "id", "data"]
+        required_keys = ["name", "project_id", "data"]
         required_data_keys = ["outcome_path", "exposure_path", "covariate_path"]
 
         for key in required_keys:
             if key not in self.project_params.keys():
-                raise Exception(f"Please provide a value for {key}.")
+                raise Exception(f"In the project.yaml file, " \
+                                f"please provide the '{key}' field.")
         for key in required_data_keys:
             if key not in self.project_params.get("data").keys():
-                raise Exception(f"Please provide a value for {key}.")
+                raise Exception(f"In the project.yaml file, "\
+                                f"under the 'data' field, " \
+                                f"please provide the '{key}' field.")
 
 
     def _connect_to_database(self):
-        print(f"Projects sqlite database name: {self.pr_db_path}")
         if self.pr_db_path is None:
             raise Exception("Database is not defined.")
             
@@ -230,7 +234,7 @@ class Project:
             print("Please provide a project name.")
             return
 
-        if "id" not in self.project_params.keys() or self.project_params.get("id") is None:
+        if "project_id" not in self.project_params.keys() or self.project_params.get("project_id") is None:
             print("Please provide a project id.")
             return
 
@@ -261,21 +265,11 @@ class Project:
 
         self.project_params["hash_value"] = self.hash_value
 
-    def summary_study_data(self):
-
-        if len(self.study_data) == 0:
-            print ("The project does not have any study data.")
-        else:
-            print(f"The project has {len(self.study_data)} study data: ")
-            for item in self.study_data:
-                st_data = self.db.get_value(item)
-                print(st_data.st_d_name)
-
-    def gps_summary(self):
+    def summary(self):
         if len(self.gps_list) == 0:
-            print ("The project does not have any gps.")
+            print ("The project does not have any computed GPS object.")
         else:
-            print(f"The project has {len(self.gps_list)} gps: ")
+            print(f"The project has {len(self.gps_list)} GPS object(s): ")
             for item in self.gps_list:
                 gps = self.db.get_value(item)
                 print(gps)
@@ -308,16 +302,16 @@ class Project:
 
 
 if __name__ == "__main__":
-    project_params = { 'id': 20221027,
+    project_params = { 'project_id': 20221027,
                        'name': 'cms_kidney_failure',
                        'details': {'description': 'Computing the effect of longterm pm2.5 exposure on kidney failure.', 'version': '1.0.0', 'authors': {'name': 'Naeem Khoshnevis', 'email': 'nkhoshnevis@g.harvard.edu'}}, 
-                       'data': {'outcome_path': '/Users/nak443/Documents/Naeem_folder_mac_h/Research_projects/F2021_001_Harvard/experiment_001_20210210_Python_CausalGPS/analysis/pycausalgps/scripts2/project_abc/outcome.csv', 
-                                'exposure_path': '/Users/nak443/Documents/Naeem_folder_mac_h/Research_projects/F2021_001_Harvard/experiment_001_20210210_Python_CausalGPS/analysis/pycausalgps/scripts2/project_abc/exposure.csv', 
-                                'covariate_path': '/Users/nak443/Documents/Naeem_folder_mac_h/Research_projects/F2021_001_Harvard/experiment_001_20210210_Python_CausalGPS/analysis/pycausalgps/scripts2/project_abc/covariate.csv'}}
+                       'data': {'outcome_path': '/Users/nak443/Documents/Naeem_folder_mac_h/Research_projects/F2022_003_Harvard/p20221104_gps/code_package/pycausalgps/notebooks/project_abc/data/outcome.csv', 
+                                'exposure_path': '/Users/nak443/Documents/Naeem_folder_mac_h/Research_projects/F2022_003_Harvard/p20221104_gps/code_package/pycausalgps/notebooks/project_abc/data/exposure.csv', 
+                                'covariate_path': '/Users/nak443/Documents/Naeem_folder_mac_h/Research_projects/F2022_003_Harvard/p20221104_gps/code_package/pycausalgps/notebooks/project_abc/data/covariate.csv'}}
 
     current_dir = os.getcwd()
     db_path = path.join(current_dir, "database.sqlite")
     print(current_dir)
     pr = Project(project_params, db_path)
-    pr.compute_gps( os.path.join(current_dir,"scripts2/project_abc", "gps_params.yaml"))
+    pr.compute_gps( os.path.join(current_dir,"notebooks/project_abc", "gps_params_1.yaml"))
 

@@ -147,20 +147,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_connect_to_database</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_check_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#TODO: In case of raising exceptions, refer the users to the documentation.</span>
         
         <span class="n">required_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">]</span>
         <span class="n">required_data_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;outcome_path&quot;</span><span class="p">,</span> <span class="s2">&quot;exposure_path&quot;</span><span class="p">,</span> <span class="s2">&quot;covariate_path&quot;</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required_keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please provide a value for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In the project.yaml file, &quot;</span> \
+                                <span class="sa">f</span><span class="s2">&quot;please provide the &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; field.&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required_data_keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Please provide a value for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In the project.yaml file, &quot;</span>\
+                                <span class="sa">f</span><span class="s2">&quot;under the &#39;data&#39; field,&quot;</span> \
+                                <span class="sa">f</span><span class="s2">&quot;please provide the &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; field.&quot;</span><span class="p">)</span>
 
 
     <span class="k">def</span> <span class="nf">_connect_to_database</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Projects sqlite database name: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">pr_db_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pr_db_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Database is not defined.&quot;</span><span class="p">)</span>
             
@@ -349,21 +352,11 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">project_params</span><span class="p">[</span><span class="s2">&quot;hash_value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash_value</span>
 
-    <span class="k">def</span> <span class="nf">summary_study_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">study_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;The project does not have any study data.&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The project has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">study_data</span><span class="p">)</span><span class="si">}</span><span class="s2"> study data: &quot;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">study_data</span><span class="p">:</span>
-                <span class="n">st_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">st_data</span><span class="o">.</span><span class="n">st_d_name</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">gps_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gps_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;The project does not have any gps.&quot;</span><span class="p">)</span>
+            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;The project does not have any computed GPS object.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The project has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gps_list</span><span class="p">)</span><span class="si">}</span><span class="s2"> gps: &quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The project has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gps_list</span><span class="p">)</span><span class="si">}</span><span class="s2"> GPS object(s): &quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gps_list</span><span class="p">:</span>
                 <span class="n">gps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">gps</span><span class="p">)</span>
@@ -399,15 +392,15 @@
     <span class="n">project_params</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">20221027</span><span class="p">,</span>
                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;cms_kidney_failure&#39;</span><span class="p">,</span>
                        <span class="s1">&#39;details&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;Computing the effect of longterm pm2.5 exposure on kidney failure.&#39;</span><span class="p">,</span> <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span> <span class="s1">&#39;authors&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Naeem Khoshnevis&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;nkhoshnevis@g.harvard.edu&#39;</span><span class="p">}},</span> 
-                       <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;outcome_path&#39;</span><span class="p">:</span> <span class="s1">&#39;/Users/nak443/Documents/Naeem_folder_mac_h/Research_projects/F2021_001_Harvard/experiment_001_20210210_Python_CausalGPS/analysis/pycausalgps/scripts2/project_abc/outcome.csv&#39;</span><span class="p">,</span> 
-                                <span class="s1">&#39;exposure_path&#39;</span><span class="p">:</span> <span class="s1">&#39;/Users/nak443/Documents/Naeem_folder_mac_h/Research_projects/F2021_001_Harvard/experiment_001_20210210_Python_CausalGPS/analysis/pycausalgps/scripts2/project_abc/exposure.csv&#39;</span><span class="p">,</span> 
-                                <span class="s1">&#39;covariate_path&#39;</span><span class="p">:</span> <span class="s1">&#39;/Users/nak443/Documents/Naeem_folder_mac_h/Research_projects/F2021_001_Harvard/experiment_001_20210210_Python_CausalGPS/analysis/pycausalgps/scripts2/project_abc/covariate.csv&#39;</span><span class="p">}}</span>
+                       <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;outcome_path&#39;</span><span class="p">:</span> <span class="s1">&#39;/Users/nak443/Documents/Naeem_folder_mac_h/Research_projects/F2022_003_Harvard/p20221104_gps/code_package/pycausalgps/notebooks/project_abc/data/outcome.csv&#39;</span><span class="p">,</span> 
+                                <span class="s1">&#39;exposure_path&#39;</span><span class="p">:</span> <span class="s1">&#39;/Users/nak443/Documents/Naeem_folder_mac_h/Research_projects/F2022_003_Harvard/p20221104_gps/code_package/pycausalgps/notebooks/project_abc/data/exposure.csv&#39;</span><span class="p">,</span> 
+                                <span class="s1">&#39;covariate_path&#39;</span><span class="p">:</span> <span class="s1">&#39;/Users/nak443/Documents/Naeem_folder_mac_h/Research_projects/F2022_003_Harvard/p20221104_gps/code_package/pycausalgps/notebooks/project_abc/data/covariate.csv&#39;</span><span class="p">}}</span>
 
     <span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
     <span class="n">db_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span> <span class="s2">&quot;database.sqlite&quot;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">current_dir</span><span class="p">)</span>
     <span class="n">pr</span> <span class="o">=</span> <span class="n">Project</span><span class="p">(</span><span class="n">project_params</span><span class="p">,</span> <span class="n">db_path</span><span class="p">)</span>
-    <span class="n">pr</span><span class="o">.</span><span class="n">compute_gps</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span><span class="s2">&quot;scripts2/project_abc&quot;</span><span class="p">,</span> <span class="s2">&quot;gps_params.yaml&quot;</span><span class="p">))</span>
+    <span class="n">pr</span><span class="o">.</span><span class="n">compute_gps</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span><span class="s2">&quot;notebooks/project_abc&quot;</span><span class="p">,</span> <span class="s2">&quot;gps_params_1.yaml&quot;</span><span class="p">))</span>
 
 </pre></div>
 
@@ -418,7 +411,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Harvard University 2021.</p>
+    <p>&#169; Copyright Harvard University 2023.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

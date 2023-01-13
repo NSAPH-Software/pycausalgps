@@ -7,10 +7,10 @@ with open("README.md", "r") as fh:
 setup(
     name="pycausalgps", 
     version="0.0.1",
-    author="Naeem Khoshnevis, Xiao Wu, Danielle Braun"
-    author_email="nkhoshnevis@g.harvard.edu, ",
+    author="Naeem Khoshnevis, Xiao Wu, Danielle Braun",
+    author_email="nkhoshnevis@g.harvard.edu,  , dbraun@mail.harvard.edu",
     maintainer="Naeem Khoshnevis",
-    maintainer_email = "nkhoshnevis@g.harvard.edu, , dbraun@mail.harvard.edu",
+    maintainer_email = "nkhoshnevis@g.harvard.edu",
     description="TBD",
     long_description=long_description,
     long_description_content_type="text/markdown",

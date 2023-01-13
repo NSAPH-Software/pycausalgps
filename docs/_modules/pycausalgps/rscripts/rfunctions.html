@@ -109,7 +109,12 @@
 <span class="k">if</span> <span class="s1">&#39;compute_density&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">robjects</span><span class="o">.</span><span class="n">globalenv</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">robjects</span><span class="o">.</span><span class="n">r</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
-<span class="s1">            source(&#39;pycausalgps/rscripts/compute_density.r&#39;)</span>
+<span class="s1">            compute_density &lt;- function(x0, x1){</span>
+<span class="s1">                tmp_density &lt;- stats::density(x0, na.rm = TRUE)</span>
+<span class="s1">                dnst &lt;- stats::approx(tmp_density$x, tmp_density$y, xout = x1,</span>
+<span class="s1">                                      rule = 2)$y</span>
+<span class="s1">            return(dnst)</span>
+<span class="s1">           }</span>
 <span class="s1">        &#39;&#39;&#39;</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error in loading the R function: compute_density&#39;</span><span class="p">)</span>
@@ -165,7 +170,67 @@
 <span class="k">if</span> <span class="s1">&#39;absolute_weighted_corr&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">robjects</span><span class="o">.</span><span class="n">globalenv</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">robjects</span><span class="o">.</span><span class="n">r</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
-<span class="s1">            source(&#39;pycausalgps/rscripts/absolute_weighted_corr.r&#39;)</span>
+<span class="s1">            absolute_weighted_corr_df &lt;- function(w,</span>
+<span class="s1">                                      vw,</span>
+<span class="s1">                                      c_num,</span>
+<span class="s1">                                      c_cat){</span>
+<span class="s1">  </span>
+<span class="s1">  </span>
+<span class="s1"> </span>
+<span class="s1">                # detect numeric columns</span>
+<span class="s1">                col_n &lt;- colnames(c_num)</span>
+<span class="s1">              </span>
+<span class="s1">                # detect factorial columns</span>
+<span class="s1">                col_f &lt;- colnames(c_cat)</span>
+<span class="s1">              </span>
+<span class="s1">                c_cat[] &lt;- lapply(c_cat, as.factor)</span>
+<span class="s1">              </span>
+<span class="s1">                absolute_corr_n &lt;- absolute_corr_f &lt;- NULL</span>
+<span class="s1">              </span>
+<span class="s1">                if (length(col_n) &gt; 0) {</span>
+<span class="s1">                  absolute_corr_n&lt;- sapply(col_n,function(i){</span>
+<span class="s1">                    abs(wCorr::weightedCorr(x = w,</span>
+<span class="s1">                                            y = c_num[,i],</span>
+<span class="s1">                                            weights = vw,</span>
+<span class="s1">                                            method = c(&quot;spearman&quot;)))})</span>
+<span class="s1">                  absolute_corr_n &lt;- unlist(absolute_corr_n)</span>
+<span class="s1">                  names(absolute_corr_n) &lt;- col_n</span>
+<span class="s1">                }</span>
+<span class="s1">              </span>
+<span class="s1">                if (length(col_f) &gt; 0) {</span>
+<span class="s1">                  internal_fun&lt;- function(i){</span>
+<span class="s1">                    abs(wCorr::weightedCorr(x = w,</span>
+<span class="s1">                                            y = c_cat[, i],</span>
+<span class="s1">                                            weights = vw,</span>
+<span class="s1">                                            method = c(&quot;Polyserial&quot;)))}</span>
+<span class="s1">              </span>
+<span class="s1">                  absolute_corr_f &lt;- c()</span>
+<span class="s1">                  for (item in col_f){</span>
+<span class="s1">                    if (length(unique(c_cat[[item]])) == 1 ){</span>
+<span class="s1">                      absolute_corr_f &lt;- c(absolute_corr_f, NA)</span>
+<span class="s1">                    } else {</span>
+<span class="s1">                      absolute_corr_f &lt;- c(absolute_corr_f, internal_fun(item))</span>
+<span class="s1">                    }</span>
+<span class="s1">                  }</span>
+<span class="s1">                  names(absolute_corr_f) &lt;- col_f</span>
+<span class="s1">                }</span>
+<span class="s1">              </span>
+<span class="s1">                absolute_corr &lt;- c(absolute_corr_n, absolute_corr_f)</span>
+<span class="s1">              </span>
+<span class="s1">                if (sum(is.na(absolute_corr)) &gt; 0){</span>
+<span class="s1">                  warning(paste(&quot;The following features generated missing values: &quot;,</span>
+<span class="s1">                                names(absolute_corr)[is.na(absolute_corr)],</span>
+<span class="s1">                                &quot;</span><span class="se">\n</span><span class="s1">In computing mean covariate balance, they will be ignored.&quot;))</span>
+<span class="s1">                }</span>
+<span class="s1">              </span>
+<span class="s1">                df &lt;- data.frame(name = character(), value = numeric())</span>
+<span class="s1">              </span>
+<span class="s1">                for (i in names(absolute_corr)){</span>
+<span class="s1">                  df &lt;- rbind(df, data.frame(name=i, value=absolute_corr[[i]]))</span>
+<span class="s1">                }</span>
+<span class="s1">              </span>
+<span class="s1">                return(df)</span>
+<span class="s1">            }</span>
 <span class="s1">        &#39;&#39;&#39;</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error in loading the R function: absolute_weighted_corr&#39;</span><span class="p">)</span>

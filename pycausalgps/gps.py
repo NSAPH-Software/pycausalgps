@@ -31,7 +31,7 @@ class GeneralizedPropensityScore:
     project_params : dict
         A dictionary of project parameters. Including:  
             | name: project name  
-            | id: project id  
+            | project_id: project id  
             | data: a dictionary of data parameters. Including:  
                 | exposure_path: path to exposure data
                 | covariate_path: path to covariate data
@@ -49,11 +49,8 @@ class GeneralizedPropensityScore:
         self.project_params = project_params
         self.gps_params = gps_params
         self.db_path = db_path
-        self.gps_id = None
-        self.gps = None
-        self.e_gps_pred = None
-        self.e_gps_std_pred = None
-        self.w_resid = None
+        self.gps_data = None
+        self.gps_minmax = None
         self.hash_value = None
         self.training_report = dict()
         self.pseudo_population_list = list()
@@ -86,10 +83,31 @@ class GeneralizedPropensityScore:
         covariate_data = pd.read_csv(covariate_path)
         LOGGER.debug(f"Covariate data shape: {covariate_data.shape}")
 
-        #TODO: check data.
+        # check data, join them based on the id column. 
+        # From the gps params, we know which columns are covariate and which is 
+        # exposure.
+        if not isinstance(covariate_data, pd.DataFrame):
+            raise ValueError("Covariate data is not a pandas DataFrame.")
 
-        return exposure_data, covariate_data
+        if not isinstance(exposure_data, pd.DataFrame):
+            raise ValueError("Exposure data is not a pandas DataFrame.")
 
+        if not "id" in covariate_data.columns:
+            raise ValueError("Covariate data does not have an 'id' column.")
+
+        if not "id" in exposure_data.columns:
+            raise ValueError("Exposure data does not have an 'id' column.")
+
+        # join data based on id column
+        data = pd.merge(covariate_data, exposure_data, on="id")
+
+        # check size of data
+        if data.shape[0] == 0:
+            raise ValueError(f"Joined data size is zero. "
+                             + f"(Size of covariate data: {covariate_data.shape[0]}." 
+                             + f"Size of exposure data: {exposure_data.shape[0]}.)")
+
+        return data
 
     def __str__(self):
         return f"GPS object with id: {self.gps_id} \n" +\
@@ -128,31 +146,49 @@ class GeneralizedPropensityScore:
         parameters.
         """
 
+
         # load data
-        exposure_data, covariate_data = self.load_data()
+        _study_data = self.load_data()
 
         lib_name = self.gps_params.get("gps_params").get("pred_model").get("libs").get("name")
 
         if lib_name == "xgboost":
-            self.gps, self.e_gps_pred, self.e_gps_std_pred, *self.w_resid = \
-                self._compute_gps_xgboost(X = covariate_data, 
-                                                 y = exposure_data)
+            gps_res = self._compute_gps_xgboost(_data=_study_data )
+
+            # check if the keys exist in the gps_res
+            for key in ["gps", "e_gps_pred", "e_gps_std", "w_resid"]:
+                if not key in gps_res.keys():
+                    raise ValueError(f"Key {key} does not exist in the gps_res.")
+            
+            gps_min, gps_max = gps_res["gps"].min(), gps_res["gps"].max()
+            gps_standardized = (gps_res["gps"] - gps_min) / (gps_max - gps_min)    
+            self._data = dict(_data=pd.DataFrame(
+                                       {"id": _study_data["id"],
+                                        "gps": gps_res["gps"],
+                                        "gps_standardized": gps_standardized,
+                                        "e_gps_pred": gps_res["e_gps_pred"],
+                                        "e_gps_std_pred": gps_res["e_gps_std"],
+                                        "w_resid": gps_res["w_resid"]}),
+                                gps_minmax=[gps_min, gps_max])
+           
+
+
         else:
             LOGGER.warning(f" GPS computing approach (approach): "+\
                            f" {self.params['approach']}  is not defined.")
 
 
 
-    def _compute_gps_xgboost(self, X, y):
+    def _compute_gps_xgboost(self, _data: pd.DataFrame) -> dict:
 
         # select columns that needs to be included.
         # TODO: add checks to make sure that all columns exist.
         num_cols = self.gps_params.get("gps_params").get("pred_model").get("covariate_column_num")
-        X_num = X[self.gps_params.get("gps_params").get("pred_model").get("covariate_column_num")]
-        y = y[self.gps_params.get("gps_params").get("pred_model").get("exposure_column")]
+        X_num = _data[self.gps_params.get("gps_params").get("pred_model").get("covariate_column_num")]
+        y = _data[self.gps_params.get("gps_params").get("pred_model").get("exposure_column")]
         
         cat_cols = self.gps_params.get("gps_params").get("pred_model").get("covariate_column_cat")
-        X_cat = X[cat_cols]
+        X_cat = _data[cat_cols]
 
         # Pandas read these comlumns as object.
         for cl in cat_cols:
@@ -163,7 +199,7 @@ class GeneralizedPropensityScore:
     
         # encoding categorical data and merge
         if len(cat_cols) > 0:
-            X_cat = pd.get_dummies(X[cat_cols], columns=cat_cols)
+            X_cat = pd.get_dummies(_data[cat_cols], columns=cat_cols)
             X_ = X_num
             X_ = X_.join(X_cat)
         else:
@@ -178,18 +214,27 @@ class GeneralizedPropensityScore:
 
         if self.gps_params.get("gps_params").get("model") == "parametric":
 
-            e_gps_pred, training_report = self.xgb_train_it(X_, y.squeeze(), self.gps_params)
+            e_gps_pred, training_report = self.xgb_train_it(X_, 
+                                                            y.squeeze(), 
+                                                            self.gps_params)
             self.training_report.update(training_report)
             e_gps_tmp = (e_gps_pred - y.to_numpy())
             e_gps_std = np.std(e_gps_tmp)
             gps = norm.pdf(y.to_numpy().squeeze(), e_gps_pred, e_gps_std)
-            return gps, e_gps_pred, e_gps_std
+            return dict(gps=gps, 
+                        e_gps_pred=e_gps_pred, 
+                        e_gps_std=e_gps_std,
+                        w_resid=None)
 
         elif self.gps_params.get("gps_params").get("model") == "non-parametric":
 
-            e_gps_pred, training_report = self.xgb_train_it(X_, y.squeeze(), self.gps_params)
+            e_gps_pred, training_report = self.xgb_train_it(X_,
+                                                            y.squeeze(), 
+                                                            self.gps_params)
             target = np.abs(e_gps_pred - y.squeeze())
-            e_gps_std_pred, training_report = self.xgb_train_it(X_, target, self.gps_params)
+            e_gps_std_pred, training_report = self.xgb_train_it(X_, 
+                                                                target, 
+                                                                self.gps_params)
            
             # compute residule
             w_resid = (y.squeeze() - e_gps_pred)/e_gps_std_pred
@@ -197,10 +242,14 @@ class GeneralizedPropensityScore:
             # compute kernel density estimate ("gaussian")
             kernel = stats.gaussian_kde(w_resid)
             gps = kernel(w_resid)
-            return gps, e_gps_pred, e_gps_std_pred, w_resid
+            return dict(gps=gps,
+                        e_gps_pred=e_gps_pred, 
+                        e_gps_std=e_gps_std_pred, 
+                        w_resid=w_resid)
         else:
             LOGGER.warning(f"gps_model: '{self.params['gps_model']}' is not defined."+\
                            f" Available models: parametric, non-parametric.")
+            return dict()
 
     @staticmethod
     def xgb_train_it(input, target, params):
@@ -341,7 +390,7 @@ class GeneralizedPropensityScore:
         if pspop_id in pspop_id_dict.keys():
             return self.db.get_value(pspop_id_dict[pspop_id])
         else:
-            print(f"A GPS object with id:{pspop_id} is not defined.")
+            print(f"A Pseudo Population object with id:{pspop_id} is not defined.")
 
 if __name__ == "__main__":
 

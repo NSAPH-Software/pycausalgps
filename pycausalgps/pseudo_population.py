@@ -10,9 +10,8 @@ import hashlib
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.stats import gaussian_kde
+from scipy.stats import gaussian_kde, norm
 from matplotlib.gridspec import GridSpec
-
 
 from pycausalgps.log import LOGGER
 from pycausalgps.database import Database
@@ -79,7 +78,9 @@ class PseudoPopulation:
             self.counter_weight = counter_weight
             self._compute_covariate_balance()
         elif self.pspop_params.get("pspop_params").get("approach") == "matching":
-            self._compute_pspop_matching()
+            counter_weight = self._compute_pspop_matching()
+            self.counter_weight = counter_weight
+            self._compute_covariate_balance()
         else:
             raise Exception("Approach is not defined.")
 
@@ -93,6 +94,12 @@ class PseudoPopulation:
         # load exposure values.
         exposure_data = pd.read_csv(exposure_path)
         LOGGER.debug(f"Exposure data shape: {exposure_data.shape}")
+
+        if not isinstance(exposure_data, pd.DataFrame):
+            raise Exception("Exposure data is not a dataframe.")
+
+        if "id" not in exposure_data.columns:
+            raise Exception("Exposure data does not have id column.")
         
         return exposure_data
 
@@ -154,8 +161,8 @@ class PseudoPopulation:
  
         # Extract the gps object from the database.
         gps_obj = self.db.get_value(self.gps_params.get("hash_value"))
-
-        ipw = data_density / gps_obj.gps
+        
+        ipw = data_density / gps_obj._data.get("gps")
         
         return ipw
         
@@ -163,7 +170,89 @@ class PseudoPopulation:
 
 
     def _compute_pspop_matching(self) -> None:
-        pass
+
+        """ 
+        Compute the pseudo-population using matching approach.
+        """
+
+        # We need: 
+        # Original GPS value and mean and standard deviation.
+        # Original exposure value.
+        # Requested exposure level. 
+        # Caliper value.
+        # Scale value.
+
+        
+        # load gps object from the database.
+        gps_obj = self.db.get_value(self.gps_params.get("hash_value"))
+        gps_min, gps_max = min(gps_obj.gps), max(gps_obj.gps)
+        gps_model = gps_obj.gps_params.get("gps_params").get("model")
+        if gps_model == "non-parametric":
+            w_resid = gps_obj.w_resid
+     
+        # load exposure values
+        obs_exposure_data = self.load_exposure()
+        w_min, w_max = (min(obs_exposure_data["exposure"]), 
+                        max(obs_exposure_data["exposure"]))
+
+        # controlling parameters
+        delta = self.pspop_params.get("pspop_params").get("controlling_params").get("caliper")
+        scale = self.pspop_params.get("pspop_params").get("controlling_params").get("scale")
+        distance_metric = self.pspop_params.get("pspop_params").get("controlling_params").get("distance_metric")
+
+        # collect requested exposure level.
+        req_exposure = self.pspop_params.get("pspop_params").get("controlling_params").get("bin_seq")
+        
+        # check if req_exposure is string
+        if isinstance(req_exposure, str):
+            req_exposure = eval(req_exposure)
+
+        if req_exposure is None:
+            req_exposure = np.arange(w_min+delta/2, w_max, delta)
+
+
+        for i, w in enumerate(req_exposure):
+
+            
+            if gps_model == "parametric":
+                p_w = norm.pdf(w, gps_obj.e_gps_pred, gps_obj.e_gps_std_pred)
+            elif gps_model == "non-parametric":
+                w_new = (w - gps_obj.gps_mean) / gps_obj.gps_std
+                p_w = compute_density(w_resid, w_new)
+            else:
+                raise Exception("GPS model is not defined.")
+           
+
+
+            # select subset of data that are within the caliper value.
+            subset_idx = np.where(np.abs(obs_exposure_data["exposure"] - w) <= delta)[0]
+            subset_row = obs_exposure_data.iloc[subset_idx]["id"]
+
+            # standardize GPS and Exposure values.
+            std_w = (w - w_min)/(w_max - w_min)
+            std_gps = (gps_obj.gps - gps_min)/(gps_max - gps_min)
+
+            # Compute closest sample to the hypothetical sample.
+            std_gps_subset = std_gps
+            c_minus_d = 1
+            
+            
+            
+            # Define the exposure level (w)
+            
+            # Compute GPS value for each data sample given the exposure level (w).
+
+            print("Computing GPS for each sample given the exposure level.")
+
+
+            # Select the samples that are within the caliper value with respect to w.
+
+            # Normalize GPS and w to get equivalent distance value.
+
+            # Find the closest sample from subset of data to these hypothetical samples.
+
+
+
 
 
 
