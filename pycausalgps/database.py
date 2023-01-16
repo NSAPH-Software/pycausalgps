@@ -11,7 +11,7 @@ from sqlitedict import SqliteDict
 from collections import OrderedDict
 
 from pycausalgps.log import LOGGER
-from pycausalgps.utils import human_readible_size
+from pycausalgps.base.utils import human_readible_size
 
 class Database:
     """ Database class

@@ -4,7 +4,6 @@ import unittest
 
 import pycausalgps.database as database
 import pycausalgps.gps as gps
-import pycausalgps.gps_utils as gps_utils
 import pycausalgps.project_controller as project_controller
 
 

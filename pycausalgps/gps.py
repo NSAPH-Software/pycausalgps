@@ -116,8 +116,6 @@ class GeneralizedPropensityScore:
                f" ----- *** -----  \n" +\
                f"Training reports: \n {yaml.dump(self.training_report, default_flow_style=False)} \n"
 
-
-
     def __repr__(self):
         return f"GeneneralizedPropensityScore({self.project_params}),{self.gps_params})"
 
@@ -198,25 +196,31 @@ class GeneralizedPropensityScore:
                               ["gps_params", "pred_model", 
                                "covariate_column_num"])
         
-        num_cols = (self.gps_params.
-                         get("gps_params").
-                         get("pred_model").
-                         get("covariate_column_num"))
+        # num_cols = (self.gps_params.
+        #                  get("gps_params").
+        #                  get("pred_model").
+        #                  get("covariate_column_num"))
 
-        X_num = _data[(self.gps_params.
-                            get("gps_params").
-                            get("pred_model").
-                            get("covariate_column_num"))]
+        
+        
+        X_num = _data[num_cols]
 
-        y = _data[(self.gps_params.
-                        get("gps_params").
-                        get("pred_model").
-                        get("exposure_column"))]
+        exposure_col = nested_get(self.gps_params,
+                                    ["gps_params", "pred_model", 
+                                     "exposure_column"])
+
+        y = _data[exposure_col]
+
+        # y = _data[(self.gps_params.
+        #                 get("gps_params").
+        #                 get("pred_model").
+        #                 get("exposure_column"))]
         
         cat_cols = (self.gps_params.
                          get("gps_params").
                          get("pred_model").
                          get("covariate_column_cat"))
+        
         X_cat = _data[cat_cols]
 
         # Pandas read these comlumns as object.
@@ -276,26 +280,63 @@ class GeneralizedPropensityScore:
                         e_gps_std=e_gps_std_pred, 
                         w_resid=w_resid)
         else:
-            LOGGER.warning(f"gps_model: '{self.params['gps_model']}' is not defined."+\
-                           f" Available models: parametric, non-parametric.")
+            LOGGER.warning(f"gps_model: '{self.params['gps_model']}'"
+                           + f" is not defined."
+                           + f" Available models: parametric, non-parametric.")
             return dict()
 
     @staticmethod
-    def xgb_train_it(input, target, params):
-        """ Creates XGBoost regressor model and returns predicted value for
-        all input data."""
+    def xgb_train_it(input: pd.DataFrame, 
+                     target: pd.Series, 
+                     params: dict) -> tuple:
+        """ Create XGBoost regressor model 
+        
+        Parameters
+        ----------
+        input : pd.DataFrame
+            Covariate data
+        target : pd.Series
+            Exposure data
+        params : dict
+            Dictionary of parameters
+        
+        Returns
+        -------
+        predict_all : np.ndarray
+            Predicted exposure for all data
+        training_report : dict
+            Dictionary of training report
+        """
 
         #initiate the model
         # TODO: collect library hyperparameters via dictionary and the main key 
         # can be the library name + hyperparams.
         # TODO: check hyper params before feeding to the model. If it is not defined, 
         # the model will use default values which is misleading.
-        xgb = XGBRegressor(n_estimators = params.get("gps_params").get("pred_model").get("libs").get("n_estimators"),
-                           learning_rate = params.get("gps_params").get("pred_model").get("libs").get("learning_rate"))                 
+        
+        # Collect hyperparameters
+        n_estimators = nested_get(params,
+                                  ["gps_params","pred_model",
+                                   "libs","n_estimators"])
+
+        learning_rate = nested_get(params,
+                                   ["gps_params","pred_model",
+                                    "libs","learning_rate"])
+
+        test_size = nested_get(params,
+                               ["gps_params","pred_model",
+                                "libs","test_rate"])
+
+        random_state = nested_get(params,
+                                 ["gps_params","pred_model",
+                                  "libs","random_state"])
+
+        xgb = XGBRegressor(n_estimators = n_estimators,
+                           learning_rate = learning_rate)                 
         
         X_train, X_val, y_train, y_val = train_test_split(input, target,
-                                    test_size = params.get("gps_params").get("pred_model").get("libs").get("test_rate"), 
-                                    random_state = params.get("gps_params").get("pred_model").get("libs").get("random_state"))
+                                    test_size = test_size, 
+                                    random_state = random_state)
         # Fit on train data
         xgb.fit(X_train, y_train)
 
@@ -306,8 +347,6 @@ class GeneralizedPropensityScore:
         
         training_report = {'r2_score': float(r_s),
                            'rmse': float(rmse)}
-
-        #print(f"R2 score: {r_s}, RMSE: {rmse}")
 
         # Fit on entire data
         predict_all = xgb.predict(input)
@@ -362,6 +401,7 @@ class GeneralizedPropensityScore:
             ps_pop.generate_pseudo_population()
             self.pseudo_population_list.append(ps_pop.hash_value)
             self.db.set_value(ps_pop.hash_value, ps_pop)
+            self.db.set_value(self.hash_value, self)
             
 
 
@@ -375,7 +415,7 @@ class GeneralizedPropensityScore:
 
         # Add pseudo population to the pseudo population list.
 
-    def pspop_summary(self):
+    def summary(self):
         """ Prints the summary of the pseudo population."""
         if len(self.pseudo_population_list) == 0:
             print ("The GPS object does not have any pseudo population.")
@@ -386,14 +426,11 @@ class GeneralizedPropensityScore:
                 print(pspop.pspop_id)
 
 
-
     def _connect_to_database(self):
         if self.db_path is None:
             raise Exception("Database is not defined.")
             
         self.db = Database(self.db_path)
-
-
 
 
     def get_pseudo_population(self, pspop_id):

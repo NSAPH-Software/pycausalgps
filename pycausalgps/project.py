@@ -110,6 +110,8 @@ class Project:
             try:
                 with open(gps_params_path, "r") as f:
                     gps_params = yaml.safe_load(f)
+            except FileNotFoundError as e:
+                raise FileNotFoundError(e)
             except Exception as e:
                 print(e)
                 return
@@ -138,7 +140,9 @@ class Project:
         else:
             gps.compute_gps()
             self.gps_list.append(gps.hash_value)
-            #self.db.set_value(gps.hash_value, gps)
+            # add the gps object to the database
+            self.db.set_value(gps.hash_value, gps)
+            # update the project object in the database
             self.db.set_value(self.hash_value, self)
         
         # TODO: You can add the gps object to the database, with or without GPS 
