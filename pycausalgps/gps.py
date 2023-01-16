@@ -18,6 +18,7 @@ from sklearn.metrics import r2_score, mean_squared_error
 
 from pycausalgps.log import LOGGER
 from pycausalgps.database import Database
+from pycausalgps.base.utils import nested_get
 from pycausalgps.pseudo_population import PseudoPopulation
 
 class GeneralizedPropensityScore:
@@ -150,7 +151,14 @@ class GeneralizedPropensityScore:
         # load data
         _study_data = self.load_data()
 
-        lib_name = self.gps_params.get("gps_params").get("pred_model").get("libs").get("name")
+        lib_name = nested_get(self.gps_params,
+                              ["gps_params", "pred_model", "libs", "name"])
+
+        # lib_name = (self.gps_params.
+        #                  get("gps_params").
+        #                  get("pred_model").
+        #                  get("libs").
+        #                  get("name"))
 
         if lib_name == "xgboost":
             gps_res = self._compute_gps_xgboost(_data=_study_data )
@@ -183,11 +191,32 @@ class GeneralizedPropensityScore:
 
         # select columns that needs to be included.
         # TODO: add checks to make sure that all columns exist.
-        num_cols = self.gps_params.get("gps_params").get("pred_model").get("covariate_column_num")
-        X_num = _data[self.gps_params.get("gps_params").get("pred_model").get("covariate_column_num")]
-        y = _data[self.gps_params.get("gps_params").get("pred_model").get("exposure_column")]
+        # TODO: Move all core functions under base module. The user should be able to compute 
+        # different parameters without using the class (provided that all information is given).
         
-        cat_cols = self.gps_params.get("gps_params").get("pred_model").get("covariate_column_cat")
+        num_cols = nested_get(self.gps_params,
+                              ["gps_params", "pred_model", 
+                               "covariate_column_num"])
+        
+        num_cols = (self.gps_params.
+                         get("gps_params").
+                         get("pred_model").
+                         get("covariate_column_num"))
+
+        X_num = _data[(self.gps_params.
+                            get("gps_params").
+                            get("pred_model").
+                            get("covariate_column_num"))]
+
+        y = _data[(self.gps_params.
+                        get("gps_params").
+                        get("pred_model").
+                        get("exposure_column"))]
+        
+        cat_cols = (self.gps_params.
+                         get("gps_params").
+                         get("pred_model").
+                         get("covariate_column_cat"))
         X_cat = _data[cat_cols]
 
         # Pandas read these comlumns as object.
