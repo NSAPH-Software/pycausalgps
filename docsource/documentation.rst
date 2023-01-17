@@ -6,6 +6,6 @@ Documenting the code is an important part of contribution. There are 3 main plac
 - The codes should be provided by sufficient docstrings and each module should be added to `Modules <modules.rst>`_ file. 
 - Any modification including: add, change, fix, and remove action should be added to Changelog under **Unreleased** section. 
 
-We include private methods (starting with "_") in the documentation for easier maintenance. However, they should never be used by the end-users. These parts of the documentation are generated for the developers.    
+We include private methods (starting with "_") in the documentation for easier maintenance. However, they are not meant to be used by the end-users. These parts of the documentation are generated for the developers.    
 
-Please note that all files should be added to the *docsource* folder. 
+Please note that all files should be added to the **docsource** folder. 

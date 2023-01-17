@@ -3,20 +3,52 @@ import numpy as np
 import pandas as pd
 
 
-from .log import LOGGER
+from pycausalgps.log import LOGGER
 
+
+def nested_get(d, keys, default=None):
+    """ Get a value from a nested dictionary.
+
+    Parameters
+    ----------
+    d : dict
+        The dictionary to search.
+    keys : list
+        The list of keys to search for.
+
+    Returns
+    -------
+    value : object
+        The value of the key if found, otherwise None.
+    """
+    for key in keys:
+        if isinstance(d, dict):
+            d = d.get(key, default)
+        else:
+            return default
+    return d
 
 def generate_syn_pop(sample_size: int, seed_val:int, outcome_sd:int,
                              gps_spec:int, cova_spec:int) -> pd.DataFrame:
-    """
-    Generates synthetic data
+    """ Generate synthetic data
 
-    Inputs:
-        | sample_size: Number of required data samples.
-        | seed_val: seed value for generating reproducible data.
-        | outcome_sd: TBD
-        | gps_spec: TBD
-        | cova_spec: TBD
+    Parameters
+    ----------
+    sample_size: int
+        A number of required data samples.
+    seed_val: int 
+        A seed value for generating reproducible data.
+    outcome_sd: int
+        TBD
+    gps_spec: int
+        TBD
+    cova_spec: int
+        TBD
+
+    Returns
+    -------
+    data: pd.DataFrame
+        A dataframe containing the generated data.
 
     >>> md = generate_syn_pop(100)
     >>> len(md)
@@ -107,7 +139,7 @@ def generate_syn_pop(sample_size: int, seed_val:int, outcome_sd:int,
         raise ValueError(f"cova_spec:  {cova_spec} is not a valid value.")
 
     
-    simulated_data = pd.DataFrame({'Y':Y, 
+    data = pd.DataFrame({'Y':Y, 
                                    'treat':treat,
                                    'cf1':cf[0,:],
                                    'cf2':cf[1,:],
@@ -116,8 +148,18 @@ def generate_syn_pop(sample_size: int, seed_val:int, outcome_sd:int,
                                    'cf5':cf5,
                                    'cf6':cf6})
 
-    return simulated_data
+    return data
 
-if __name__ == "__main__":
-    sim_data = generate_syn_pop(1000, gps_spec=1)
-    print(sim_data)
+
+
+def human_readible_size(nbytes):
+    """
+    Convert a number of bytes to a human readable string. 
+    """
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+    i = 0
+    while nbytes >= 1024 and i < len(suffixes)-1:
+        nbytes /= 1024.
+        i += 1
+
+    return f"{nbytes:.2f} {suffixes[i]}"

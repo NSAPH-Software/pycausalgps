@@ -45,7 +45,11 @@
 <p class="caption" role="heading"><span class="caption-text">Researchers</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="setup_env.html">Setting Up Environment</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installing-the-package">Installing the Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-whole-game">The Whole Game</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="gps.html">Estimating Generalized Propensity Score (GPS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gps.html#computing-gps-values">Computing GPS Values</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
@@ -113,7 +117,30 @@
 </style>
 <div class="section" id="quickstart">
 <h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline"></a></h1>
-<p>Quickstart goes here ….</p>
+<div class="section" id="installing-the-package">
+<h2>Installing the Package<a class="headerlink" href="#installing-the-package" title="Permalink to this headline"></a></h2>
+<ol class="arabic">
+<li><p>Install the package using pip:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span><span class="n">TBD</span><span class="o">*</span>
+</pre></div>
+</div>
+</li>
+<li><p>Install the package from Github:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span><span class="n">TBD</span><span class="o">*</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="the-whole-game">
+<h2>The Whole Game<a class="headerlink" href="#the-whole-game" title="Permalink to this headline"></a></h2>
+<p>A processing is described under a project. Although users can use classes individually, we recommend using the project controller because it is the only way to generate a flow of processing and keep track of the results in the database. Each processing session requires an instance of project controller.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycausalgps.project_controller</span> <span class="kn">import</span> <span class="n">ProjectController</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pc</span> <span class="o">=</span> <span class="n">ProjectController</span><span class="p">(</span><span class="n">db_path</span> <span class="o">=</span> <span class="s1">&#39;test_database.sqlite&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The project controller manages the projects in the database. The project controller will connect to the database if the provided database already exists. Otherwise, it will create a new database. We assume that the database did not exist.</p>
+</div>
 </div>
 
 
@@ -127,7 +154,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright Harvard University 2021.</p>
+    <p>&#169; Copyright Harvard University 2023.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
