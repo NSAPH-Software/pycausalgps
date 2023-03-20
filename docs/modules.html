@@ -248,21 +248,29 @@ the disk)</p>
 <dt class="sig sig-object py" id="pycausalgps.project_controller.ProjectController">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycausalgps.project_controller.</span></span><span class="sig-name descname"><span class="pre">ProjectController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">db_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/project_controller.html#ProjectController"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.project_controller.ProjectController" title="Permalink to this definition"></a></dt>
 <dd><p>ProjectController class</p>
-<p>The ProjectController class is used to manage projects. It provides suite of
+<p>The ProjectController class manages the projects. It provides suite of
 methods to add, remove, and connect to projects. It also provides a summary
 method to print the list of projects. Each project is defined by a folder
 with a project.yaml file.</p>
-<div class="line-block">
-<div class="line">db_path: str</div>
-</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>db_path</strong> (<em>str</em>) – Path to the database file.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.project_controller.ProjectController._update_project_list">
+<span class="sig-name descname"><span class="pre">_update_project_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/project_controller.html#ProjectController._update_project_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.project_controller.ProjectController._update_project_list" title="Permalink to this definition"></a></dt>
+<dd><p>The PROJECTS_LIST is a list of available projects’ hash values.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pycausalgps.project_controller.ProjectController.connect_to_project">
 <span class="sig-name descname"><span class="pre">connect_to_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/project_controller.html#ProjectController.connect_to_project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.project_controller.ProjectController.connect_to_project" title="Permalink to this definition"></a></dt>
 <dd><p>Connect to a project. If the project is not defined, it will be created.
-The project is defined by a folder with a project.yaml file inside.</p>
+The project is defined by a folder with a <cite>project.yaml</cite> file inside.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>folder_path</strong> (<em>str</em>) – The path to the project folder.</p>
+<dd class="field-odd"><p><strong>folder_path</strong> (<em>str</em>) – A path to the project folder.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -271,12 +279,17 @@ The project is defined by a folder with a project.yaml file inside.</p>
 <dt class="sig sig-object py" id="pycausalgps.project_controller.ProjectController.get_project">
 <span class="sig-name descname"><span class="pre">get_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pr_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/project_controller.html#ProjectController.get_project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.project_controller.ProjectController.get_project" title="Permalink to this definition"></a></dt>
 <dd><p>Get a project object from the database.</p>
-<div class="line-block">
-<div class="line">pr_name: str</div>
-</div>
-<div class="line-block">
-<div class="line">project: Project</div>
-</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pr_name</strong> (<em>str</em>) – Name of the project to be retrieved.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>project</strong> – The project object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -284,9 +297,11 @@ The project is defined by a folder with a project.yaml file inside.</p>
 <span class="sig-name descname"><span class="pre">remove_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/project_controller.html#ProjectController.remove_project"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.project_controller.ProjectController.remove_project" title="Permalink to this definition"></a></dt>
 <dd><p>Remove a project from the database, the list of projects, and the
 in-memory cache. Run pc.summary() to see the list of projects.</p>
-<div class="line-block">
-<div class="line">project_name: str</div>
-</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>project_name</strong> (<em>str</em>) – Name of the project to be removed.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -311,9 +326,10 @@ details.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>project_params</strong> (<em>dict</em>) – </p></li>
-<li><p><strong>keys</strong> (<em>The parameters of the project. It should contain the following mandotary</em>) – </p></li>
+<li><p><strong>mandotary</strong> (<em>The parameters of the project. It should contain the following</em>) – </p></li>
+<li><p><strong>keys</strong> – </p></li>
 <li><p><strong>name</strong> (<em>|</em>) – </p></li>
-<li><p><strong>id</strong> (<em>|</em>) – </p></li>
+<li><p><strong>project_id</strong> (<em>|</em>) – </p></li>
 <li><p><strong>data.outcome_path</strong> (<em>|</em>) – </p></li>
 <li><p><strong>data.exposure_path</strong> (<em>|</em>) – </p></li>
 <li><p><strong>data.covariate_path</strong> (<em>|</em>) – </p></li>
@@ -321,10 +337,11 @@ details.</p>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
-<p>The project object does not load the data. It only stores the paths to the data.</p>
+<p>The project object does not load the data. It only stores the paths to the
+data. Other than mandatory keys, the project_params can contain other keys.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycausalgps.project</span> <span class="kn">import</span> <span class="n">Project</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">project_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test_project&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">project_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;test_project&quot;</span><span class="p">,</span> <span class="s2">&quot;project_id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
 <span class="go">                      &quot;data&quot;: {&quot;outcome_path&quot;: &quot;data/outcome.csv&quot;,</span>
 <span class="go">                               &quot;exposure_path&quot;: &quot;data/exposure.csv&quot;,</span>
 <span class="go">                               &quot;covariate_path&quot;: &quot;data/covariate.csv&quot;}}</span>
@@ -347,10 +364,17 @@ This function computes the GPS for the project.</p>
 <dt class="sig sig-object py" id="pycausalgps.project.Project.get_gps">
 <span class="sig-name descname"><span class="pre">get_gps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gps_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/project.html#Project.get_gps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.project.Project.get_gps" title="Permalink to this definition"></a></dt>
 <dd><p>Get a project object from the database.</p>
-<p>gps_id: str</p>
-<div class="line-block">
-<div class="line">gps: GeneralizedPropensityScore</div>
-</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>gps_id</strong> (<em>str</em>) – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>gps</strong> – A GPS object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pycausalgps.gps.GeneralizedPropensityScore" title="pycausalgps.gps.GeneralizedPropensityScore">GeneralizedPropensityScore</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -432,16 +456,31 @@ work with them.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.pspop_summary">
-<span class="sig-name descname"><span class="pre">pspop_summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.pspop_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.pspop_summary" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.summary" title="Permalink to this definition"></a></dt>
 <dd><p>Prints the summary of the pseudo population.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.xgb_train_it">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xgb_train_it</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.xgb_train_it"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.xgb_train_it" title="Permalink to this definition"></a></dt>
-<dd><p>Creates XGBoost regressor model and returns predicted value for
-all input data.</p>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xgb_train_it</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.series.Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.xgb_train_it"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.xgb_train_it" title="Permalink to this definition"></a></dt>
+<dd><p>Create XGBoost regressor model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input</strong> (<em>pd.DataFrame</em>) – Covariate data</p></li>
+<li><p><strong>target</strong> (<em>pd.Series</em>) – Exposure data</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – Dictionary of parameters</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>predict_all</strong> (<em>np.ndarray</em>) – Predicted exposure for all data</p></li>
+<li><p><strong>training_report</strong> (<em>dict</em>) – Dictionary of training report</p></li>
+</ul>
+</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
