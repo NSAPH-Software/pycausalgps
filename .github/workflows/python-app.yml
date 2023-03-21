@@ -25,7 +25,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install R
-      uses: r-lib/actions/setup-r@v1
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y r-base
       with:
         r-version: '4.1.0'
     - name: Setup conda
