@@ -70,7 +70,6 @@ class TestDatabase(unittest.TestCase):
         # cache size is still 10.
         self.assertEqual(len(Database._cache), 10)
 
-
     def test_summary(self):
         db_name = "test.db"
         db = Database(db_path=db_name)
