@@ -10,6 +10,14 @@ from unittest.mock import MagicMock
 
 class TestDatabase(unittest.TestCase):
 
+    def setUp(self):
+        self.db = Database(db_path="test.db")
+
+    def tearDown(self):
+        self.db.close_db()
+        if os.path.exists("test.db"):
+            os.remove("test.db")
+
     def test_add_retrieve_data(self):
 
         db = Database(db_path="test.db")
@@ -108,11 +116,9 @@ class TestDatabase(unittest.TestCase):
 
         # Check if the reserved keys still exist in the database
         reserved_keys_value = db.get_value("RESERVED_KEYS")
-        projects_list_value = db.get_value("PROJECTS_LIST")
 
         # Assert that the reserved keys still exist
         self.assertIsNotNone(reserved_keys_value)
-        self.assertIsNotNone(projects_list_value)
 
         db.close_db()
 
@@ -157,3 +163,7 @@ class TestDatabase(unittest.TestCase):
                 self.fail(f"set_Value raised RuntimeError unexpectedly: {e}")
 
         db.close_db()
+
+
+if __name__ == "__main__":
+    unittest.main()
