@@ -99,7 +99,7 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 
 <span class="kn">from</span> <span class="nn">pycausalgps.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
-<span class="kn">from</span> <span class="nn">pycausalgps.utils</span> <span class="kn">import</span> <span class="n">human_readible_size</span>
+<span class="kn">from</span> <span class="nn">pycausalgps.base.utils</span> <span class="kn">import</span> <span class="n">human_readible_size</span>
 
 <div class="viewcode-block" id="Database"><a class="viewcode-back" href="../../modules.html#pycausalgps.database.Database">[docs]</a><span class="k">class</span> <span class="nc">Database</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot; Database class</span>
@@ -174,12 +174,15 @@
             <span class="k">del</span> <span class="n">Database</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tried to delete non-existing </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> on the cache.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tried to set </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> on the database.&quot;</span>
              <span class="s2">&quot;Something went wrong.&quot;</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-            <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> </div>
+            <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Database.delete_value"><a class="viewcode-back" href="../../modules.html#pycausalgps.database.Database.delete_value">[docs]</a>    <span class="k">def</span> <span class="nf">delete_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Deletes the key, and its value from both in-memory dictionary and</span>
@@ -247,13 +250,13 @@
                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Database</span><span class="o">.</span><span class="n">_cache_size</span><span class="si">}</span><span class="s2">. An item removed, and new item added.&quot;</span><span class="p">)</span>
                 <span class="n">Database</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
                 <span class="k">return</span> <span class="n">tmp</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RuntimeError: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The requested key (</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">) is not in the&quot;</span>
                  <span class="s2">&quot; database. Returns None.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">None</span>
-            <span class="k">finally</span><span class="p">:</span>
-                <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-                <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">value</span></div>
 
@@ -310,16 +313,16 @@
 <div class="viewcode-block" id="Database._init_reserved_keys"><a class="viewcode-back" href="../../modules.html#pycausalgps.database.Database._init_reserved_keys">[docs]</a>    <span class="k">def</span> <span class="nf">_init_reserved_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initializes the reserved keys in the database. There are two </span>
 <span class="sd">        reserved keys: RESERVED_KEYS and PROJECTS_LIST.&quot;&quot;&quot;</span>
+             
         <span class="k">try</span><span class="p">:</span>
             <span class="n">db</span> <span class="o">=</span> <span class="n">SqliteDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">autocommit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">db</span><span class="p">[</span><span class="s2">&quot;RESERVED_KEYS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;RESERVED_KEYS&quot;</span><span class="p">,</span> <span class="s2">&quot;PROJECTS_LIST&quot;</span><span class="p">]</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reserved keys are initialized.&quot;</span><span class="p">)</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reserved keys are initialized.&quot;</span><span class="p">)</span>     
+        <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reserved keys are already initialized.&quot;</span><span class="p">)</span>
-        <span class="k">finally</span><span class="p">:</span>
-            <span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-            <span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
-            
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reserved keys are already initialized.&quot;</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

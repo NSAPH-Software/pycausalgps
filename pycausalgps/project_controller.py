@@ -42,23 +42,22 @@ class ProjectController:
 
     def _update_project_list(self):
         """ The PROJECTS_LIST is a list of available projects' hash values."""
-        # TODO: How to protect this key from others access?
         if self.db.get_value("PROJECTS_LIST") is None:
             self.db.set_value("PROJECTS_LIST", list())
         else:
             self.projects_list = self.db.get_value("PROJECTS_LIST")
 
-    def connect_to_project(self, folder_path=None):
+    def create_project(self, folder_path=None):
         """
-        Connect to a project. If the project is not defined, it will be created.
-        The project is defined by a folder with a `project.yaml` file inside. 
-
+        Create a new project and add it to the database. The project is defined by
+        a folder with a `project.yaml` file inside.
+    
         Parameters
         ----------
         folder_path : str
-            A path to the project folder.
+            A path to the project folder containing the `project.yaml` file.
         """
-
+    
         if folder_path is not None:
             try:
                 with open(os.path.join(folder_path, "project.yaml"), "r") as f:
@@ -69,13 +68,13 @@ class ProjectController:
         else:
             print("Please provide a yaml file path for the project.")
             return
-        
+    
         # sanity check for the project parameters are defined inside the 
         # Project class.
         p_obj = Project(project_params=project_params, db_path=self.db_path)
-   
+    
         c_pr = self.db.get_value("PROJECTS_LIST")
-
+    
         if p_obj.hash_value in c_pr:
             print("The project has been already submitted to the database. "
                   + "Retrieving the project object from the database.")
@@ -84,12 +83,50 @@ class ProjectController:
             c_pr.append(p_obj.hash_value)     
             self.db.set_value("PROJECTS_LIST", c_pr)
             self._update_project_list()
-
+    
             # Add project to the database
             self.db.set_value(p_obj.hash_value, p_obj)
             print(f"Project {project_params.get('name')} " 
                   + f"has been successfully added to the database.")
-
+    
+            
+    def connect_to_project(self, folder_path=None):
+        """
+        Connect to an existing project defined by a folder with a `project.yaml`
+        file inside.
+    
+        Parameters
+        ----------
+        folder_path : str
+            A path to the project folder containing the `project.yaml` file.
+        """
+    
+        if folder_path is not None:
+            try:
+                with open(os.path.join(folder_path, "project.yaml"), "r") as f:
+                    project_params = yaml.safe_load(f)
+            except Exception as e:
+                print(e)
+                return
+        else:
+            print("Please provide a yaml file path for the project.")
+            return
+    
+        # sanity check for the project parameters are defined inside the 
+        # Project class.
+        p_obj = Project(project_params=project_params, db_path=self.db_path)
+    
+        c_pr = self.db.get_value("PROJECTS_LIST")
+    
+        if p_obj.hash_value in c_pr:
+            print("The project has been already submitted to the database. "
+                  + "Retrieving the project object from the database.")
+            p_obj = self.db.get_value(p_obj.hash_value)
+        else:
+            print("The project does not exist in the database. "
+                  + "Please create the project first.")
+    
+    
     def remove_project(self, project_name):
         """
         Remove a project from the database, the list of projects, and the
@@ -113,6 +150,7 @@ class ProjectController:
         else:
             print("Project is not defined." 
                   + "Use pc.summary() to see the list of projects.")
+            self.summary()
             return
         
         if p_obj.hash_value in self.projects_list:
@@ -131,6 +169,7 @@ class ProjectController:
             print(f"Project '{project_name}' has been successfully deleted.")
         else:
             print(f"Project '{project_name}' is not defined.")
+            self.summary()
 
     def summary(self):
         """

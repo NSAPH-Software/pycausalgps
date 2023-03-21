@@ -106,6 +106,7 @@
 
 <span class="kn">from</span> <span class="nn">pycausalgps.log</span> <span class="kn">import</span> <span class="n">LOGGER</span>
 <span class="kn">from</span> <span class="nn">pycausalgps.database</span> <span class="kn">import</span> <span class="n">Database</span>
+<span class="kn">from</span> <span class="nn">pycausalgps.base.utils</span> <span class="kn">import</span> <span class="n">nested_get</span>
 <span class="kn">from</span> <span class="nn">pycausalgps.pseudo_population</span> <span class="kn">import</span> <span class="n">PseudoPopulation</span>
 
 <div class="viewcode-block" id="GeneralizedPropensityScore"><a class="viewcode-back" href="../../modules.html#pycausalgps.gps.GeneralizedPropensityScore">[docs]</a><span class="k">class</span> <span class="nc">GeneralizedPropensityScore</span><span class="p">:</span>
@@ -203,8 +204,6 @@
                <span class="sa">f</span><span class="s2">&quot; ----- *** -----  </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span>\
                <span class="sa">f</span><span class="s2">&quot;Training reports: </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">training_report</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="se">\n</span><span class="s2">&quot;</span>
 
-
-
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;GeneneralizedPropensityScore(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">project_params</span><span class="si">}</span><span class="s2">),</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gps_params</span><span class="si">}</span><span class="s2">)&quot;</span>
 
@@ -238,7 +237,14 @@
         <span class="c1"># load data</span>
         <span class="n">_study_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
 
-        <span class="n">lib_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gps_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gps_params&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pred_model&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;libs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+        <span class="n">lib_name</span> <span class="o">=</span> <span class="n">nested_get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gps_params</span><span class="p">,</span>
+                              <span class="p">[</span><span class="s2">&quot;gps_params&quot;</span><span class="p">,</span> <span class="s2">&quot;pred_model&quot;</span><span class="p">,</span> <span class="s2">&quot;libs&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">])</span>
+
+        <span class="c1"># lib_name = (self.gps_params.</span>
+        <span class="c1">#                  get(&quot;gps_params&quot;).</span>
+        <span class="c1">#                  get(&quot;pred_model&quot;).</span>
+        <span class="c1">#                  get(&quot;libs&quot;).</span>
+        <span class="c1">#                  get(&quot;name&quot;))</span>
 
         <span class="k">if</span> <span class="n">lib_name</span> <span class="o">==</span> <span class="s2">&quot;xgboost&quot;</span><span class="p">:</span>
             <span class="n">gps_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_gps_xgboost</span><span class="p">(</span><span class="n">_data</span><span class="o">=</span><span class="n">_study_data</span> <span class="p">)</span>
@@ -271,11 +277,38 @@
 
         <span class="c1"># select columns that needs to be included.</span>
         <span class="c1"># TODO: add checks to make sure that all columns exist.</span>
-        <span class="n">num_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gps_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gps_params&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pred_model&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;covariate_column_num&quot;</span><span class="p">)</span>
-        <span class="n">X_num</span> <span class="o">=</span> <span class="n">_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gps_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gps_params&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pred_model&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;covariate_column_num&quot;</span><span class="p">)]</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">gps_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gps_params&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pred_model&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;exposure_column&quot;</span><span class="p">)]</span>
+        <span class="c1"># TODO: Move all core functions under base module. The user should be able to compute </span>
+        <span class="c1"># different parameters without using the class (provided that all information is given).</span>
         
-        <span class="n">cat_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gps_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gps_params&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pred_model&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;covariate_column_cat&quot;</span><span class="p">)</span>
+        <span class="n">num_cols</span> <span class="o">=</span> <span class="n">nested_get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gps_params</span><span class="p">,</span>
+                              <span class="p">[</span><span class="s2">&quot;gps_params&quot;</span><span class="p">,</span> <span class="s2">&quot;pred_model&quot;</span><span class="p">,</span> 
+                               <span class="s2">&quot;covariate_column_num&quot;</span><span class="p">])</span>
+        
+        <span class="c1"># num_cols = (self.gps_params.</span>
+        <span class="c1">#                  get(&quot;gps_params&quot;).</span>
+        <span class="c1">#                  get(&quot;pred_model&quot;).</span>
+        <span class="c1">#                  get(&quot;covariate_column_num&quot;))</span>
+
+        
+        
+        <span class="n">X_num</span> <span class="o">=</span> <span class="n">_data</span><span class="p">[</span><span class="n">num_cols</span><span class="p">]</span>
+
+        <span class="n">exposure_col</span> <span class="o">=</span> <span class="n">nested_get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gps_params</span><span class="p">,</span>
+                                    <span class="p">[</span><span class="s2">&quot;gps_params&quot;</span><span class="p">,</span> <span class="s2">&quot;pred_model&quot;</span><span class="p">,</span> 
+                                     <span class="s2">&quot;exposure_column&quot;</span><span class="p">])</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="n">_data</span><span class="p">[</span><span class="n">exposure_col</span><span class="p">]</span>
+
+        <span class="c1"># y = _data[(self.gps_params.</span>
+        <span class="c1">#                 get(&quot;gps_params&quot;).</span>
+        <span class="c1">#                 get(&quot;pred_model&quot;).</span>
+        <span class="c1">#                 get(&quot;exposure_column&quot;))]</span>
+        
+        <span class="n">cat_cols</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gps_params</span><span class="o">.</span>
+                         <span class="n">get</span><span class="p">(</span><span class="s2">&quot;gps_params&quot;</span><span class="p">)</span><span class="o">.</span>
+                         <span class="n">get</span><span class="p">(</span><span class="s2">&quot;pred_model&quot;</span><span class="p">)</span><span class="o">.</span>
+                         <span class="n">get</span><span class="p">(</span><span class="s2">&quot;covariate_column_cat&quot;</span><span class="p">))</span>
+        
         <span class="n">X_cat</span> <span class="o">=</span> <span class="n">_data</span><span class="p">[</span><span class="n">cat_cols</span><span class="p">]</span>
 
         <span class="c1"># Pandas read these comlumns as object.</span>
@@ -335,26 +368,63 @@
                         <span class="n">e_gps_std</span><span class="o">=</span><span class="n">e_gps_std_pred</span><span class="p">,</span> 
                         <span class="n">w_resid</span><span class="o">=</span><span class="n">w_resid</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;gps_model: &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;gps_model&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; is not defined.&quot;</span><span class="o">+</span>\
-                           <span class="sa">f</span><span class="s2">&quot; Available models: parametric, non-parametric.&quot;</span><span class="p">)</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;gps_model: &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;gps_model&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+                           <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; is not defined.&quot;</span>
+                           <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot; Available models: parametric, non-parametric.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">dict</span><span class="p">()</span>
 
 <div class="viewcode-block" id="GeneralizedPropensityScore.xgb_train_it"><a class="viewcode-back" href="../../modules.html#pycausalgps.gps.GeneralizedPropensityScore.xgb_train_it">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">xgb_train_it</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Creates XGBoost regressor model and returns predicted value for</span>
-<span class="sd">        all input data.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">xgb_train_it</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> 
+                     <span class="n">target</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> 
+                     <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; Create XGBoost regressor model </span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        input : pd.DataFrame</span>
+<span class="sd">            Covariate data</span>
+<span class="sd">        target : pd.Series</span>
+<span class="sd">            Exposure data</span>
+<span class="sd">        params : dict</span>
+<span class="sd">            Dictionary of parameters</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        predict_all : np.ndarray</span>
+<span class="sd">            Predicted exposure for all data</span>
+<span class="sd">        training_report : dict</span>
+<span class="sd">            Dictionary of training report</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1">#initiate the model</span>
         <span class="c1"># TODO: collect library hyperparameters via dictionary and the main key </span>
         <span class="c1"># can be the library name + hyperparams.</span>
         <span class="c1"># TODO: check hyper params before feeding to the model. If it is not defined, </span>
         <span class="c1"># the model will use default values which is misleading.</span>
-        <span class="n">xgb</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gps_params&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pred_model&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;libs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;n_estimators&quot;</span><span class="p">),</span>
-                           <span class="n">learning_rate</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gps_params&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pred_model&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;libs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;learning_rate&quot;</span><span class="p">))</span>                 
+        
+        <span class="c1"># Collect hyperparameters</span>
+        <span class="n">n_estimators</span> <span class="o">=</span> <span class="n">nested_get</span><span class="p">(</span><span class="n">params</span><span class="p">,</span>
+                                  <span class="p">[</span><span class="s2">&quot;gps_params&quot;</span><span class="p">,</span><span class="s2">&quot;pred_model&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;libs&quot;</span><span class="p">,</span><span class="s2">&quot;n_estimators&quot;</span><span class="p">])</span>
+
+        <span class="n">learning_rate</span> <span class="o">=</span> <span class="n">nested_get</span><span class="p">(</span><span class="n">params</span><span class="p">,</span>
+                                   <span class="p">[</span><span class="s2">&quot;gps_params&quot;</span><span class="p">,</span><span class="s2">&quot;pred_model&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;libs&quot;</span><span class="p">,</span><span class="s2">&quot;learning_rate&quot;</span><span class="p">])</span>
+
+        <span class="n">test_size</span> <span class="o">=</span> <span class="n">nested_get</span><span class="p">(</span><span class="n">params</span><span class="p">,</span>
+                               <span class="p">[</span><span class="s2">&quot;gps_params&quot;</span><span class="p">,</span><span class="s2">&quot;pred_model&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;libs&quot;</span><span class="p">,</span><span class="s2">&quot;test_rate&quot;</span><span class="p">])</span>
+
+        <span class="n">random_state</span> <span class="o">=</span> <span class="n">nested_get</span><span class="p">(</span><span class="n">params</span><span class="p">,</span>
+                                 <span class="p">[</span><span class="s2">&quot;gps_params&quot;</span><span class="p">,</span><span class="s2">&quot;pred_model&quot;</span><span class="p">,</span>
+                                  <span class="s2">&quot;libs&quot;</span><span class="p">,</span><span class="s2">&quot;random_state&quot;</span><span class="p">])</span>
+
+        <span class="n">xgb</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span> <span class="o">=</span> <span class="n">n_estimators</span><span class="p">,</span>
+                           <span class="n">learning_rate</span> <span class="o">=</span> <span class="n">learning_rate</span><span class="p">)</span>                 
         
         <span class="n">X_train</span><span class="p">,</span> <span class="n">X_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span>
-                                    <span class="n">test_size</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gps_params&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pred_model&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;libs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test_rate&quot;</span><span class="p">),</span> 
-                                    <span class="n">random_state</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gps_params&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pred_model&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;libs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;random_state&quot;</span><span class="p">))</span>
+                                    <span class="n">test_size</span> <span class="o">=</span> <span class="n">test_size</span><span class="p">,</span> 
+                                    <span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span><span class="p">)</span>
         <span class="c1"># Fit on train data</span>
         <span class="n">xgb</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
 
@@ -365,8 +435,6 @@
         
         <span class="n">training_report</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;r2_score&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">r_s</span><span class="p">),</span>
                            <span class="s1">&#39;rmse&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">rmse</span><span class="p">)}</span>
-
-        <span class="c1">#print(f&quot;R2 score: {r_s}, RMSE: {rmse}&quot;)</span>
 
         <span class="c1"># Fit on entire data</span>
         <span class="n">predict_all</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
@@ -420,7 +488,8 @@
             <span class="c1"># compute ps_pop</span>
             <span class="n">ps_pop</span><span class="o">.</span><span class="n">generate_pseudo_population</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pseudo_population_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ps_pop</span><span class="o">.</span><span class="n">hash_value</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">ps_pop</span><span class="o">.</span><span class="n">hash_value</span><span class="p">,</span> <span class="n">ps_pop</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">ps_pop</span><span class="o">.</span><span class="n">hash_value</span><span class="p">,</span> <span class="n">ps_pop</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash_value</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
             
 
 
@@ -434,7 +503,7 @@
 
         <span class="c1"># Add pseudo population to the pseudo population list.</span>
 
-<div class="viewcode-block" id="GeneralizedPropensityScore.pspop_summary"><a class="viewcode-back" href="../../modules.html#pycausalgps.gps.GeneralizedPropensityScore.pspop_summary">[docs]</a>    <span class="k">def</span> <span class="nf">pspop_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="GeneralizedPropensityScore.summary"><a class="viewcode-back" href="../../modules.html#pycausalgps.gps.GeneralizedPropensityScore.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Prints the summary of the pseudo population.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pseudo_population_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;The GPS object does not have any pseudo population.&quot;</span><span class="p">)</span>
@@ -445,14 +514,11 @@
                 <span class="nb">print</span><span class="p">(</span><span class="n">pspop</span><span class="o">.</span><span class="n">pspop_id</span><span class="p">)</span></div>
 
 
-
     <span class="k">def</span> <span class="nf">_connect_to_database</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Database is not defined.&quot;</span><span class="p">)</span>
             
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">Database</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db_path</span><span class="p">)</span>
-
-
 
 
 <div class="viewcode-block" id="GeneralizedPropensityScore.get_pseudo_population"><a class="viewcode-back" href="../../modules.html#pycausalgps.gps.GeneralizedPropensityScore.get_pseudo_population">[docs]</a>    <span class="k">def</span> <span class="nf">get_pseudo_population</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pspop_id</span><span class="p">):</span>
