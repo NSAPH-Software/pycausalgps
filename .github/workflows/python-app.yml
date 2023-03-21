@@ -28,8 +28,6 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y r-base
-      with:
-        r-version: '4.1.0'
     - name: Setup conda
       uses: s-weigand/setup-conda@v1
     - name: Install dependencies
