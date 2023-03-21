@@ -69,11 +69,11 @@ class Project:
 
         for key in required_keys:
             if key not in self.project_params.keys():
-                raise Exception(f"In the project.yaml file, " \
+                raise KeyError(f"In the project.yaml file, " \
                                 f"please provide the '{key}' field.")
         for key in required_data_keys:
             if key not in self.project_params.get("data").keys():
-                raise Exception(f"In the project.yaml file, "\
+                raise KeyError(f"In the project.yaml file, "\
                                 f"under the 'data' field, " \
                                 f"please provide the '{key}' field.")
 
@@ -107,14 +107,9 @@ class Project:
         # it should create different gps objects for each combination.
 
         if gps_params_path is not None:
-            try:
-                with open(gps_params_path, "r") as f:
-                    gps_params = yaml.safe_load(f)
-            except FileNotFoundError as e:
-                raise FileNotFoundError(e)
-            except Exception as e:
-                print(e)
-                return
+            with open(gps_params_path, "r") as f:
+                gps_params = yaml.safe_load(f)
+            
         else:
             print("Please provide a yaml file path for the gps parameters.")
             return
@@ -152,10 +147,10 @@ class Project:
 
     def __str__(self) -> str:
 
-        return f"Project name: {self.pr_name} \n" +\
-               f"Project id: {self.pr_id} \n" +\
-               f"Project database: {self.pr_db_path} \n" +\
-               f"Number of gps objects: {len(self.gps_list)} \n"
+        return (f"Project name: {self.pr_name} \n"
+               f"Project id: {self.pr_id} \n"
+               f"Project database: {self.pr_db_path} \n"
+               f"Number of gps objects: {len(self.gps_list)} \n")
 
     def __repr__(self) -> str:
         return (f"Project({self.pr_name})")
