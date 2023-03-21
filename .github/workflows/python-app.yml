@@ -30,7 +30,7 @@ jobs:
         sudo apt-get install -y r-base
     - name: Install R packages
       run: |
-        R -e 'install.packages(c("polycor", "locpol", "wCorr"), repos="https://cran.rstudio.com/")'
+        sudo R -e 'install.packages(c("polycor", "locpol", "wCorr"), repos="https://cran.rstudio.com/")'
     - name: Setup conda
       uses: s-weigand/setup-conda@v1
     - name: Install dependencies
