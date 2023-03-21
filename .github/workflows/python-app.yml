@@ -31,7 +31,7 @@ jobs:
         pip install flake8 pytest
         conda config --add channels conda-forge
         conda config --add channels intel
-        conda install -y mkl-fft mkl-random mkl-service
+        conda install -y -c intel mkl-fft mkl-random mkl-service
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     # - name: Lint with flake8
     #   run: |
