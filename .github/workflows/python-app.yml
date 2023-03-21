@@ -23,13 +23,26 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+
+    - name: Install R
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y r-base
+    - name: Install R packages
+      run: |
+        sudo R -e 'install.packages(c("polycor", "locpol", "wCorr"), repos="https://cran.rstudio.com/")'
     - name: Setup conda
       uses: s-weigand/setup-conda@v1
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest
-        pip install mkl-fft mkl-random mkl-service
+        conda update --all
+        conda install -c intel mkl_random
+        conda install -c intel mkl_fft
+        conda config --append channels conda-forge
+        conda config --append channels intel
+        conda install -y mkl-service
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     # - name: Lint with flake8
     #   run: |
