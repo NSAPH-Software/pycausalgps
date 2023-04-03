@@ -1,5 +1,13 @@
 # pycausalgps
 
+_[This packages is under development. Some of the features are not yet implemented.]_
+
+[![PyPI version](https://badge.fury.io/py/pycausalgps.svg)](https://badge.fury.io/py/pycausalgps)
+[![Build Status](https://travis-ci.org/NSAPH-Software/pycausalgps.svg?branch=master)](https://travis-ci.org/NSAPH-Software/pycausalgps)
+[![Documentation Status](https://readthedocs.org/projects/pycausalgps/badge/?version=latest)](https://pycausalgps.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/NSAPH-Software/pycausalgps/branch/master/graph/badge.svg)](https://codecov.io/gh/NSAPH-Software/pycausalgps)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Causal Inference with Generalized Propensity Score
 
 pycausalgps is a Python library for implementing matching on generalized propensity scores with continuous exposures. We have developed an innovative approach for estimating causal effects using observational data in settings with continuous exposures and introduced a new framework for GPS caliper matching that jointly matches on both the estimated GPS and exposure levels to fully adjust for confounding bias.
