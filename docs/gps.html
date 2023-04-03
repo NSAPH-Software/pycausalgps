@@ -144,26 +144,6 @@ estimate GPS (<cite>gps_models</cite>):</p>
 <h1>Computing GPS Values<a class="headerlink" href="#computing-gps-values" title="Permalink to this headline"></a></h1>
 <p>The ComputeGPS class can be used to generate GPS values. The following represents
 a simple example.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pycausalgps.gps_utils</span> <span class="kn">import</span> <span class="n">generate_syn_pop</span>
-<span class="kn">from</span> <span class="nn">pycausalgps.gps</span> <span class="kn">import</span> <span class="n">ComputeGPS</span>
-
-<span class="n">data</span> <span class="o">=</span> <span class="n">generate_syn_pop</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
-<span class="n">data</span><span class="p">[</span><span class="s1">&#39;cf5&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">cf5</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
-
-<span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;approach&#39;</span><span class="p">:</span><span class="s2">&quot;xgboost1&quot;</span><span class="p">,</span> <span class="s1">&#39;gps_model&#39;</span><span class="p">:</span> <span class="s1">&#39;parametric&#39;</span><span class="p">,</span>
-          <span class="s1">&#39;test_size&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s1">&#39;random_state&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-          <span class="s1">&#39;n_estimator&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;learning_rate&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">}</span>
-
-<span class="n">conf</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;cf1&quot;</span><span class="p">,</span><span class="s2">&quot;cf2&quot;</span><span class="p">,</span><span class="s2">&quot;cf3&quot;</span><span class="p">,</span><span class="s2">&quot;cf4&quot;</span><span class="p">,</span><span class="s2">&quot;cf5&quot;</span><span class="p">,</span><span class="s2">&quot;cf6&quot;</span><span class="p">]]</span>
-<span class="n">treat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s2">&quot;treat&quot;</span><span class="p">]]</span>
-
-<span class="n">gp</span> <span class="o">=</span> <span class="n">ComputeGPS</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">conf</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">treat</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
-
-<span class="n">gp</span><span class="o">.</span><span class="n">compute_gps</span><span class="p">()</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">gp</span><span class="o">.</span><span class="n">gps</span><span class="p">)</span>
-</pre></div>
-</div>
 </div>
 
 
