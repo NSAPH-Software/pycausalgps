@@ -9,13 +9,19 @@ pycausalgps
     :target: https://github.com/nsaph-software/pycausalgps/actions
     :alt: Test Status
 
-.. image:: https://img.shields.io/pypi/v/pycausalgps.svg
-    :target: https://pypi.org/project/pycausalgps
-    :alt: PyPI version
+.. image:: https://badge.fury.io/py/pycausalgps.svg
+   :target: https://badge.fury.io/py/pycausalgps
+   :alt: PyPI version
 
 .. image:: https://img.shields.io/github/issues/nsaph-software/pycausalgps
     :target: https://pypi.org/project/pycausalgps
     :alt: issues
+
+.. image:: https://codecov.io/gh/NSAPH-Software/pycausalgps/branch/develop/graph/badge.svg?token=8aSueNmHZN 
+    :target: https://codecov.io/gh/NSAPH-Software/pycausalgps
+    :alt: codecov
+
+
 
 *Causal Inference with Generalized Propensity Score*
 

@@ -2,10 +2,11 @@
 
 _[This packages is under development. Some of the features are not yet implemented.]_
 
-[![PyPI version](https://badge.fury.io/py/pycausalgps.svg)](https://badge.fury.io/py/pycausalgps)
-[![Build Status](https://travis-ci.org/NSAPH-Software/pycausalgps.svg?branch=master)](https://travis-ci.org/NSAPH-Software/pycausalgps)
-[![codecov](https://codecov.io/gh/NSAPH-Software/pycausalgps/branch/master/graph/badge.svg)](https://codecov.io/gh/NSAPH-Software/pycausalgps)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build Status](https://travis-ci.org/NSAPH-Software/pycausalgps.svg?branch=master)](https://travis-ci.org/NSAPH-Software/pycausalgps)
+[![PyPI version](https://badge.fury.io/py/pycausalgps.svg)](https://badge.fury.io/py/pycausalgps)
+[![codecov](https://codecov.io/gh/NSAPH-Software/pycausalgps/branch/develop/graph/badge.svg)](https://codecov.io/gh/NSAPH-Software/pycausalgps)
+
 
 Causal Inference with Generalized Propensity Score
 
