@@ -4,7 +4,6 @@ _[This packages is under development. Some of the features are not yet implement
 
 [![PyPI version](https://badge.fury.io/py/pycausalgps.svg)](https://badge.fury.io/py/pycausalgps)
 [![Build Status](https://travis-ci.org/NSAPH-Software/pycausalgps.svg?branch=master)](https://travis-ci.org/NSAPH-Software/pycausalgps)
-[![Documentation Status](https://readthedocs.org/projects/pycausalgps/badge/?version=latest)](https://pycausalgps.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/NSAPH-Software/pycausalgps/branch/master/graph/badge.svg)](https://codecov.io/gh/NSAPH-Software/pycausalgps)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
