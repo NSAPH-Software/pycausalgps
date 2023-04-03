@@ -1,43 +1,22 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Modules &mdash; pycausalgps 0.0.1 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -45,29 +24,14 @@
     <link rel="prev" title="Git Branching Model" href="git_branching.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> pycausalgps
-          
-
-          
+            <img src="_static/pycausalgps_logo.png" class="logo" alt="Logo"/>
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -75,108 +39,60 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Introduction</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Researchers</span></p>
+<p class="caption" role="heading"><span class="caption-text">Researchers</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="setup_env.html">Setting Up Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gps.html">Estimating Generalized Propensity Score (GPS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gps.html#computing-gps-values">Computing GPS Values</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developers</span></p>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="setup_env_dev.html">Development Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="git_branching.html">Git Branching Model</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Modules</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#dataset-py">dataset.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gps-py">gps.py</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rfunctions-py">rfunctions.py</a></li>
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">Community</span></p>
+<p class="caption" role="heading"><span class="caption-text">Community</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="contact.html">Contact Us</a></li>
 <li class="toctree-l1"><a class="reference internal" href="CHANGELOG.html">Changelog</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">pycausalgps</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Modules</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   
 <style>
 /* CSS overrides for sphinx_rtd_theme */
@@ -202,37 +118,70 @@
 }
 </style>
 <div class="section" id="modules">
-<h1>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h1>
+<h1>Modules<a class="headerlink" href="#modules" title="Permalink to this headline"></a></h1>
 <p>This section includes modules that are used in this project.</p>
-<span class="target" id="module-pycausalgps.dataset"></span><div class="section" id="dataset-py">
-<h2>dataset.py<a class="headerlink" href="#dataset-py" title="Permalink to this headline">¶</a></h2>
-<p>The core module for the Dataset class.</p>
+<span class="target" id="module-pycausalgps.gps"></span><div class="section" id="gps-py">
+<h2>gps.py<a class="headerlink" href="#gps-py" title="Permalink to this headline"></a></h2>
+<p>The core module for the GeneralizedPropensityScore class.</p>
 <dl class="py class">
-<dt id="pycausalgps.dataset.Dataset">
-<em class="property">class </em><code class="sig-prename descclassname">pycausalgps.dataset.</code><code class="sig-name descname">Dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycausalgps.dataset.Dataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dataset class</p>
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycausalgps.gps.</span></span><span class="sig-name descname"><span class="pre">GeneralizedPropensityScore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore" title="Permalink to this definition"></a></dt>
+<dd><p>Create a GPS object based on provided parameters.</p>
+<p>GPS object supports continuous treatment with numerical or categorical
+confounders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>pd.DataFrame</em>) – A pandas DataFrame that contains the data for the GPS computation.</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – A dictionary of gps parameters.</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
-<dt id="pycausalgps.dataset.Dataset.read_from_disk">
-<code class="sig-name descname">read_from_disk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">'csv'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/dataset.html#Dataset.read_from_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycausalgps.dataset.Dataset.read_from_disk" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reads data from disk based on the provided format.</p>
-<dl>
-<dt>Inputs:</dt><dd><div class="line-block">
-<div class="line">path: path to the file. It should include the file name.</div>
-<div class="line">format: format of the file. Supported formats: csv</div>
-</div>
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.compute_gps">
+<span class="sig-name descname"><span class="pre">compute_gps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.compute_gps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.compute_gps" title="Permalink to this definition"></a></dt>
+<dd><p>Returns Generalized Propensity Score (GPS) value based on input
+parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.compute_gps_xgboost">
+<span class="sig-name descname"><span class="pre">compute_gps_xgboost</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.compute_gps_xgboost"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.compute_gps_xgboost" title="Permalink to this definition"></a></dt>
+<dd><p>Compute GPS using XGBoost library.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.get_results">
+<span class="sig-name descname"><span class="pre">get_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.get_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.get_results" title="Permalink to this definition"></a></dt>
+<dd><p>Return results of GPS computation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary of results</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pycausalgps.dataset.Dataset.write_to_disk">
-<code class="sig-name descname">write_to_disk</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">'csv'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/dataset.html#Dataset.write_to_disk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycausalgps.dataset.Dataset.write_to_disk" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes data from disk based on the provided format.</p>
-<dl>
-<dt>Inputs:</dt><dd><div class="line-block">
-<div class="line">path: path to the file. It should include the file name.</div>
-<div class="line">format: format of the file. Supported formats: csv</div>
-</div>
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.xgb_train_it">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xgb_train_it</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.series.Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.xgb_train_it"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.xgb_train_it" title="Permalink to this definition"></a></dt>
+<dd><p>Create XGBoost regressor model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pd.DataFrame</em>) – Covariate data</p></li>
+<li><p><strong>target</strong> (<em>pd.Series</em>) – Exposure data</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – Dictionary of parameters</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>predict_all</strong> (<em>np.ndarray</em>) – Predicted exposure for all data</p></li>
+<li><p><strong>training_report</strong> (<em>dict</em>) – Dictionary of training report</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>
@@ -240,75 +189,73 @@
 </dd></dl>
 
 </div>
-<span class="target" id="module-pycausalgps.gps_utils"></span><dl class="py function">
-<dt id="pycausalgps.gps_utils.generate_syn_pop">
-<code class="sig-prename descclassname">pycausalgps.gps_utils.</code><code class="sig-name descname">generate_syn_pop</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sample_size</span></em>, <em class="sig-param"><span class="n">seed_val</span><span class="o">=</span><span class="default_value">300</span></em>, <em class="sig-param"><span class="n">outcome_sd</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">gps_spec</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">cova_spec</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps_utils.html#generate_syn_pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycausalgps.gps_utils.generate_syn_pop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates synthetic data</p>
-<dl>
-<dt>Inputs:</dt><dd><div class="line-block">
-<div class="line">sample_size: Number of required data samples.</div>
-<div class="line">seed_val: seed value for generating reproducible data.</div>
-<div class="line">outcome_sd: TBD</div>
-<div class="line">gps_spec: TBD</div>
-<div class="line">cova_spec: TBD</div>
+<span class="target" id="module-pycausalgps.rscripts.rfunctions"></span><div class="section" id="rfunctions-py">
+<h2>rfunctions.py<a class="headerlink" href="#rfunctions-py" title="Permalink to this headline"></a></h2>
+<p>Main module to define the R functions to be used in the package.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="pycausalgps.rscripts.rfunctions.compute_absolute_weighted_corr">
+<span class="sig-prename descclassname"><span class="pre">pycausalgps.rscripts.rfunctions.</span></span><span class="sig-name descname"><span class="pre">compute_absolute_weighted_corr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vw</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_cat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pandas.core.frame.DataFrame</span></span></span><a class="reference internal" href="_modules/pycausalgps/rscripts/rfunctions.html#compute_absolute_weighted_corr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.rscripts.rfunctions.compute_absolute_weighted_corr" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the absolute weighted correlation using R’s wCorr package.</p>
+<p>params:</p>
+<div class="line-block">
+<div class="line">w: A vector of exposure values.</div>
+<div class="line">vw: A vector of weights.</div>
+<div class="line">c_num: A dataframe of numerical covariates.</div>
+<div class="line">c_cat: A dataframe of categorical covariates.</div>
 </div>
-</dd>
-</dl>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">md</span> <span class="o">=</span> <span class="n">generate_syn_pop</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">mydata</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-<span class="go">1002</span>
-</pre></div>
+<p>returns:</p>
+<div class="line-block">
+<div class="line">A dataframe of absolute weighted correlation values.</div>
 </div>
 </dd></dl>
 
-<span class="target" id="module-pycausalgps.gps_plot_utils"></span></div>
+<dl class="py function">
+<dt class="sig sig-object py" id="pycausalgps.rscripts.rfunctions.compute_density">
+<span class="sig-prename descclassname"><span class="pre">pycausalgps.rscripts.rfunctions.</span></span><span class="sig-name descname"><span class="pre">compute_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.array</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.array</span></span></span><a class="reference internal" href="_modules/pycausalgps/rscripts/rfunctions.html#compute_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.rscripts.rfunctions.compute_density" title="Permalink to this definition"></a></dt>
+<dd><p>Kernel density estimation.
+params:</p>
+<div class="line-block">
+<div class="line">x0: A vectore of values to compute the density function.</div>
+<div class="line">x1: A vector of values to evaluate the density function.</div>
+</div>
+<p>returns:</p>
+<div class="line-block">
+<div class="line">A vector of density values the same size as x1.</div>
+</div>
+</dd></dl>
+
+</div>
+</div>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="contact.html" class="btn btn-neutral float-right" title="Contact Us" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="git_branching.html" class="btn btn-neutral float-left" title="Git Branching Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="contact.html" class="btn btn-neutral float-right" title="Contact Us" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright Harvard University 2021.
-
-    </p>
+    <p>&#169; Copyright Harvard University 2023.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pycausalgps.rscripts.rfunctions &mdash; pycausalgps 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="author" title="About these documents" href="../../../about.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> pycausalgps
+            <img src="../../../_static/pycausalgps_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Researchers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../setup_env.html">Setting Up Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gps.html">Estimating Generalized Propensity Score (GPS)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../gps.html#computing-gps-values">Computing GPS Values</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../setup_env_dev.html">Development Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../documentation.html">Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../git_branching.html">Git Branching Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Community</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contact.html">Contact Us</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CHANGELOG.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pycausalgps</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>pycausalgps.rscripts.rfunctions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pycausalgps.rscripts.rfunctions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">rfunctions.py</span>
+<span class="sd">=============</span>
+<span class="sd">Main module to define the R functions to be used in the package.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">rpy2</span> <span class="kn">import</span> <span class="n">robjects</span>
+<span class="kn">from</span> <span class="nn">rpy2.robjects</span> <span class="kn">import</span> <span class="n">pandas2ri</span>
+<span class="kn">from</span> <span class="nn">rpy2.robjects.conversion</span> <span class="kn">import</span> <span class="n">localconverter</span>
+
+
+
+<span class="c1">#### Compute density function --------------------------------------------------</span>
+<span class="c1"># R </span>
+<span class="c1"># Check if function is defined</span>
+<span class="c1"># TODO: Check if there is a better way to fix the path.</span>
+<span class="k">if</span> <span class="s1">&#39;compute_density&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">robjects</span><span class="o">.</span><span class="n">globalenv</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">robjects</span><span class="o">.</span><span class="n">r</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">            compute_density &lt;- function(x0, x1){</span>
+<span class="s1">                tmp_density &lt;- stats::density(x0, na.rm = TRUE)</span>
+<span class="s1">                dnst &lt;- stats::approx(tmp_density$x, tmp_density$y, xout = x1,</span>
+<span class="s1">                                      rule = 2)$y</span>
+<span class="s1">            return(dnst)</span>
+<span class="s1">           }</span>
+<span class="s1">        &#39;&#39;&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error in loading the R function: compute_density&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+
+
+<span class="c1"># Python </span>
+<span class="c1"># Kernel density estimation</span>
+
+<div class="viewcode-block" id="compute_density"><a class="viewcode-back" href="../../../modules.html#pycausalgps.rscripts.rfunctions.compute_density">[docs]</a><span class="k">def</span> <span class="nf">compute_density</span><span class="p">(</span><span class="n">x0</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Kernel density estimation. </span>
+<span class="sd">    params: </span>
+
+<span class="sd">    | x0: A vectore of values to compute the density function.    </span>
+<span class="sd">    | x1: A vector of values to evaluate the density function.     </span>
+
+<span class="sd">    returns:   </span>
+
+<span class="sd">    | A vector of density values the same size as x1.    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+  
+    <span class="c1"># check input data</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">robjects</span><span class="o">.</span><span class="n">vectors</span><span class="o">.</span><span class="n">FloatVector</span><span class="p">):</span>
+        <span class="n">x0_r</span> <span class="o">=</span> <span class="n">robjects</span><span class="o">.</span><span class="n">FloatVector</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">robjects</span><span class="o">.</span><span class="n">vectors</span><span class="o">.</span><span class="n">FloatVector</span><span class="p">):</span>
+        <span class="n">x1_r</span> <span class="o">=</span> <span class="n">robjects</span><span class="o">.</span><span class="n">FloatVector</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+    
+    <span class="c1"># collect the function from R</span>
+    <span class="n">r_f</span> <span class="o">=</span> <span class="n">robjects</span><span class="o">.</span><span class="n">globalenv</span><span class="p">[</span><span class="s1">&#39;compute_density&#39;</span><span class="p">]</span>
+    
+    <span class="c1"># call the function</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">r_f</span><span class="p">(</span><span class="n">x0_r</span><span class="p">,</span> <span class="n">x1_r</span><span class="p">)</span>
+
+    <span class="c1"># return back the results into a numpy array</span>
+    <span class="n">np_results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+    
+    
+    <span class="c1"># Checks</span>
+    <span class="k">if</span> <span class="n">np_results</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">x1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The output shape is not the same as the input shape.&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np_results</span></div>
+
+
+<span class="c1">#### ---------------------------------------------------------------------------</span>
+
+<span class="c1">#### Compute absolute weighted corr function -----------------------------------</span>
+
+<span class="c1"># R</span>
+<span class="c1"># Check if function is defined</span>
+<span class="k">if</span> <span class="s1">&#39;absolute_weighted_corr&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">robjects</span><span class="o">.</span><span class="n">globalenv</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">robjects</span><span class="o">.</span><span class="n">r</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">            absolute_weighted_corr_df &lt;- function(w,</span>
+<span class="s1">                                      vw,</span>
+<span class="s1">                                      c_num,</span>
+<span class="s1">                                      c_cat){</span>
+<span class="s1">  </span>
+<span class="s1">  </span>
+<span class="s1"> </span>
+<span class="s1">                # detect numeric columns</span>
+<span class="s1">                col_n &lt;- colnames(c_num)</span>
+<span class="s1">              </span>
+<span class="s1">                # detect factorial columns</span>
+<span class="s1">                col_f &lt;- colnames(c_cat)</span>
+<span class="s1">              </span>
+<span class="s1">                c_cat[] &lt;- lapply(c_cat, as.factor)</span>
+<span class="s1">              </span>
+<span class="s1">                absolute_corr_n &lt;- absolute_corr_f &lt;- NULL</span>
+<span class="s1">              </span>
+<span class="s1">                if (length(col_n) &gt; 0) {</span>
+<span class="s1">                  absolute_corr_n&lt;- sapply(col_n,function(i){</span>
+<span class="s1">                    abs(wCorr::weightedCorr(x = w,</span>
+<span class="s1">                                            y = c_num[,i],</span>
+<span class="s1">                                            weights = vw,</span>
+<span class="s1">                                            method = c(&quot;spearman&quot;)))})</span>
+<span class="s1">                  absolute_corr_n &lt;- unlist(absolute_corr_n)</span>
+<span class="s1">                  names(absolute_corr_n) &lt;- col_n</span>
+<span class="s1">                }</span>
+<span class="s1">              </span>
+<span class="s1">                if (length(col_f) &gt; 0) {</span>
+<span class="s1">                  internal_fun&lt;- function(i){</span>
+<span class="s1">                    abs(wCorr::weightedCorr(x = w,</span>
+<span class="s1">                                            y = c_cat[, i],</span>
+<span class="s1">                                            weights = vw,</span>
+<span class="s1">                                            method = c(&quot;Polyserial&quot;)))}</span>
+<span class="s1">              </span>
+<span class="s1">                  absolute_corr_f &lt;- c()</span>
+<span class="s1">                  for (item in col_f){</span>
+<span class="s1">                    if (length(unique(c_cat[[item]])) == 1 ){</span>
+<span class="s1">                      absolute_corr_f &lt;- c(absolute_corr_f, NA)</span>
+<span class="s1">                    } else {</span>
+<span class="s1">                      absolute_corr_f &lt;- c(absolute_corr_f, internal_fun(item))</span>
+<span class="s1">                    }</span>
+<span class="s1">                  }</span>
+<span class="s1">                  names(absolute_corr_f) &lt;- col_f</span>
+<span class="s1">                }</span>
+<span class="s1">              </span>
+<span class="s1">                absolute_corr &lt;- c(absolute_corr_n, absolute_corr_f)</span>
+<span class="s1">              </span>
+<span class="s1">                if (sum(is.na(absolute_corr)) &gt; 0){</span>
+<span class="s1">                  warning(paste(&quot;The following features generated missing values: &quot;,</span>
+<span class="s1">                                names(absolute_corr)[is.na(absolute_corr)],</span>
+<span class="s1">                                &quot;</span><span class="se">\n</span><span class="s1">In computing mean covariate balance, they will be ignored.&quot;))</span>
+<span class="s1">                }</span>
+<span class="s1">              </span>
+<span class="s1">                df &lt;- data.frame(name = character(), value = numeric())</span>
+<span class="s1">              </span>
+<span class="s1">                for (i in names(absolute_corr)){</span>
+<span class="s1">                  df &lt;- rbind(df, data.frame(name=i, value=absolute_corr[[i]]))</span>
+<span class="s1">                }</span>
+<span class="s1">              </span>
+<span class="s1">                return(df)</span>
+<span class="s1">            }</span>
+<span class="s1">        &#39;&#39;&#39;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Error in loading the R function: absolute_weighted_corr&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+<span class="c1"># Python</span>
+
+<div class="viewcode-block" id="compute_absolute_weighted_corr"><a class="viewcode-back" href="../../../modules.html#pycausalgps.rscripts.rfunctions.compute_absolute_weighted_corr">[docs]</a><span class="k">def</span> <span class="nf">compute_absolute_weighted_corr</span><span class="p">(</span><span class="n">w</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> 
+                                   <span class="n">vw</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
+                                   <span class="n">c_num</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                                   <span class="n">c_cat</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot; Compute the absolute weighted correlation using R&#39;s wCorr package.    </span>
+<span class="sd">    </span>
+<span class="sd">    params:    </span>
+
+<span class="sd">    | w: A vector of exposure values.      </span>
+<span class="sd">    | vw: A vector of weights.     </span>
+<span class="sd">    | c_num: A dataframe of numerical covariates.    </span>
+<span class="sd">    | c_cat: A dataframe of categorical covariates.    </span>
+
+<span class="sd">    returns:</span>
+<span class="sd">    </span>
+<span class="sd">    | A dataframe of absolute weighted correlation values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># check input data</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">robjects</span><span class="o">.</span><span class="n">vectors</span><span class="o">.</span><span class="n">FloatVector</span><span class="p">):</span>
+        <span class="n">w_r</span> <span class="o">=</span> <span class="n">robjects</span><span class="o">.</span><span class="n">FloatVector</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vw</span><span class="p">,</span> <span class="n">robjects</span><span class="o">.</span><span class="n">vectors</span><span class="o">.</span><span class="n">FloatVector</span><span class="p">):</span>
+        <span class="n">vw_r</span> <span class="o">=</span> <span class="n">robjects</span><span class="o">.</span><span class="n">FloatVector</span><span class="p">(</span><span class="n">vw</span><span class="p">)</span>
+    
+    <span class="c1">#TODO: check if one of them is None.</span>
+    <span class="c1"># convert pandas dataframe to R dataframe</span>
+    <span class="k">with</span> <span class="n">localconverter</span><span class="p">(</span><span class="n">robjects</span><span class="o">.</span><span class="n">default_converter</span> <span class="o">+</span> <span class="n">pandas2ri</span><span class="o">.</span><span class="n">converter</span><span class="p">):</span>
+        <span class="n">c_num_r</span> <span class="o">=</span> <span class="n">robjects</span><span class="o">.</span><span class="n">conversion</span><span class="o">.</span><span class="n">py2rpy</span><span class="p">(</span><span class="n">c_num</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">localconverter</span><span class="p">(</span><span class="n">robjects</span><span class="o">.</span><span class="n">default_converter</span> <span class="o">+</span> <span class="n">pandas2ri</span><span class="o">.</span><span class="n">converter</span><span class="p">):</span>
+        <span class="n">c_cat_r</span> <span class="o">=</span> <span class="n">robjects</span><span class="o">.</span><span class="n">conversion</span><span class="o">.</span><span class="n">py2rpy</span><span class="p">(</span><span class="n">c_cat</span><span class="p">)</span>
+    
+    <span class="c1"># collect the function from R</span>
+    <span class="n">r_absolute_weighted_corr</span> <span class="o">=</span> <span class="n">robjects</span><span class="o">.</span><span class="n">globalenv</span><span class="p">[</span><span class="s1">&#39;absolute_weighted_corr_df&#39;</span><span class="p">]</span>
+
+    <span class="c1"># call the function</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">r_absolute_weighted_corr</span><span class="p">(</span><span class="n">w_r</span><span class="p">,</span> <span class="n">vw_r</span><span class="p">,</span> <span class="n">c_num_r</span><span class="p">,</span> <span class="n">c_cat_r</span><span class="p">)</span>
+
+    <span class="c1"># return back the results into a pandas dataframe</span>
+    <span class="k">with</span> <span class="n">localconverter</span><span class="p">(</span><span class="n">robjects</span><span class="o">.</span><span class="n">default_converter</span> <span class="o">+</span> <span class="n">robjects</span><span class="o">.</span><span class="n">pandas2ri</span><span class="o">.</span><span class="n">converter</span><span class="p">):</span>
+        <span class="n">results_python</span> <span class="o">=</span> <span class="n">robjects</span><span class="o">.</span><span class="n">conversion</span><span class="o">.</span><span class="n">rpy2py</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results_python</span></div>
+
+
+<span class="c1">#### ---------------------------------------------------------------------------</span>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">dnsty</span> <span class="o">=</span> <span class="n">compute_density</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">)</span>
+    <span class="c1">#print(dnsty)</span>
+
+    <span class="c1"># plot x0 and dnsty </span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">dnsty</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Harvard University 2023.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

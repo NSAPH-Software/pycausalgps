@@ -24,7 +24,7 @@ sys.path.append(os.path.join(os.path.dirname(__name__), '..'))
 # -- Project information -----------------------------------------------------
 
 project = 'pycausalgps'
-copyright = 'Harvard University 2021'
+copyright = 'Harvard University 2023'
 author = 'Naeem Khoshnevis'
 
 # The full version, including alpha/beta/rc tags
@@ -86,6 +86,7 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+html_logo = '_static/pycausalgps_logo.png'
 
 # to inlcude private methods in the documentation. 
-napoleon_include_private_with_doc = True
+napoleon_include_private_with_doc = True 
