@@ -2,7 +2,8 @@
 
 Causal Inference with Generalized Propensity Score
 
-pycausalgps is a Python package that provides end-to-end causal inference solutions with continuous exposures. By generating a unique hash value for the data and actions on the data, pycausalgps guarantees that each process is carried out once and the results are stored once.
+pycausalgps is a Python library for implementing matching on generalized propensity scores with continuous exposures. We have developed an innovative approach for estimating causal effects using observational data in settings with continuous exposures and introduced a new framework for GPS caliper matching that jointly matches on both the estimated GPS and exposure levels to fully adjust for confounding bias.
+
 
 ## Setting Up Environment
 
