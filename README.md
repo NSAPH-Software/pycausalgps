@@ -9,10 +9,21 @@ pycausalgps is a Python library for implementing matching on generalized propens
 
 Please refer to the documentation for setting up the enviorment.
 
-## Getting Started
+## Installation
 
-TBD
+To install the latest release from PyPI, run:
 
+```bash
+pip install pycausalgps
+```
+
+To install the latest development version from GitHub, run:
+
+```bash
+git clone https://github.com/NSAPH-Software/pycausalgps
+cd pycausalgps
+pip install .
+```
 
 ## Documentation
 

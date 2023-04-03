@@ -33,9 +33,11 @@ Type 'y' (yes) for popup questions.
 Install **PyCausalGPS** (Step 3 or Step 4)
 
 - Step 3: Directly from PyPI
+
 TBD
 
 - Step 4: Install from Github package in developement mode
+
 You can install the package in a developement mode according to the
 following commands: 
 
