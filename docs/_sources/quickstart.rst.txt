@@ -6,25 +6,24 @@ Installing the Package
 
 1. Install the package using pip::
 
-   *TBD*
+.. code-block:: bash
 
-2. Install the package from Github::
+    $ pip install pycausalgps
 
-   *TBD*
+See the `Setting Up Environment <installation.html>`_ for more details.
 
 
-The Whole Game
---------------
+Generating Synthetic Data
+-------------------------
 
-A processing is described under a project. Although users can use classes individually, we recommend using the project controller because it is the only way to generate a flow of processing and keep track of the results in the database. Each processing session requires an instance of project controller. 
+The package provides a function to generate synthetic data. 
 
 .. code-block:: python
 
-    >>> from pycausalgps.project_controller import ProjectController
-    >>> pc = ProjectController(db_path = 'test_database.sqlite')   
-
-
-The project controller manages the projects in the database. The project controller will connect to the database if the provided database already exists. Otherwise, it will create a new database. We assume that the database did not exist.
-
-
+    >>> from pycausalgps.base.utils import generate_syn_pop
+    >>> data = generate_syn_pop(sample_size=1000, 
+                                seed_val=456, 
+                                outcome_sd=0.25, 
+                                gps_spec=1, 
+                                cova_spec=2)
 

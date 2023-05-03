@@ -31,6 +31,19 @@ git clone https://github.com/NSAPH-Software/pycausalgps
 cd pycausalgps
 pip install .
 ```
+## Usage
+
+### Geneting synthetic data
+
+```python
+from pycausalgps.base.utils import generate_syn_pop
+data = generate_syn_pop(sample_size=1000, 
+                        seed_val=456, 
+                        outcome_sd=0.25, 
+                        gps_spec=1, 
+                        cova_spec=2)
+```
+
 
 ## Documentation
 

@@ -20,7 +20,7 @@ lightweight version of anaconda.
 
 .. code-block:: console
 
-    $ conda create --name your_venv python=3.7
+    $ conda create --name your_venv python=3.10
 
 Type 'y' (yes) for popup questions.
 
@@ -30,11 +30,13 @@ Type 'y' (yes) for popup questions.
 
     $ conda activate your_venv
 
-Install **PyCausalGPS** (Step 3 or Step 4)
+Install **pycausalgps** (Step 3 or Step 4)
 
 - Step 3: Directly from PyPI
 
-TBD
+.. code-block:: console
+
+    $ pip3 install pycausalgps
 
 - Step 4: Install from Github package in developement mode
 
@@ -86,7 +88,3 @@ open terminal and fire up notebook:
 At the top right corner, there is a button labeled `New` key. Choose your 
 recently created kernel (in this example: your_venv_name). Choosing a kernel 
 will open a new tab that you can work on.
-
-pipenv
-------
-TBD

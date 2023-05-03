@@ -19,7 +19,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Estimating Generalized Propensity Score (GPS)" href="gps.html" />
+    <link rel="next" title="Development Environment" href="setup_env_dev.html" />
     <link rel="prev" title="Setting Up Environment" href="setup_env.html" /> 
 </head>
 
@@ -48,12 +48,9 @@
 <li class="toctree-l1"><a class="reference internal" href="setup_env.html">Setting Up Environment</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installing-the-package">Installing the Package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#the-whole-game">The Whole Game</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#generating-synthetic-data">Generating Synthetic Data</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="gps.html">Estimating Generalized Propensity Score (GPS)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gps.html#computing-gps-values">Computing GPS Values</a></li>
-<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
@@ -120,27 +117,25 @@
 <h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline"></a></h1>
 <div class="section" id="installing-the-package">
 <h2>Installing the Package<a class="headerlink" href="#installing-the-package" title="Permalink to this headline"></a></h2>
-<ol class="arabic">
-<li><p>Install the package using pip:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span><span class="n">TBD</span><span class="o">*</span>
-</pre></div>
-</div>
-</li>
-<li><p>Install the package from Github:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span><span class="n">TBD</span><span class="o">*</span>
-</pre></div>
-</div>
-</li>
+<ol class="arabic simple">
+<li><p>Install the package using pip:</p></li>
 </ol>
-</div>
-<div class="section" id="the-whole-game">
-<h2>The Whole Game<a class="headerlink" href="#the-whole-game" title="Permalink to this headline"></a></h2>
-<p>A processing is described under a project. Although users can use classes individually, we recommend using the project controller because it is the only way to generate a flow of processing and keep track of the results in the database. Each processing session requires an instance of project controller.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycausalgps.project_controller</span> <span class="kn">import</span> <span class="n">ProjectController</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pc</span> <span class="o">=</span> <span class="n">ProjectController</span><span class="p">(</span><span class="n">db_path</span> <span class="o">=</span> <span class="s1">&#39;test_database.sqlite&#39;</span><span class="p">)</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip install pycausalgps
 </pre></div>
 </div>
-<p>The project controller manages the projects in the database. The project controller will connect to the database if the provided database already exists. Otherwise, it will create a new database. We assume that the database did not exist.</p>
+<p>See the <a class="reference external" href="installation.html">Setting Up Environment</a> for more details.</p>
+</div>
+<div class="section" id="generating-synthetic-data">
+<h2>Generating Synthetic Data<a class="headerlink" href="#generating-synthetic-data" title="Permalink to this headline"></a></h2>
+<p>The package provides a function to generate synthetic data.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycausalgps.base.utils</span> <span class="kn">import</span> <span class="n">generate_syn_pop</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">generate_syn_pop</span><span class="p">(</span><span class="n">sample_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+<span class="go">                            seed_val=456,</span>
+<span class="go">                            outcome_sd=0.25,</span>
+<span class="go">                            gps_spec=1,</span>
+<span class="go">                            cova_spec=2)</span>
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -149,7 +144,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="setup_env.html" class="btn btn-neutral float-left" title="Setting Up Environment" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="gps.html" class="btn btn-neutral float-right" title="Estimating Generalized Propensity Score (GPS)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="setup_env_dev.html" class="btn btn-neutral float-right" title="Development Environment" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
