@@ -14,8 +14,7 @@ class TestGeneralizedPropensityScore(unittest.TestCase):
                                   "cat_feature": np.random.choice(["A", "B", "C"], 100)})
 
         self.params = {
-            "gps_params": {
-                "model": "parametric",
+                "gps_density": "normal",
                 "exposure_column": ["exposure"],
                 "covariate_column_num": ["num_feature_1", "num_feature_2"],
                 "covariate_column_cat": ["cat_feature"],
@@ -28,7 +27,6 @@ class TestGeneralizedPropensityScore(unittest.TestCase):
                         "random_state": 42
                     }
                 }
-            }
         }
 
     def test_init(self):

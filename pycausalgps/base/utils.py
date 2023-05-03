@@ -142,14 +142,15 @@ def generate_syn_pop(sample_size: int, seed_val:int, outcome_sd:int,
         raise ValueError(f"cova_spec:  {cova_spec} is not a valid value.")
 
     
-    data = pd.DataFrame({'Y':Y, 
-                                   'treat':treat,
-                                   'cf1':cf[0,:],
-                                   'cf2':cf[1,:],
-                                   'cf3':cf[2,:],
-                                   'cf4':cf[3,:],
-                                   'cf5':cf5,
-                                   'cf6':cf6})
+    data = pd.DataFrame({'id': range(1,sample_size+1),
+                         'Y':Y, 
+                         'treat':treat,
+                         'cf1':cf[0,:],
+                         'cf2':cf[1,:],
+                         'cf3':cf[2,:],
+                         'cf4':cf[3,:],
+                         'cf5':cf5,
+                         'cf6':cf6})
 
     return data
 
