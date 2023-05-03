@@ -49,6 +49,11 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installing-the-package">Installing the Package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#generating-synthetic-data">Generating Synthetic Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#estimating-gps-values">Estimating GPS values</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#example-of-normal-approach">Example of <cite>normal</cite> approach:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-of-kernel-approach">Example of <cite>kernel</cite> approach:</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -117,9 +122,7 @@
 <h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline"></a></h1>
 <div class="section" id="installing-the-package">
 <h2>Installing the Package<a class="headerlink" href="#installing-the-package" title="Permalink to this headline"></a></h2>
-<ol class="arabic simple">
-<li><p>Install the package using pip:</p></li>
-</ol>
+<p>Install the package using pip:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip install pycausalgps
 </pre></div>
 </div>
@@ -135,6 +138,77 @@
 <span class="go">                            gps_spec=1,</span>
 <span class="go">                            cova_spec=2)</span>
 </pre></div>
+</div>
+</div>
+<div class="section" id="estimating-gps-values">
+<h2>Estimating GPS values<a class="headerlink" href="#estimating-gps-values" title="Permalink to this headline"></a></h2>
+<p>Two approaches are provided to estimate GPS values. These approaches are different
+based on the type of gps_denisty specified. These approaches are <cite>normal</cite> and <cite>kernel</cite>.</p>
+<div class="section" id="example-of-normal-approach">
+<h3>Example of <cite>normal</cite> approach:<a class="headerlink" href="#example-of-normal-approach" title="Permalink to this headline"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pycausalgps.base.utils</span> <span class="kn">import</span> <span class="n">generate_syn_pop</span>
+<span class="kn">from</span> <span class="nn">pycausalgps.base</span> <span class="kn">import</span> <span class="n">GeneralizedPropensityScore</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;gps_density&quot;</span><span class="p">:</span> <span class="s2">&quot;normal&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;exposure_column&quot;</span><span class="p">:</span> <span class="s2">&quot;treat&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;covariate_column_num&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;cf1&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;cf2&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;cf3&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;cf4&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;cf6&quot;</span><span class="p">],</span>
+      <span class="s2">&quot;covariate_column_cat&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;cf5&quot;</span><span class="p">],</span>
+      <span class="s2">&quot;libs&quot;</span><span class="p">:{</span>
+              <span class="s2">&quot;xgboost&quot;</span><span class="p">:{</span>
+                         <span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+                         <span class="s2">&quot;max_depth&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                         <span class="s2">&quot;learning_rate&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                         <span class="s2">&quot;test_rate&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+                         <span class="s2">&quot;random_state&quot;</span><span class="p">:</span> <span class="mi">42</span>
+                         <span class="p">}</span>
+                     <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">generate_syn_pop</span><span class="p">(</span><span class="n">sample_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                        <span class="n">seed_val</span><span class="o">=</span><span class="mi">456</span><span class="p">,</span>
+                        <span class="n">outcome_sd</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+                        <span class="n">gps_spec</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">cova_spec</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">gps</span> <span class="o">=</span> <span class="n">GeneralizedPropensityScore</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="example-of-kernel-approach">
+<h3>Example of <cite>kernel</cite> approach:<a class="headerlink" href="#example-of-kernel-approach" title="Permalink to this headline"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pycausalgps.base.utils</span> <span class="kn">import</span> <span class="n">generate_syn_pop</span>
+<span class="kn">from</span> <span class="nn">pycausalgps.base</span> <span class="kn">import</span> <span class="n">GeneralizedPropensityScore</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;gps_density&quot;</span><span class="p">:</span> <span class="s2">&quot;kernel&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;exposure_column&quot;</span><span class="p">:</span> <span class="s2">&quot;treat&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;covariate_column_num&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;cf1&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;cf2&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;cf3&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;cf4&quot;</span><span class="p">,</span>
+                               <span class="s2">&quot;cf6&quot;</span><span class="p">],</span>
+      <span class="s2">&quot;covariate_column_cat&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;cf5&quot;</span><span class="p">],</span>
+      <span class="s2">&quot;libs&quot;</span><span class="p">:{</span>
+              <span class="s2">&quot;xgboost&quot;</span><span class="p">:{</span>
+                         <span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+                         <span class="s2">&quot;max_depth&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                         <span class="s2">&quot;learning_rate&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                         <span class="s2">&quot;test_rate&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+                         <span class="s2">&quot;random_state&quot;</span><span class="p">:</span> <span class="mi">42</span>
+                         <span class="p">}</span>
+                     <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">generate_syn_pop</span><span class="p">(</span><span class="n">sample_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                        <span class="n">seed_val</span><span class="o">=</span><span class="mi">456</span><span class="p">,</span>
+                        <span class="n">outcome_sd</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+                        <span class="n">gps_spec</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">cova_spec</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">gps</span> <span class="o">=</span> <span class="n">GeneralizedPropensityScore</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 </div>

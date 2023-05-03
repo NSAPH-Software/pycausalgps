@@ -62,10 +62,6 @@ pycausalgps is a Python library for implementing matching on generalized propens
    CHANGELOG
 
 
-
-
-
-
 Indices and tables
 ==================
 

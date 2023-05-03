@@ -240,7 +240,7 @@ class GeneralizedPropensityScore:
                         e_gps_std=e_gps_std,
                         w_resid=None)
 
-        elif self.params.get("gps_density") == "non-parametric":
+        elif self.params.get("gps_density") == "kernel":
 
             e_gps_pred, training_report = self.xgb_train_it(X_,
                                                             y.squeeze(), 
@@ -267,7 +267,7 @@ class GeneralizedPropensityScore:
         else:
             LOGGER.warning(f"gps_density: '{self.params['gps_density']}'"
                            f" is not defined."
-                           f" Available options: normal, non-parametric.")
+                           f" Available options: normal, kernel.")
             return dict()
 
     @staticmethod
