@@ -47,7 +47,7 @@ class GeneralizedPropensityScore:
                 A dictionary of libraries and their parameters. Currently only
                 xgboost is supported. Any parameters for hypertuning the 
                 xgboost model can be passed including:
-                
+
                     - n_estimators: int
                         Number of trees to fit.
                     - learning_rate: float
@@ -305,6 +305,7 @@ class GeneralizedPropensityScore:
         test_size = params.get("test_rate", 0.2)
         max_depth = params.get("max_depth", 3)
         random_state = params.get("random_state", 42)
+        n_jobs = params.get("n_jobs", 1)
 
         LOGGER.debug(f"XGBoost used parameters: n_estimators={n_estimators}, "
                      f"learning_rate={learning_rate}, test_size={test_size}, "
@@ -313,7 +314,8 @@ class GeneralizedPropensityScore:
 
         xgb = XGBRegressor(n_estimators = n_estimators,
                            learning_rate = learning_rate,
-                           max_depth = max_depth)                 
+                           max_depth = max_depth,
+                           n_jobs=n_jobs)                 
         
         X_train, X_val, y_train, y_val = train_test_split(X, target,
                                     test_size = test_size, 

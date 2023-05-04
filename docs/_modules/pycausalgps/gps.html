@@ -133,7 +133,7 @@
 <span class="sd">                A dictionary of libraries and their parameters. Currently only</span>
 <span class="sd">                xgboost is supported. Any parameters for hypertuning the </span>
 <span class="sd">                xgboost model can be passed including:</span>
-<span class="sd">                </span>
+
 <span class="sd">                    - n_estimators: int</span>
 <span class="sd">                        Number of trees to fit.</span>
 <span class="sd">                    - learning_rate: float</span>
@@ -391,6 +391,7 @@
         <span class="n">test_size</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;test_rate&quot;</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span>
         <span class="n">max_depth</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_depth&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
         <span class="n">random_state</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;random_state&quot;</span><span class="p">,</span> <span class="mi">42</span><span class="p">)</span>
+        <span class="n">n_jobs</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;n_jobs&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="n">LOGGER</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;XGBoost used parameters: n_estimators=</span><span class="si">{</span><span class="n">n_estimators</span><span class="si">}</span><span class="s2">, &quot;</span>
                      <span class="sa">f</span><span class="s2">&quot;learning_rate=</span><span class="si">{</span><span class="n">learning_rate</span><span class="si">}</span><span class="s2">, test_size=</span><span class="si">{</span><span class="n">test_size</span><span class="si">}</span><span class="s2">, &quot;</span>
@@ -399,7 +400,8 @@
 
         <span class="n">xgb</span> <span class="o">=</span> <span class="n">XGBRegressor</span><span class="p">(</span><span class="n">n_estimators</span> <span class="o">=</span> <span class="n">n_estimators</span><span class="p">,</span>
                            <span class="n">learning_rate</span> <span class="o">=</span> <span class="n">learning_rate</span><span class="p">,</span>
-                           <span class="n">max_depth</span> <span class="o">=</span> <span class="n">max_depth</span><span class="p">)</span>                 
+                           <span class="n">max_depth</span> <span class="o">=</span> <span class="n">max_depth</span><span class="p">,</span>
+                           <span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="p">)</span>                 
         
         <span class="n">X_train</span><span class="p">,</span> <span class="n">X_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span>
                                     <span class="n">test_size</span> <span class="o">=</span> <span class="n">test_size</span><span class="p">,</span> 

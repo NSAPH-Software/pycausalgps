@@ -138,7 +138,8 @@ Example of `weighting` approach:
                                  "max_depth": 3,
                                  "learning_rate": 0.1,
                                  "test_rate": 0.2,
-                                 "random_state": 42
+                                 "random_state": 42,
+                                 "n_jobs": 12
                                  }
                              }
     }
@@ -191,7 +192,8 @@ Example of `matching` approach:
                                  "max_depth": 3,
                                  "learning_rate": 0.1,
                                  "test_rate": 0.2,
-                                 "random_state": 42
+                                 "random_state": 42,
+                                 "n_jobs": 12
                                  }
                              }
     }
