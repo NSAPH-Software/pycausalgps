@@ -7,6 +7,7 @@ The core module for the PseudoPopulation class.
 import json
 import hashlib
 from collections import Counter
+from dataclasses import dataclass
 
 import numpy as np
 import pandas as pd
@@ -52,6 +53,8 @@ class PseudoPopulation:
 
     APPROACH_WEIGHTING = "weighting"
     APPROACH_MATCHING = "matching"
+    GPS_DENSITY_NORMAL = "normal"
+    GPS_DENSITY_KERNEL = "kernel"
 
     def __init__(self, data: pd.DataFrame, gps_data: dict, params: dict):
 
@@ -106,7 +109,7 @@ class PseudoPopulation:
             self.counter_weight = self._compute_pspop_weighting() 
             self._compute_covariate_balance()
         elif self.params.get("approach") == self.APPROACH_MATCHING:
-            self.counter_weight = self._compute_pspop_matching()
+            self.counter_weight, self.counter_weight_list = self._compute_pspop_matching()
             self._compute_covariate_balance()
         else:
             raise Exception("Approach is not defined.")
@@ -159,36 +162,32 @@ class PseudoPopulation:
 
         
         # load gps object from the database.
-        gps_obj = self.db.get_value(self.gps_params.get("hash_value"))
-        gps_min, gps_max = gps_obj._data.get("gps_minmax")
-        gps_model = gps_obj.gps_params.get("gps_params").get("model")
-        if gps_model == "non-parametric":
-            w_resid = gps_obj.w_resid
+        gps_min, gps_max = self.gps_data.get("gps_minmax")
+        gps_density = self.gps_data.get("gps_density")
+        if gps_density == self.GPS_DENSITY_KERNEL:
+            w_resid = self.gps_data.get("data")["w_resid"]
      
         # load exposure values
-        obs_exposure_data = self.load_exposure()
-        w_min, w_max = (min(obs_exposure_data["exposure"]), 
-                        max(obs_exposure_data["exposure"]))
+        obs_exposure_data = self.data[["id", self.exposure_data_col_name]]
+        w_min, w_max = (min(obs_exposure_data[self.exposure_data_col_name]), 
+                        max(obs_exposure_data[self.exposure_data_col_name]))
 
         # controlling parameters
-        delta = nested_get(self.pspop_params,
-                               ["pspop_params", 
-                                "controlling_params", 
+        delta = nested_get(self.params,
+                                ["control_params", 
                                 "caliper"])
-        scale = nested_get(self.pspop_params,
-                                ["pspop_params",
-                                 "controlling_params",
-                                 "scale"])
-        distance_metric = nested_get(self.pspop_params, 
-                                          ["pspop_params",
-                                           "controlling_params", 
-                                           "distance_metric"])
+        scale = nested_get(self.params,
+                                ["control_params",
+                                "scale"])
+        
+        dist_measure = nested_get(self.params, 
+                                 ["control_params", 
+                                  "dist_measure"])
 
         # collect requested exposure level.
-        req_exposure = nested_get(self.pspop_params, 
-                                       ["pspop_params", 
-                                        "controlling_params", 
-                                        "bin_seq"])
+        req_exposure = nested_get(self.params, 
+                                 ["control_params", 
+                                  "bin_seq"])
         
         # check if req_exposure is string
         if isinstance(req_exposure, str):
@@ -196,24 +195,33 @@ class PseudoPopulation:
 
         if req_exposure is None:
             req_exposure = np.arange(w_min+delta/2, w_max, delta)
-
+     
+        counter_weight = Counter({key: 0 for key in obs_exposure_data["id"]})
+        counter_weight_list = []
 
         for i, w in enumerate(req_exposure):
-            if gps_model == "parametric":
+            if gps_density == "normal":
                 p_w = norm.pdf(w, 
-                               gps_obj._data.get("_data")["e_gps_pred"], 
-                               gps_obj._data.get("_data")["e_gps_std_pred"])
-            elif gps_model == "non-parametric":
-                w_new = ((w - gps_obj._data.get("_data")["e_gps_pred"]) 
-                         / gps_obj._data.get("_data")["e_gps_std_pred"])
+                               self.gps_data.get("data")["e_gps_pred"], 
+                               self.gps_data.get("data")["e_gps_std_pred"])
+            elif gps_density == "kernel":
+                w_new = ((w - self.gps_data.get("data")["e_gps_pred"]) 
+                         / self.gps_data.get("data")["e_gps_std_pred"])
                 p_w = compute_density(w_resid, w_new)
             else:
                 raise Exception("GPS model is not defined.")
            
 
             # select subset of data that are within the caliper value.
-            subset_idx = np.where(np.abs(obs_exposure_data["exposure"] - w) <= delta)[0]
+            subset_idx = np.where(np.abs(obs_exposure_data[self.exposure_data_col_name] - w) <= delta)[0]
             subset_row = obs_exposure_data.iloc[subset_idx]["id"]
+
+            print(f"Subset size: {len(subset_row)}")
+
+            if len(subset_row) == 0:
+                print(f"No data within the caliper value for the requested exposure level: {w}.")
+                continue 
+
 
             # standardize GPS and Exposure values.
             std_w = (w - w_min)/(w_max - w_min)
@@ -230,12 +238,10 @@ class PseudoPopulation:
             # std_w_subset: vector
             # std_gps_subset: vector
             std_w_subset = ((obs_exposure_data[obs_exposure_data["id"].
-                            isin(subset_row)]["exposure"] - w_min)) / (w_max - w_min)
+                            isin(subset_row)][self.exposure_data_col_name] - w_min)) / (w_max - w_min)
             
             # TODO: use query.
-            std_gps_subset = (gps_obj._data.get("_data")[gps_obj.
-                              _data.get("_data")["id"].
-                              isin(subset_row)]["gps_standardized"])
+            std_gps_subset = (self.gps_data.get("data")[self.gps_data.get("data")["id"].isin(subset_row)]["gps_standardized"])
 
             # a: subset of data with standardized GPS (std_gps_subset)
             # b: all data with estimated GPS based on requested exposure level. (std_gps)
@@ -254,14 +260,9 @@ class PseudoPopulation:
             len_b = len(b)
             len_a = len(a)
             out = np.zeros(len_b)
+            out2 = np.zeros(len_b)
+            out3 = np.zeros(len_b)
 
-            # counter_weight = pd.DataFrame.from_dict({key: 0 for key in 
-            #                                          obs_exposure_data["id"]}, 
-            #                                          orient="index", 
-            #                                          columns=['counter_weight'])
-
-            counter_weight = Counter({key: 0 for key in obs_exposure_data["id"]})
- 
             # Brute force method.
             for i in range(len_b):
                 for j in range(len_a):
@@ -286,17 +287,34 @@ class PseudoPopulation:
                             + c_minus_d[:, np.newaxis], axis=0)
 
             
+            # Third solution:
+            # Vectorized method
+            for i in range(len_b):
+                tmp_vals = np.abs(a - b[i]) * scale + c_minus_d
+                min_idx = np.argmin(tmp_vals)
+                out3[i] = min_idx
+
+            print(f"out - out2: {sum(out - out2)}")
+            print(f"out2 - out3: {sum(out2 - out3)}")
+
+
+
 
             # Get the id based on the index.
             selected_id = subset_row.iloc[out].to_numpy()
             tmp_freq_table = Counter(selected_id)
-            counter_weight.update(tmp_freq_table)   
+            #counter_weight.update(tmp_freq_table)   
+            counter_weight_list.append(CounterWeightData(w, tmp_freq_table))
 
+
+        for i_counter_weight in counter_weight_list:
+            counter_weight.update(i_counter_weight.counter_weight)
+        
         counter_weight_dict = dict(counter_weight)
         counter_weight_df = pd.DataFrame(list(counter_weight_dict.items()), 
                                                    columns=["id", "counter_weight"])
 
-        return counter_weight_df
+        return counter_weight_df, counter_weight_list
 
             
     def _compute_covariate_balance(self) -> None:
@@ -448,10 +466,23 @@ class PseudoPopulation:
         
         return results
 
+    def get_individual_counter_weight(self) -> list:
+        """
+        Get the counter-weight for each individual exposure.
+        """
+
+        if self.counter_weight_list is None:
+            raise Exception("Counter-weight is not defined. " +\
+                "Try generating the pseudo-population first.")
+
+        return self.counter_weight_list
 
 
-    
-    
+@dataclass    
+class CounterWeightData:
+    w: float
+    counter_weight: np.ndarray
+
     
     
     
