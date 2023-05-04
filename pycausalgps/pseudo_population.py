@@ -15,56 +15,63 @@ from scipy.stats import gaussian_kde, norm
 from matplotlib.gridspec import GridSpec
 
 from pycausalgps.log import LOGGER
-from pycausalgps.database import Database
 from pycausalgps.base.utils import nested_get
 from pycausalgps.rscripts.rfunctions import (compute_density,
                                              compute_absolute_weighted_corr)
 
 class PseudoPopulation:
+    """
+    The PseudoPopulation class is used to compute the pseudo-population.
 
-    def __init__(self, project_params, gps_params, 
-                       pspop_params, db_path) -> None:
-        self.project_params = project_params
-        self.gps_params = gps_params
-        self.pspop_params = pspop_params
-        self.db_path = db_path
-        self.hash_value = None
-        self.pspop_id = None
-        self.counter_weight = None
-        self.covariate_balance = None
-        self._generate_hash()
-        self._connect_to_database()
+    Parameters
+    ----------
 
+    data: pd.DataFrame
+        The dataframe containing the data and the GPS values as well as the
+        estimated exposure and estimated exposure standard deviation.
+    params: dict
+        The dictionary containing the parameters for computing the 
+        pseudo-population. The required parameters are:
+        - approach: str
+            The approach to compute the pseudo-population. The available
+            approaches are: "weighting" and "matching".
+        - exposure_column: str  
+            A string that indicates the name of the exposure column.
+        - covariate_column_num: list
+            A list of strings that indicates the names of the numerical
+            covariate columns.
+        - covariate_column_cat: list
+            A list of strings that indicates the names of the categorical
+            covariate columns.
 
-    def _generate_hash(self) -> None:
-        """
-        Generate a hash value for the pseudo-population object.
-        """
+    """
 
-        hash_string = json.dumps(self.pspop_params, sort_keys=True)
+    def __init__(self, data: pd.DataFrame, params: dict):
 
-        if self.gps_params.get("hash_value"):
-            hash_string = self.gps_params.get("hash_value") + hash_string
-            self.hash_value = hashlib.sha256(
-                hash_string.encode("utf-8")).hexdigest()
-            # generating random id for the pseudo-population
-            self.pspop_id = hashlib.shake_256(self.hash_value.encode()).hexdigest(8)
-            self.pspop_params["hash_value"] = self.hash_value
-        else:
-            LOGGER.warning("Project hash value is not assigned. " +\
-                           "This can happen becuase of running the class individually. " +\
-                           "Hash value cannot be generated. ")
+        self.data = data
+        self.params = params
+        self.compiling_report = {}
+        self.results = None
+        self._check_data()
+        self._check_params()
+        self.generate_pseudo_population()
 
-            
-    def _connect_to_database(self):
-        """
-        Connect to the database.
-        """
-        if self.db_path is None:
-            raise Exception("Database is not defined.")
-            
-        self.db = Database(self.db_path)
     
+    def _check_data(self) -> None:
+        pass
+    
+    def _check_params(self):
+        """
+        Check if the params are in the correct format.
+        """
+
+        required_params = ["approach"]
+        
+        for param in required_params:
+            if not param in self.params.keys():
+                raise ValueError(f"Required parameter {param} is missing.")
+            
+
     def generate_pseudo_population(self) -> None:
         """
         Compute the pseudo-population.
@@ -75,69 +82,19 @@ class PseudoPopulation:
         #                w_resid)
         # 2. pspop_params (approach, caliper, scale, 
 
-        if self.pspop_params.get("pspop_params").get("approach") == "weighting":
+        if self.params.get("approach") == "weighting":
             counter_weight = self._compute_pspop_weighting()
             self.counter_weight = counter_weight["counter_weight"]
             self._compute_covariate_balance()
-        elif self.pspop_params.get("pspop_params").get("approach") == "matching":
+        elif self.params.get("pspop_params").get("approach") == "matching":
             counter_weight = self._compute_pspop_matching()
             self.counter_weight = counter_weight["counter_weight"]
             self._compute_covariate_balance()
         else:
             raise Exception("Approach is not defined.")
-
-
-    def load_exposure(self) -> None:
-        """
-        Load the exposure values.
-        """
-        exposure_path = self.project_params.get("data").get("exposure_path")
-
-        # load exposure values.
-        exposure_data = pd.read_csv(exposure_path)
-        LOGGER.debug(f"Exposure data shape: {exposure_data.shape}")
-
-        if not isinstance(exposure_data, pd.DataFrame):
-            raise Exception("Exposure data is not a dataframe.")
-
-        if "id" not in exposure_data.columns:
-            raise Exception("Exposure data does not have id column.")
-        
-        return exposure_data
-
-    def load_confounders(self) -> tuple:
-        """
-        Load the confounder values.
-        """
-        covariate_path = self.project_params.get("data").get("covariate_path")
-
-        # load confounder values.
-        covariate_data = pd.read_csv(covariate_path)
-        LOGGER.debug(f"Confounder data shape: {covariate_data.shape}")
-        
-        # select the comlumns that are used in the gps
-        covariate_col_num = nested_get(self.gps_params,
-                                            ["gps_params","pred_model",
-                                            "covariate_column_num"])
-        covariate_col_cat = nested_get(self.gps_params,
-                                            ["gps_params", "pred_model", 
-                                            "covariate_column_cat"])
-        
-        if covariate_col_num is not None:
-            covariate_data_num = covariate_data[covariate_col_num]
-        else:
-            covariate_data_num = None
-        
-        if covariate_col_cat is not None:
-            covariate_data_cat = covariate_data[covariate_col_cat]
-        else:
-            covariate_data_cat = None
-
-
-        return covariate_data_num, covariate_data_cat
-
-
-    def _compute_pspop_weighting(self) -> None:
+    
+    
+    def _compute_pspop_weighting(self) -> pd.DataFrame:
         """
         Compute the pseudo-population using weighting.
         """
@@ -149,31 +106,22 @@ class PseudoPopulation:
         # temp test
         compute_density_with_r = True
         
-        # load exposure values. 
-        exposure_data = self.load_exposure()
-
-        exposure_data_col_name = nested_get(self.gps_params,
-                                                ["gps_params", "pred_model", 
-                                                "exposure_column"])
+        exposure_data_col_name = nested_get(self.params, ["exposure_column"])
 
         # compute density of the exposure in the data.
         if compute_density_with_r:
             # compute density with R.
-            w_val = exposure_data[exposure_data_col_name].to_numpy()
+            w_val = self.data[exposure_data_col_name].to_numpy()
             data_density = compute_density(w_val, w_val)
             print("Density was computed with R.")
         else:
-            exp_data = exposure_data[exposure_data_col_name]
+            exp_data = self.data[exposure_data_col_name]
             kde = gaussian_kde(exp_data)
             data_density = kde(exp_data)
+
         
- 
-        # Extract the gps object from the database.
-        gps_obj = self.db.get_value(self.gps_params.get("hash_value"))
-        
-        ipw = data_density / gps_obj._data.get("_data")["gps"].to_numpy()
-        
-        value = pd.DataFrame({"id": exposure_data["id"], "counter_weight": ipw})
+        ipw = data_density / self.data["gps"].to_numpy()     
+        value = pd.DataFrame({"id": self.data["id"], "counter_weight": ipw})
 
         return value
   
@@ -335,9 +283,6 @@ class PseudoPopulation:
         return counter_weight_df
 
             
-
-
-
     def _compute_covariate_balance(self) -> None:
         """
         Compute covariate balance.
@@ -347,11 +292,18 @@ class PseudoPopulation:
                 "Try generating the pseudo-population first.")
 
         # load exposure values.
-        exposure_data = self.load_exposure()
-        exp_data = exposure_data[self.gps_params.get("gps_params").get("pred_model").get("exposure_column")].to_numpy()
+        # exposure_data = self.load_exposure()
+        # exp_data = exposure_data[self.gps_params.get("gps_params").get("pred_model").get("exposure_column")].to_numpy()
+        exposure_data_col_name = nested_get(self.params, ["exposure_column"])
+        exp_data = self.data[exposure_data_col_name].to_numpy()
 
         # load the confounders.
-        covariate_data_num, covariate_data_cat = self.load_confounders()
+        covariate_col_num = nested_get(self.params, 
+                                       ["covariate_column_num"])
+        covariate_col_cat = nested_get(self.params, 
+                                       ["covariate_column_cat"])
+        covariate_data_num = self.data[covariate_col_num]
+        covariate_data_cat = self.data[covariate_col_cat]
 
         # compute weighted correlation between the confounders and the exposure.
         covariate_balance = compute_absolute_weighted_corr(exp_data, 
@@ -359,18 +311,22 @@ class PseudoPopulation:
                                                            covariate_data_num,
                                                            covariate_data_cat) 
 
-        original_data_covariate_balance = compute_absolute_weighted_corr(exp_data,
-                                                                         np.ones(self.counter_weight.shape),
-                                                                         covariate_data_num,
-                                                                         covariate_data_cat)                    
+        original_data_covariate_balance = compute_absolute_weighted_corr(
+            exp_data,
+            np.ones(self.counter_weight.shape),
+            covariate_data_num,
+            covariate_data_cat)                    
 
         cov_balance_current = covariate_balance
-        cov_balance_current.rename(columns = {'value':'current'}, inplace = True)
+        cov_balance_current.rename(columns = {'value':'current'}, 
+                                   inplace = True)
         cov_balance_original = original_data_covariate_balance
-        cov_balance_original.rename(columns = {'value':'original'}, inplace = True)
+        cov_balance_original.rename(columns = {'value':'original'}, 
+                                    inplace = True)
 
 
-        cov_balance = pd.merge(cov_balance_current, cov_balance_original, on='name')
+        cov_balance = pd.merge(cov_balance_current, cov_balance_original, 
+                               on='name')
 
         self.covariate_balance = cov_balance
 
@@ -448,18 +404,74 @@ class PseudoPopulation:
         hyper_param_3 = {"fontsize": 8, "ha":"left", "va":"center"}
 
         ax3.text(xlim3[0], ylim3[1]-0.05, 'Data Info', **hyper_param_1)
-        ax3.text(xlim3[0], ylim3[1]-0.15, 
-                 f'GPS Object ID: {self.gps_params.get("gps_id")}', 
-                 **hyper_param_3)
-        ax3.text(xlim3[0], ylim3[1]-0.2,
-                    f'GPS hash value: {self.gps_params.get("hash_value")}',
-                    **hyper_param_3)
-        ax3.text(xlim3[0], ylim3[1]-0.25,
-                    f'Pseudo population ID: {self.pspop_id}',
-                    **hyper_param_3)
-        ax3.text(xlim3[0], ylim3[1]-0.3,
-                    f'Pseudo population hash value: {self.hash_value}',
-                    **hyper_param_3)
+        # ax3.text(xlim3[0], ylim3[1]-0.15, 
+        #          f'GPS Object ID: {self.gps_params.get("gps_id")}', 
+        #          **hyper_param_3)
+        # ax3.text(xlim3[0], ylim3[1]-0.2,
+        #             f'GPS hash value: {self.gps_params.get("hash_value")}',
+        #             **hyper_param_3)
+        # ax3.text(xlim3[0], ylim3[1]-0.25,
+        #             f'Pseudo population ID: {self.pspop_id}',
+        #             **hyper_param_3)
+        # ax3.text(xlim3[0], ylim3[1]-0.3,
+        #             f'Pseudo population hash value: {self.hash_value}',
+        #             **hyper_param_3)
 
         fig.suptitle("Covariate Balance", fontsize=16)
         plt.show()   
+    
+    
+    
+    
+    
+    # Old code 
+    
+    
+
+if __name__ == "__main__":
+
+    from pycausalgps.base.utils import generate_syn_pop
+    from pycausalgps.gps import GeneralizedPropensityScore
+
+    gps_params = {"gps_density": "normal",
+                  "exposure_column": "treat",
+                  "covariate_column_num": ["cf1", 
+                                           "cf2", 
+                                           "cf3", 
+                                           "cf4", 
+                                           "cf6"],
+                  "covariate_column_cat": ["cf5"],
+                  "libs":{
+                          "xgboost":{
+                                 "n_estimators": 100,
+                                 "max_depth": 3,
+                                 "learning_rate": 0.1,
+                                 "test_rate": 0.2,
+                                 "random_state": 42
+                                 }
+                             }
+    }
+    
+    data = generate_syn_pop(sample_size=1000, 
+                            seed_val=456, 
+                            outcome_sd=0.25, 
+                            gps_spec=1, 
+                            cova_spec=2)
+        
+    gps = GeneralizedPropensityScore(data, gps_params)
+    results = gps.get_results()
+    gps_data = results.get("data")    
+
+    merged_df = pd.merge(data, gps_data, on='id')
+    merged_df
+
+    pspop_params = {"approach" : "weighting", 
+                    "exposure_column": "treat",
+                    "covariate_column_num": ["cf1", 
+                                             "cf2", 
+                                             "cf3", 
+                                             "cf4", 
+                                             "cf6"],
+                    "covariate_column_cat": ["cf5"]}
+    
+

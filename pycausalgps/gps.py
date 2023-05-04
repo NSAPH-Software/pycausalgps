@@ -68,7 +68,6 @@ class GeneralizedPropensityScore:
     """
     
     def __init__(self, data: pd.DataFrame, params: dict) -> None:
-
         self.data = data
         self.params = params
         self.training_report = {}

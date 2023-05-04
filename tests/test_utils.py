@@ -25,7 +25,8 @@ class TestGenerateSynPop(unittest.TestCase):
         gps_spec = 3
         cova_spec = 2
 
-        result = generate_syn_pop(sample_size, seed_val, outcome_sd, gps_spec, cova_spec)
+        result = generate_syn_pop(sample_size, seed_val, outcome_sd,
+                                  gps_spec, cova_spec)
         self.assertIsInstance(result, pd.DataFrame)
         self.assertEqual(len(result), sample_size)
 
@@ -37,7 +38,8 @@ class TestGenerateSynPop(unittest.TestCase):
         cova_spec = 2
 
         with self.assertRaises(ValueError):
-            generate_syn_pop(sample_size, seed_val, outcome_sd, gps_spec, cova_spec)
+            generate_syn_pop(sample_size, seed_val, outcome_sd, 
+                             gps_spec, cova_spec)
 
     def test_valid_cova_spec(self):
         sample_size = 100
@@ -46,7 +48,8 @@ class TestGenerateSynPop(unittest.TestCase):
         gps_spec = 3
         cova_spec = 2
 
-        result = generate_syn_pop(sample_size, seed_val, outcome_sd, gps_spec, cova_spec)
+        result = generate_syn_pop(sample_size, seed_val, outcome_sd, 
+                                  gps_spec, cova_spec)
         self.assertIsInstance(result, pd.DataFrame)
         self.assertEqual(len(result), sample_size)
 
@@ -58,7 +61,8 @@ class TestGenerateSynPop(unittest.TestCase):
         cova_spec = 3  # Invalid cova_spec value
 
         with self.assertRaises(ValueError):
-            generate_syn_pop(sample_size, seed_val, outcome_sd, gps_spec, cova_spec)
+            generate_syn_pop(sample_size, seed_val, outcome_sd, 
+                             gps_spec, cova_spec)
 
     def test_columns(self):
         sample_size = 100
@@ -67,8 +71,10 @@ class TestGenerateSynPop(unittest.TestCase):
         gps_spec = 3
         cova_spec = 2
 
-        result = generate_syn_pop(sample_size, seed_val, outcome_sd, gps_spec, cova_spec)
-        expected_columns = ['Y', 'treat', 'cf1', 'cf2', 'cf3', 'cf4', 'cf5', 'cf6']
+        result = generate_syn_pop(sample_size, seed_val, outcome_sd, 
+                                  gps_spec, cova_spec)
+        expected_columns = ['id', 'Y', 'treat', 'cf1', 'cf2', 'cf3', 
+                            'cf4', 'cf5', 'cf6']
         self.assertListEqual(list(result.columns), expected_columns)
 
 
