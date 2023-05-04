@@ -159,7 +159,8 @@ class GeneralizedPropensityScore:
                                         "e_gps_std_pred": gps_res["e_gps_std"],
                                         "w_resid": gps_res["w_resid"]}),
                         "gps_minmax":[gps_min, gps_max],
-                        "training_report": self.training_report
+                        "gps_density": self.params["gps_density"],
+                        "training_report": self.training_report,
             }
             return results
 

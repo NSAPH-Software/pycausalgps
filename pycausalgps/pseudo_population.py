@@ -27,8 +27,12 @@ class PseudoPopulation:
     ----------
 
     data: pd.DataFrame
-        The dataframe containing the data and the GPS values as well as the
-        estimated exposure and estimated exposure standard deviation.
+        The dataframe containing the data (covariate and exposure columns).
+    gps_data: dict
+        The dictionary containing the GPS data. The required keys are:
+        - gps_data: pd.DataFrame
+            The dataframe containing the GPS data, and its auxiliary columns.
+        - gps_model: str
     params: dict
         The dictionary containing the parameters for computing the 
         pseudo-population. The required parameters are:
@@ -46,49 +50,63 @@ class PseudoPopulation:
 
     """
 
-    def __init__(self, data: pd.DataFrame, params: dict):
+    APPROACH_WEIGHTING = "weighting"
+    APPROACH_MATCHING = "matching"
+
+    def __init__(self, data: pd.DataFrame, gps_data: dict, params: dict):
 
         self.data = data
         self.params = params
+        self.gps_data = gps_data
         self.compiling_report = {}
-        self.results = None
-        self._check_data()
-        self._check_params()
+        self.counter_weight = None
         self.generate_pseudo_population()
 
+    @property
+    def data(self) -> pd.DataFrame:
+        return self.__data
     
-    def _check_data(self) -> None:
-        pass
-    
-    def _check_params(self):
-        """
-        Check if the params are in the correct format.
-        """
+    @data.setter
+    def data(self, value: pd.DataFrame) -> None:
+        if not isinstance(value, pd.DataFrame):
+            raise ValueError("Data must be a pandas DataFrame.")
+        self.__data = value
 
-        required_params = ["approach"]
-        
-        for param in required_params:
-            if not param in self.params.keys():
-                raise ValueError(f"Required parameter {param} is missing.")
-            
+    @property
+    def params(self) -> dict:
+        return self.__params
+    
+    @params.setter
+    def params(self, value: dict) -> None:
+        #TODO: Check if the params are in the correct format.
+        if not isinstance(value, dict):
+            raise ValueError("Params must be a dictionary.")
+        self.__params = value
+
+    @property
+    def gps_data(self) -> dict:
+        return self.__gps_data
+    
+    @gps_data.setter
+    def gps_data(self, value: dict) -> None:
+        #TODO: check if the gps_data is in the correct format.
+        if not isinstance(value, dict):
+            raise ValueError("Data must be a pandas DataFrame.")
+        self.__gps_data = value
 
     def generate_pseudo_population(self) -> None:
         """
         Compute the pseudo-population.
         """
+        self.exposure_data_col_name = self.params.get("exposure_column")
+        self.covariate_col_num = self.params.get("covariate_column_num")
+        self.covariate_col_cat = self.params.get("covariate_column_cat")
         
-        # For computing pspop we need to have the following:
-        # 1. gps_params (gps values, estimated exposure, estimated exposure std,
-        #                w_resid)
-        # 2. pspop_params (approach, caliper, scale, 
-
-        if self.params.get("approach") == "weighting":
-            counter_weight = self._compute_pspop_weighting()
-            self.counter_weight = counter_weight["counter_weight"]
+        if self.params.get("approach") == self.APPROACH_WEIGHTING:
+            self.counter_weight = self._compute_pspop_weighting() 
             self._compute_covariate_balance()
-        elif self.params.get("pspop_params").get("approach") == "matching":
-            counter_weight = self._compute_pspop_matching()
-            self.counter_weight = counter_weight["counter_weight"]
+        elif self.params.get("approach") == self.APPROACH_MATCHING:
+            self.counter_weight = self._compute_pspop_matching()
             self._compute_covariate_balance()
         else:
             raise Exception("Approach is not defined.")
@@ -106,22 +124,22 @@ class PseudoPopulation:
         # temp test
         compute_density_with_r = True
         
-        exposure_data_col_name = nested_get(self.params, ["exposure_column"])
-
+        
         # compute density of the exposure in the data.
         if compute_density_with_r:
             # compute density with R.
-            w_val = self.data[exposure_data_col_name].to_numpy()
+            w_val = self.data[self.exposure_data_col_name].to_numpy()
             data_density = compute_density(w_val, w_val)
             print("Density was computed with R.")
         else:
-            exp_data = self.data[exposure_data_col_name]
+            exp_data = self.data[self.exposure_data_col_name]
             kde = gaussian_kde(exp_data)
             data_density = kde(exp_data)
 
         
-        ipw = data_density / self.data["gps"].to_numpy()     
-        value = pd.DataFrame({"id": self.data["id"], "counter_weight": ipw})
+        ipw = data_density / self.gps_data.get("data")["gps"].to_numpy()            
+        value = pd.DataFrame({"id": self.gps_data.get("data")["id"], 
+                              "counter_weight": ipw})
 
         return value
   
@@ -181,7 +199,6 @@ class PseudoPopulation:
 
 
         for i, w in enumerate(req_exposure):
-            
             if gps_model == "parametric":
                 p_w = norm.pdf(w, 
                                gps_obj._data.get("_data")["e_gps_pred"], 
@@ -193,7 +210,6 @@ class PseudoPopulation:
             else:
                 raise Exception("GPS model is not defined.")
            
-
 
             # select subset of data that are within the caliper value.
             subset_idx = np.where(np.abs(obs_exposure_data["exposure"] - w) <= delta)[0]
@@ -288,32 +304,31 @@ class PseudoPopulation:
         Compute covariate balance.
         """
         if self.counter_weight is None:
-            raise Exception("Counter weight is not defined. " +\
-                "Try generating the pseudo-population first.")
+            raise Exception(f"Counter weight is not defined. " 
+                             "Try generating the pseudo-population first.")
 
-        # load exposure values.
-        # exposure_data = self.load_exposure()
-        # exp_data = exposure_data[self.gps_params.get("gps_params").get("pred_model").get("exposure_column")].to_numpy()
-        exposure_data_col_name = nested_get(self.params, ["exposure_column"])
-        exp_data = self.data[exposure_data_col_name].to_numpy()
+        
+        # merge the counter weight with the original data.
+        # TODO: warn users if there is a discrepancy in ids.
+        self.merged_data = pd.merge(self.data, self.counter_weight, on="id")
+               
+        # load the exposure data.
+        exp_data = self.merged_data[self.exposure_data_col_name].to_numpy()
 
         # load the confounders.
-        covariate_col_num = nested_get(self.params, 
-                                       ["covariate_column_num"])
-        covariate_col_cat = nested_get(self.params, 
-                                       ["covariate_column_cat"])
-        covariate_data_num = self.data[covariate_col_num]
-        covariate_data_cat = self.data[covariate_col_cat]
+        covariate_data_num = self.merged_data[self.covariate_col_num]
+        covariate_data_cat = self.merged_data[self.covariate_col_cat]
+        counter_weight = self.merged_data["counter_weight"].to_numpy()
 
         # compute weighted correlation between the confounders and the exposure.
         covariate_balance = compute_absolute_weighted_corr(exp_data, 
-                                                           self.counter_weight, 
+                                                           counter_weight, 
                                                            covariate_data_num,
                                                            covariate_data_cat) 
 
         original_data_covariate_balance = compute_absolute_weighted_corr(
             exp_data,
-            np.ones(self.counter_weight.shape),
+            np.ones(counter_weight.shape),
             covariate_data_num,
             covariate_data_cat)                    
 
@@ -419,6 +434,22 @@ class PseudoPopulation:
 
         fig.suptitle("Covariate Balance", fontsize=16)
         plt.show()   
+
+
+    def get_results(self) -> dict:
+        """
+        Get the results of generating the pseudo-population.
+        """
+
+        results = {"data": self.merged_data,
+                   "params": self.params,
+                   "compiling_report": self.compiling_report,
+                   "covariate_balance": self.covariate_balance}
+        
+        return results
+
+
+
     
     
     
