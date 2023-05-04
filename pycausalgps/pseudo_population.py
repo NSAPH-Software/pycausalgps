@@ -176,7 +176,7 @@ class PseudoPopulation:
         return out_chunk
 
 
-    def _compute_pspop_matching(self) -> None:
+    def _compute_pspop_matching(self):
 
         """ 
         Compute the pseudo-population using matching approach.
@@ -289,99 +289,17 @@ class PseudoPopulation:
             len_b = len(b)
             len_a = len(a)
             out = np.zeros(len_b)
-            out2 = np.zeros(len_b)
-            out3 = np.zeros(len_b)
-            out4 = np.zeros(len_b)
-            out5 = np.zeros(len_b)
-            out6 = np.zeros(len_b)
 
+            chunk_size = int(nested_get(self.params, ["run_params", "chunk_size"]))
+            n_thread = int(nested_get(self.params, ["run_params", "n_thread"]))
+            num_chunks = int(np.ceil(len_b / chunk_size))
 
-            # Solutions of O(N2) complexity problem ----------------------------
-            # Brute force method.
-            brute_force = True
-            if brute_force:
-                for i in range(len_b):
-                    for j in range(len_a):
+            with ProcessPoolExecutor(max_workers=n_thread) as executor:
+                args_list = [(i * chunk_size, chunk_size, a, b, scale, c_minus_d) for i in range(num_chunks)]
+                results = list(executor.map(self.compute_min_idx_proc_chunk, args_list))
 
-                        subtract_val = abs(a[j] - b[i])*scale
-
-                        tmp_val = subtract_val + c_minus_d[j]
-
-                        if (j == 0):
-                            min_val = tmp_val 
-                            min_idx = j
-                            continue
-
-                        if (tmp_val < min_val):
-                            min_val = tmp_val
-                            min_idx = j
-                    out[i] = min_idx
-
-            # Solution with numpy, but it will consume more memory.
-            numpy_memory_consuming = True
-            if numpy_memory_consuming:    
-                out2 = np.argmin(np.abs(np.subtract.outer(a, b))*scale 
-                                + c_minus_d[:, np.newaxis], axis=0)
-
-            # Solution with numpy, but it will consume less memory.
-            numpy_memory_saving = True
-            if numpy_memory_saving:
-                for i in range(len_b):
-                    tmp_vals = np.abs(a - b[i]) * scale + c_minus_d
-                    min_idx = np.argmin(tmp_vals)
-                    out3[i] = min_idx
-
-            # Soltion with threadpool
-            thread_pool = True
-            if thread_pool:
-                with ThreadPoolExecutor(max_workers=12) as executor:
-                    results = list(executor.map(self.compute_min_idx, range(len_b), [a]*len_b, [b]*len_b, [scale]*len_b, [c_minus_d]*len_b))
-
-                out4 = np.array(results)
-         
-            # Solution with processpool
-            process_pool = True
-            if process_pool:
-                with ProcessPoolExecutor(max_workers=12) as executor:
-                    args_list = [(i, a, b, scale, c_minus_d) for i in range(len_b)]
-                    results = list(executor.map(self.compute_min_idx_proc, args_list))
-
-                out5 = np.array(results)
-
-
-            # solution with processpool and chunking
-            process_pool_chunking = True
-            if process_pool_chunking:
-                chunk_size = 5000  # Adjust this value based on your problem size
-                num_chunks = int(np.ceil(len_b / chunk_size))
-
-                with ProcessPoolExecutor(max_workers=12) as executor:
-                    args_list = [(i * chunk_size, chunk_size, a, b, scale, c_minus_d) for i in range(num_chunks)]
-                    results = list(executor.map(self.compute_min_idx_proc_chunk, args_list))
-
-                # Flatten the results and assign them back to the 'out' array
-                out6 = np.concatenate([chunk[chunk != -1] for chunk in results])
-
-
-            
-            print(f"out: {out}")
-            print(f"out2: {out2}")
-            print(f"out3: {out3}")
-            print(f"out4: {out4}")
-            print(f"out5: {out5}")
-            print(f"out6: {out6}")
-            print(f"out == out2: {np.array_equal(out, out2)}")
-            print(f"out == out3: {np.array_equal(out, out3)}")
-            print(f"out == out4: {np.array_equal(out, out4)}")
-            print(f"out == out5: {np.array_equal(out, out5)}")
-            print(f"out == out6: {np.array_equal(out, out6)}")
-
-            
-            
-
-
-        # End of solutions of O(N2) complexity problem -------------------------
-
+            # Flatten the results and assign them back to the 'out' array
+            out = np.concatenate([chunk[chunk != -1] for chunk in results])
 
             # Get the id based on the index.
             selected_id = subset_row.iloc[out].to_numpy()
