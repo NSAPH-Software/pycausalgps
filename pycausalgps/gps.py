@@ -25,11 +25,13 @@ class GeneralizedPropensityScore:
 
     Parameters
     ----------
+
     data: pd.DataFrame
         A pandas DataFrame that contains the data for the GPS computation.
     params : dict
         A dictionary of gps parameters. This includes the folowing required
         parameters:
+
             - gps_density: str
                 A string that indicates the density estimation method to be
                 used. Available options are "normal" and "kernel".
@@ -45,6 +47,7 @@ class GeneralizedPropensityScore:
                 A dictionary of libraries and their parameters. Currently only
                 xgboost is supported. Any parameters for hypertuning the 
                 xgboost model can be passed including:
+                
                     - n_estimators: int
                         Number of trees to fit.
                     - learning_rate: float
@@ -58,6 +61,7 @@ class GeneralizedPropensityScore:
 
     Returns
     -------
+
     GeneralizedPropensityScore object that includes the following attributes:
         - data: pd.DataFrame
             The gps and auxilary columns.

@@ -111,11 +111,13 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
+
 <span class="sd">    data: pd.DataFrame</span>
 <span class="sd">        A pandas DataFrame that contains the data for the GPS computation.</span>
 <span class="sd">    params : dict</span>
 <span class="sd">        A dictionary of gps parameters. This includes the folowing required</span>
 <span class="sd">        parameters:</span>
+
 <span class="sd">            - gps_density: str</span>
 <span class="sd">                A string that indicates the density estimation method to be</span>
 <span class="sd">                used. Available options are &quot;normal&quot; and &quot;kernel&quot;.</span>
@@ -131,6 +133,7 @@
 <span class="sd">                A dictionary of libraries and their parameters. Currently only</span>
 <span class="sd">                xgboost is supported. Any parameters for hypertuning the </span>
 <span class="sd">                xgboost model can be passed including:</span>
+<span class="sd">                </span>
 <span class="sd">                    - n_estimators: int</span>
 <span class="sd">                        Number of trees to fit.</span>
 <span class="sd">                    - learning_rate: float</span>
@@ -144,6 +147,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
+
 <span class="sd">    GeneralizedPropensityScore object that includes the following attributes:</span>
 <span class="sd">        - data: pd.DataFrame</span>
 <span class="sd">            The gps and auxilary columns.</span>
@@ -154,7 +158,6 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">training_report</span> <span class="o">=</span> <span class="p">{}</span>
@@ -246,7 +249,8 @@
                                         <span class="s2">&quot;e_gps_std_pred&quot;</span><span class="p">:</span> <span class="n">gps_res</span><span class="p">[</span><span class="s2">&quot;e_gps_std&quot;</span><span class="p">],</span>
                                         <span class="s2">&quot;w_resid&quot;</span><span class="p">:</span> <span class="n">gps_res</span><span class="p">[</span><span class="s2">&quot;w_resid&quot;</span><span class="p">]}),</span>
                         <span class="s2">&quot;gps_minmax&quot;</span><span class="p">:[</span><span class="n">gps_min</span><span class="p">,</span> <span class="n">gps_max</span><span class="p">],</span>
-                        <span class="s2">&quot;training_report&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">training_report</span>
+                        <span class="s2">&quot;gps_density&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;gps_density&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;training_report&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">training_report</span><span class="p">,</span>
             <span class="p">}</span>
             <span class="k">return</span> <span class="n">results</span>
 
