@@ -27,19 +27,6 @@ if 'compute_density' not in robjects.globalenv:
 
         robjects.r(f'source("{r_file_path}")')
 
-        # with open(r_file_path, 'r') as r_file:
-        #     r_code = r_file.read()
-
-        # robjects.r(r_code)
-
-        # robjects.r('''
-        #     compute_density <- function(x0, x1){
-        #         tmp_density <- stats::density(x0, na.rm = TRUE)
-        #         dnst <- stats::approx(tmp_density$x, tmp_density$y, xout = x1,
-        #                               rule = 2)$y
-        #     return(dnst)
-        #    }
-        # ''')
     except Exception as e:
         print('Error in loading the R function: compute_density')
         print(e)
@@ -93,69 +80,12 @@ def compute_density(x0:np.array, x1:np.array) -> np.array:
 # Check if function is defined
 if 'absolute_weighted_corr' not in robjects.globalenv:
     try:
-        robjects.r('''
-            absolute_weighted_corr_df <- function(w,
-                                      vw,
-                                      c_num,
-                                      c_cat){
-  
-  
- 
-                # detect numeric columns
-                col_n <- colnames(c_num)
-              
-                # detect factorial columns
-                col_f <- colnames(c_cat)
-              
-                c_cat[] <- lapply(c_cat, as.factor)
-              
-                absolute_corr_n <- absolute_corr_f <- NULL
-              
-                if (length(col_n) > 0) {
-                  absolute_corr_n<- sapply(col_n,function(i){
-                    abs(wCorr::weightedCorr(x = w,
-                                            y = c_num[,i],
-                                            weights = vw,
-                                            method = c("spearman")))})
-                  absolute_corr_n <- unlist(absolute_corr_n)
-                  names(absolute_corr_n) <- col_n
-                }
-              
-                if (length(col_f) > 0) {
-                  internal_fun<- function(i){
-                    abs(wCorr::weightedCorr(x = w,
-                                            y = c_cat[, i],
-                                            weights = vw,
-                                            method = c("Polyserial")))}
-              
-                  absolute_corr_f <- c()
-                  for (item in col_f){
-                    if (length(unique(c_cat[[item]])) == 1 ){
-                      absolute_corr_f <- c(absolute_corr_f, NA)
-                    } else {
-                      absolute_corr_f <- c(absolute_corr_f, internal_fun(item))
-                    }
-                  }
-                  names(absolute_corr_f) <- col_f
-                }
-              
-                absolute_corr <- c(absolute_corr_n, absolute_corr_f)
-              
-                if (sum(is.na(absolute_corr)) > 0){
-                  warning(paste("The following features generated missing values: ",
-                                names(absolute_corr)[is.na(absolute_corr)],
-                                "\nIn computing mean covariate balance, they will be ignored."))
-                }
-              
-                df <- data.frame(name = character(), value = numeric())
-              
-                for (i in names(absolute_corr)){
-                  df <- rbind(df, data.frame(name=i, value=absolute_corr[[i]]))
-                }
-              
-                return(df)
-            }
-        ''')
+
+        r_file_path = os.path.join(os.path.dirname(__file__), 
+                                   'absolute_weighted_corr_df.r')
+
+        robjects.r(f'source("{r_file_path}")')
+
     except Exception as e:
         print('Error in loading the R function: absolute_weighted_corr')
         print(e)
