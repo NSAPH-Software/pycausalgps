@@ -13,9 +13,11 @@ from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde, norm
 from matplotlib.gridspec import GridSpec
+
 
 from pycausalgps.log import LOGGER
 from pycausalgps.base.utils import nested_get
@@ -111,7 +113,10 @@ class PseudoPopulation:
             self.counter_weight = self._compute_pspop_weighting() 
             self._compute_covariate_balance()
         elif self.params.get("approach") == self.APPROACH_MATCHING:
-            self.counter_weight, self.counter_weight_list = self._compute_pspop_matching()
+            (
+             self.counter_weight, 
+             self.counter_weight_list
+            ) = self._compute_pspop_matching()
             self._compute_covariate_balance()
         else:
             raise Exception("Approach is not defined.")
@@ -176,20 +181,8 @@ class PseudoPopulation:
         return out_chunk
 
 
-    def _compute_pspop_matching(self):
+    def _process_exposure_level(self, w):
 
-        """ 
-        Compute the pseudo-population using matching approach.
-        """
-
-        # We need: 
-        # Original GPS value and mean and standard deviation.
-        # Original exposure value.
-        # Requested exposure level. 
-        # Caliper value.
-        # Scale value.
-
-        
         # load gps object from the database.
         gps_min, gps_max = self.gps_data.get("gps_minmax")
         gps_density = self.gps_data.get("gps_density")
@@ -213,11 +206,119 @@ class PseudoPopulation:
                                  ["control_params", 
                                   "dist_measure"])
 
+        
+        if gps_density == self.GPS_DENSITY_NORMAL:
+            p_w = norm.pdf(w, 
+                           self.gps_data.get("data")["e_gps_pred"], 
+                           self.gps_data.get("data")["e_gps_std_pred"])
+        elif gps_density == self.GPS_DENSITY_KERNEL:
+            w_new = ((w - self.gps_data.get("data")["e_gps_pred"]) 
+                      / self.gps_data.get("data")["e_gps_std_pred"])
+            p_w = compute_density(w_resid, w_new)
+        else:
+            raise Exception("GPS model is not defined.")
+           
+
+        # select subset of data that are within the caliper value.
+        subset_idx = np.where(np.abs(
+            obs_exposure_data[self.exposure_data_col_name] - w) <= delta)[0]
+        subset_row = obs_exposure_data.iloc[subset_idx]["id"]
+
+        if len(subset_row) == 0:
+            LOGGER.debug(f"No data found within the caliper value ({delta}) " 
+                         f"for the requested exposure level: {w}.")
+            return (w, Counter(None))
+
+
+        # standardize GPS and Exposure values.
+        std_w = (w - w_min)/(w_max - w_min)
+        std_gps = (p_w - gps_min)/(gps_max - gps_min)
+
+        # all data (observational data where w is requested w.)
+        # std_w: scaler
+        # std_gps: vector
+        all_curated_data = pd.DataFrame({"id": obs_exposure_data["id"],
+                                            "std_w": std_w,
+                                            "std_gps": std_gps})
+        
+        # subset of data (actual standardized data that are within the caliper value.)
+        # std_w_subset: vector
+        # std_gps_subset: vector
+        std_w_subset = ((obs_exposure_data[obs_exposure_data["id"].
+                        isin(subset_row)][self.exposure_data_col_name] - w_min)) / (w_max - w_min)
+        
+        # TODO: use query.
+        std_gps_subset = (self.gps_data.get("data")[self.gps_data.get("data")["id"].isin(subset_row)]["gps_standardized"])
+
+        # a: subset of data with standardized GPS (std_gps_subset)
+        # b: all data with estimated GPS based on requested exposure level. (std_gps)
+        # c: subset of data with standardized exposure (std_w_subset)
+        # d: the exposure level that is requested. (std_w)
+        
+        a = std_gps_subset.to_numpy()
+        b = std_gps
+        c = std_w_subset.to_numpy()
+        d = std_w
+
+        c_minus_d = abs(c - d)*(1-scale)
+
+        # compute closest sample from subset of data to these hypothetical samples.
+        # TODO: make this a fucntion
+        len_b = len(b)
+        #len_a = len(a)
+        out = np.zeros(len_b)
+
+        # chunk_size = int(nested_get(self.params, ["run_params", "chunk_size"]))
+        
+        # num_chunks = int(np.ceil(len_b / chunk_size))
+
+        # with ProcessPoolExecutor(max_workers=n_thread) as executor:
+        #     args_list = [(i * chunk_size, chunk_size, a, b, scale, c_minus_d) for i in range(num_chunks)]
+        #     results = list(executor.map(self.compute_min_idx_proc_chunk, args_list))
+
+        # # Flatten the results and assign them back to the 'out' array
+        # out = np.concatenate([chunk[chunk != -1] for chunk in results])
+
+    
+        for i in range(len_b):
+            tmp_vals = np.abs(a - b[i]) * scale + c_minus_d
+            min_idx = np.argmin(tmp_vals)
+            out[i] = min_idx
+
+        # Get the id based on the index.
+        selected_id = subset_row.iloc[out].to_numpy()
+        tmp_freq_table = Counter(selected_id)
+        #counter_weight.update(tmp_freq_table)   
+        
+        return (w, tmp_freq_table)
+
+
+    def _compute_pspop_matching(self):
+
+        """ 
+        Compute the pseudo-population using matching approach.
+        """
+
+        # We need: 
+        # Original GPS value and mean and standard deviation.
+        # Original exposure value.
+        # Requested exposure level. 
+        # Caliper value.
+        # Scale value.
+
+        obs_exposure_data = self.data[["id", self.exposure_data_col_name]]
+        w_min, w_max = (min(obs_exposure_data[self.exposure_data_col_name]), 
+                max(obs_exposure_data[self.exposure_data_col_name]))
+
         # collect requested exposure level.
         req_exposure = nested_get(self.params, 
                                  ["control_params", 
                                   "bin_seq"])
         
+        delta = nested_get(self.params,
+                                ["control_params", 
+                                "caliper"])
+
         # check if req_exposure is string
         if isinstance(req_exposure, str):
             req_exposure = eval(req_exposure)
@@ -227,86 +328,21 @@ class PseudoPopulation:
      
         counter_weight = Counter({key: 0 for key in obs_exposure_data["id"]})
         counter_weight_list = []
-
-        for i, w in enumerate(req_exposure):
-            if gps_density == "normal":
-                p_w = norm.pdf(w, 
-                               self.gps_data.get("data")["e_gps_pred"], 
-                               self.gps_data.get("data")["e_gps_std_pred"])
-            elif gps_density == "kernel":
-                w_new = ((w - self.gps_data.get("data")["e_gps_pred"]) 
-                         / self.gps_data.get("data")["e_gps_std_pred"])
-                p_w = compute_density(w_resid, w_new)
-            else:
-                raise Exception("GPS model is not defined.")
-           
-
-            # select subset of data that are within the caliper value.
-            subset_idx = np.where(np.abs(obs_exposure_data[self.exposure_data_col_name] - w) <= delta)[0]
-            subset_row = obs_exposure_data.iloc[subset_idx]["id"]
-
-            print(f"Subset size: {len(subset_row)}")
-
-            if len(subset_row) == 0:
-                print(f"No data within the caliper value for the requested exposure level: {w}.")
-                continue 
+ 
+        n_thread = int(nested_get(self.params, ["run_params", "n_thread"]))
 
 
-            # standardize GPS and Exposure values.
-            std_w = (w - w_min)/(w_max - w_min)
-            std_gps = (p_w - gps_min)/(gps_max - gps_min)
+        # for _, w in tqdm(enumerate(req_exposure), total=len(req_exposure), desc="Processing exposure levels"):
+        with ProcessPoolExecutor(max_workers=n_thread) as executor:
+            results = list(tqdm(executor.map(self._process_exposure_level, req_exposure), total=len(req_exposure), desc="Processing exposure levels"))
 
-            # all data (observational data where w is requested w.)
-            # std_w: scaler
-            # std_gps: vector
-            all_curated_data = pd.DataFrame({"id": obs_exposure_data["id"],
-                                             "std_w": std_w,
-                                             "std_gps": std_gps})
-            
-            # subset of data (actual standardized data that are within the caliper value.)
-            # std_w_subset: vector
-            # std_gps_subset: vector
-            std_w_subset = ((obs_exposure_data[obs_exposure_data["id"].
-                            isin(subset_row)][self.exposure_data_col_name] - w_min)) / (w_max - w_min)
-            
-            # TODO: use query.
-            std_gps_subset = (self.gps_data.get("data")[self.gps_data.get("data")["id"].isin(subset_row)]["gps_standardized"])
-
-            # a: subset of data with standardized GPS (std_gps_subset)
-            # b: all data with estimated GPS based on requested exposure level. (std_gps)
-            # c: subset of data with standardized exposure (std_w_subset)
-            # d: the exposure level that is requested. (std_w)
-            
-            a = std_gps_subset.to_numpy()
-            b = std_gps
-            c = std_w_subset.to_numpy()
-            d = std_w
-
-            c_minus_d = abs(c - d)*(1-scale)
-
-            # compute closest sample from subset of data to these hypothetical samples.
-            # TODO: make this a fucntion
-            len_b = len(b)
-            len_a = len(a)
-            out = np.zeros(len_b)
-
-            chunk_size = int(nested_get(self.params, ["run_params", "chunk_size"]))
-            n_thread = int(nested_get(self.params, ["run_params", "n_thread"]))
-            num_chunks = int(np.ceil(len_b / chunk_size))
-
-            with ProcessPoolExecutor(max_workers=n_thread) as executor:
-                args_list = [(i * chunk_size, chunk_size, a, b, scale, c_minus_d) for i in range(num_chunks)]
-                results = list(executor.map(self.compute_min_idx_proc_chunk, args_list))
-
-            # Flatten the results and assign them back to the 'out' array
-            out = np.concatenate([chunk[chunk != -1] for chunk in results])
-
-            # Get the id based on the index.
-            selected_id = subset_row.iloc[out].to_numpy()
-            tmp_freq_table = Counter(selected_id)
-            #counter_weight.update(tmp_freq_table)   
+        # Process the results and update the counter_weight and counter_weight_list
+        for w, tmp_freq_table in results:
             counter_weight_list.append(CounterWeightData(w, tmp_freq_table))
-
+    
+        for i_counter_weight in counter_weight_list:
+            counter_weight.update(i_counter_weight.counter_weight)
+    
 
         for i_counter_weight in counter_weight_list:
             counter_weight.update(i_counter_weight.counter_weight)
