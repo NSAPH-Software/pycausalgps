@@ -4,6 +4,7 @@ rfunctions.py
 Main module to define the R functions to be used in the package.
 """
 
+import os
 
 import numpy as np
 import pandas as pd
@@ -19,15 +20,26 @@ from rpy2.robjects.conversion import localconverter
 # Check if function is defined
 # TODO: Check if there is a better way to fix the path.
 if 'compute_density' not in robjects.globalenv:
+    
     try:
-        robjects.r('''
-            compute_density <- function(x0, x1){
-                tmp_density <- stats::density(x0, na.rm = TRUE)
-                dnst <- stats::approx(tmp_density$x, tmp_density$y, xout = x1,
-                                      rule = 2)$y
-            return(dnst)
-           }
-        ''')
+        r_file_path = os.path.join(os.path.dirname(__file__), 
+                                   'compute_density.r')
+
+        robjects.r(f'source("{r_file_path}")')
+
+        # with open(r_file_path, 'r') as r_file:
+        #     r_code = r_file.read()
+
+        # robjects.r(r_code)
+
+        # robjects.r('''
+        #     compute_density <- function(x0, x1){
+        #         tmp_density <- stats::density(x0, na.rm = TRUE)
+        #         dnst <- stats::approx(tmp_density$x, tmp_density$y, xout = x1,
+        #                               rule = 2)$y
+        #     return(dnst)
+        #    }
+        # ''')
     except Exception as e:
         print('Error in loading the R function: compute_density')
         print(e)
