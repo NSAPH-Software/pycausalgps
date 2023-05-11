@@ -185,6 +185,51 @@ def estimate_pmetric_erf(formula:str,
     
 #### ---------------------------------------------------------------------------
 
+## Compute semiparametric exposure response function ---------------------------
+
+# R
+# TODO: Check if there is a better way to fix the path.
+if 'r_estimate_semipmetric_erf' not in robjects.globalenv:
+    
+    try:
+        r_file_path = os.path.join(os.path.dirname(__file__), 
+                                   'r_estimate_semipmetric_erf.r')
+
+        robjects.r(f'source("{r_file_path}")')
+
+    except Exception as e:
+        print('Error in loading the R function: compute_density')
+        print(e)
+
+
+# Python
+def estimate_semipmetric_erf(formula:str,
+                             family:str,
+                             data:pd.DataFrame) -> any:
+    
+
+    # Convert pandas dataframe to R dataframe
+    with localconverter(robjects.default_converter + pandas2ri.converter):
+        r_data = robjects.conversion.py2rpy(data)
+    
+    # collect the function from R
+    r_estimate_semipmetric_erf = robjects.globalenv['r_estimate_semipmetric_erf']
+
+    # call the function
+    results = r_estimate_semipmetric_erf(formula, 
+                                         family, 
+                                         r_data)
+    
+    # Convert results to python
+    with localconverter(robjects.default_converter + 
+                        robjects.pandas2ri.converter):
+        py_results = robjects.conversion.rpy2py(results)
+
+    return py_results
+    
+#### ---------------------------------------------------------------------------
+
+
 #### locpol function -----------------------------------------------------------
 
 # R
