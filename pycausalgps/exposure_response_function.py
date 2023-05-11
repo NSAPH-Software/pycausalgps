@@ -54,10 +54,6 @@ class ExposureResponseFunction:
             raise Exception("erf_type must be one of parametric, semiparametric, or nonparametric.")
 
 
-        
-        
-
-
 
     def _erf_parametric(self):
         pass

@@ -9,7 +9,7 @@ utils = importr('utils')
 utils.chooseCRANmirror(ind=1) # select the first mirror in the list
 
 # define packages to be installed
-packnames = ('polycor', 'locpol', 'wCorr')
+packnames = ('polycor', 'locpol', 'wCorr', 'gnm')
 
 # Install packages if not installed
 names_to_install = [x for x in packnames if not rpackages.isinstalled(x)]

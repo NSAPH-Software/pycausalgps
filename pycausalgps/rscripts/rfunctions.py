@@ -141,6 +141,98 @@ def compute_absolute_weighted_corr(w:np.array,
 #### ---------------------------------------------------------------------------
 
 
+### Compute parametric exposure response function ------------------------------
+
+# R
+# TODO: Check if there is a better way to fix the path.
+if 'r_estimate_pmetric_erf' not in robjects.globalenv:
+    
+    try:
+        r_file_path = os.path.join(os.path.dirname(__file__), 
+                                   'r_estimate_pmetric_erf.r')
+
+        robjects.r(f'source("{r_file_path}")')
+
+    except Exception as e:
+        print('Error in loading the R function: compute_density')
+        print(e)
+
+
+# Python
+def estimate_pmetric_erf(formula:str,
+                         family:str,
+                         data:pd.DataFrame) -> any:
+    
+
+    # Convert pandas dataframe to R dataframe
+    with localconverter(robjects.default_converter + pandas2ri.converter):
+        r_data = robjects.conversion.py2rpy(data)
+    
+    # collect the function from R
+    r_estimate_pmetric_erf = robjects.globalenv['r_estimate_pmetric_erf']
+
+    # call the function
+    results = r_estimate_pmetric_erf(formula, 
+                                     family, 
+                                     r_data)
+    
+    # Convert results to python
+    with localconverter(robjects.default_converter + 
+                        robjects.pandas2ri.converter):
+        py_results = robjects.conversion.rpy2py(results)
+
+    return py_results
+    
+#### ---------------------------------------------------------------------------
+
+#### locpol function -----------------------------------------------------------
+
+# R
+if 'r_locpol' not in robjects.globalenv:
+        
+    try:
+        r_file_path = os.path.join(os.path.dirname(__file__), 
+                                'r_locpol.r')
+
+        robjects.r(f'source("{r_file_path}")')
+
+    except Exception as e:
+        print('Error in loading the R function: r_locpol')
+        print(e)
+
+# Python
+
+def locpol(data: pd.DataFrame, formula: str, bw: float, w_vals:np.array) -> any:
+
+    # Convert pandas dataframe to R dataframe
+    with localconverter(robjects.default_converter + pandas2ri.converter):
+        r_data = robjects.conversion.py2rpy(data)
+
+    # Convert numpy array to R vector
+    if not isinstance(w_vals, robjects.vectors.FloatVector):
+        w_vals = robjects.FloatVector(w_vals)
+
+    # Convert bw to R vector
+    if not isinstance(bw, robjects.vectors.FloatVector):
+        bw = robjects.FloatVector([bw])
+
+    # collect the function from R
+    r_locpol = robjects.globalenv['r_locpol']
+
+    # call the function
+    results = r_locpol(data = r_data,
+                       formula = formula, 
+                       bw = bw,
+                       w_vals = w_vals)
+
+    # Convert results to python (R vector to numpy array)
+    with localconverter(robjects.default_converter + 
+                        robjects.pandas2ri.converter):
+        py_results = robjects.conversion.rpy2py(results)
+
+    return py_results
+
+
 
 if __name__ == "__main__":
     x0 = np.random.normal(0, 1, 100)
