@@ -21,8 +21,16 @@ r_estimate_semipmetric_erf <- function(formula, family, data) {
     stop("gnm model is null. Did not converge.")
   }
 
-  vals <- as.data.frame(gam_model$fitted.values)
-  colnames(vals) <- c("fitted values")
+  fitted_values <- gam_model$fitted.values
+  w_column <- gam_model$terms[[3]]
+  
+  if (is.null(fitted_values)) {
+    vals <- data.frame()
+  } else {
+    vals <- data.frame(w_vals = data[[w_column]],
+                       fitted_values = fitted_values)
+    colnames(vals) <- c("w", "fitted_values")
+  }
 
   return(vals)
 }

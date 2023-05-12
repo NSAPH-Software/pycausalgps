@@ -1,6 +1,5 @@
 r_estimate_pmetric_erf <- function(formula, family, data) {
 
-
   if (any(data$counter_weight < 0)){
     stop("Negative weights are not allowed.")
   }
@@ -21,8 +20,18 @@ r_estimate_pmetric_erf <- function(formula, family, data) {
     stop("gnm model is null. Did not converge.")
   }
 
-  vals <- as.data.frame(outcome = gnm_model$fitted.values)
-  colnames(vals) <- c("fitted values")
+  fitted_values <- gnm_model$fitted.values
+
+  # get the w values based on the formula's second term
+  w_column <- gnm_model$terms[[3]]
+
+  if (is.null(fitted_values)) {
+    vals <- data.frame()
+  } else {
+    vals <- data.frame(w_vals = data[[w_column]],
+                       fitted_values = fitted_values)
+    colnames(vals) <- c("w", "fitted_values")
+  }
 
   return(vals)
 }
