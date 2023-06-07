@@ -4,6 +4,7 @@ rfunctions.py
 Main module to define the R functions to be used in the package.
 """
 
+import os
 
 import numpy as np
 import pandas as pd
@@ -19,15 +20,13 @@ from rpy2.robjects.conversion import localconverter
 # Check if function is defined
 # TODO: Check if there is a better way to fix the path.
 if 'compute_density' not in robjects.globalenv:
+    
     try:
-        robjects.r('''
-            compute_density <- function(x0, x1){
-                tmp_density <- stats::density(x0, na.rm = TRUE)
-                dnst <- stats::approx(tmp_density$x, tmp_density$y, xout = x1,
-                                      rule = 2)$y
-            return(dnst)
-           }
-        ''')
+        r_file_path = os.path.join(os.path.dirname(__file__), 
+                                   'compute_density.r')
+
+        robjects.r(f'source("{r_file_path}")')
+
     except Exception as e:
         print('Error in loading the R function: compute_density')
         print(e)
@@ -81,69 +80,12 @@ def compute_density(x0:np.array, x1:np.array) -> np.array:
 # Check if function is defined
 if 'absolute_weighted_corr' not in robjects.globalenv:
     try:
-        robjects.r('''
-            absolute_weighted_corr_df <- function(w,
-                                      vw,
-                                      c_num,
-                                      c_cat){
-  
-  
- 
-                # detect numeric columns
-                col_n <- colnames(c_num)
-              
-                # detect factorial columns
-                col_f <- colnames(c_cat)
-              
-                c_cat[] <- lapply(c_cat, as.factor)
-              
-                absolute_corr_n <- absolute_corr_f <- NULL
-              
-                if (length(col_n) > 0) {
-                  absolute_corr_n<- sapply(col_n,function(i){
-                    abs(wCorr::weightedCorr(x = w,
-                                            y = c_num[,i],
-                                            weights = vw,
-                                            method = c("spearman")))})
-                  absolute_corr_n <- unlist(absolute_corr_n)
-                  names(absolute_corr_n) <- col_n
-                }
-              
-                if (length(col_f) > 0) {
-                  internal_fun<- function(i){
-                    abs(wCorr::weightedCorr(x = w,
-                                            y = c_cat[, i],
-                                            weights = vw,
-                                            method = c("Polyserial")))}
-              
-                  absolute_corr_f <- c()
-                  for (item in col_f){
-                    if (length(unique(c_cat[[item]])) == 1 ){
-                      absolute_corr_f <- c(absolute_corr_f, NA)
-                    } else {
-                      absolute_corr_f <- c(absolute_corr_f, internal_fun(item))
-                    }
-                  }
-                  names(absolute_corr_f) <- col_f
-                }
-              
-                absolute_corr <- c(absolute_corr_n, absolute_corr_f)
-              
-                if (sum(is.na(absolute_corr)) > 0){
-                  warning(paste("The following features generated missing values: ",
-                                names(absolute_corr)[is.na(absolute_corr)],
-                                "\nIn computing mean covariate balance, they will be ignored."))
-                }
-              
-                df <- data.frame(name = character(), value = numeric())
-              
-                for (i in names(absolute_corr)){
-                  df <- rbind(df, data.frame(name=i, value=absolute_corr[[i]]))
-                }
-              
-                return(df)
-            }
-        ''')
+
+        r_file_path = os.path.join(os.path.dirname(__file__), 
+                                   'absolute_weighted_corr_df.r')
+
+        robjects.r(f'source("{r_file_path}")')
+
     except Exception as e:
         print('Error in loading the R function: absolute_weighted_corr')
         print(e)
@@ -197,6 +139,143 @@ def compute_absolute_weighted_corr(w:np.array,
 
 
 #### ---------------------------------------------------------------------------
+
+
+### Compute parametric exposure response function ------------------------------
+
+# R
+# TODO: Check if there is a better way to fix the path.
+if 'r_estimate_pmetric_erf' not in robjects.globalenv:
+    
+    try:
+        r_file_path = os.path.join(os.path.dirname(__file__), 
+                                   'r_estimate_pmetric_erf.r')
+
+        robjects.r(f'source("{r_file_path}")')
+
+    except Exception as e:
+        print('Error in loading the R function: compute_density')
+        print(e)
+
+
+# Python
+def estimate_pmetric_erf(formula:str,
+                         family:str,
+                         data:pd.DataFrame) -> any:
+    
+
+    # Convert pandas dataframe to R dataframe
+    with localconverter(robjects.default_converter + pandas2ri.converter):
+        r_data = robjects.conversion.py2rpy(data)
+    
+    # collect the function from R
+    r_estimate_pmetric_erf = robjects.globalenv['r_estimate_pmetric_erf']
+
+    # call the function
+    results = r_estimate_pmetric_erf(formula, 
+                                     family, 
+                                     r_data)
+    
+    # Convert results to python
+    with localconverter(robjects.default_converter + 
+                        robjects.pandas2ri.converter):
+        py_results = robjects.conversion.rpy2py(results)
+
+    return py_results
+    
+#### ---------------------------------------------------------------------------
+
+## Compute semiparametric exposure response function ---------------------------
+
+# R
+# TODO: Check if there is a better way to fix the path.
+if 'r_estimate_semipmetric_erf' not in robjects.globalenv:
+    
+    try:
+        r_file_path = os.path.join(os.path.dirname(__file__), 
+                                   'r_estimate_semipmetric_erf.r')
+
+        robjects.r(f'source("{r_file_path}")')
+
+    except Exception as e:
+        print('Error in loading the R function: compute_density')
+        print(e)
+
+
+# Python
+def estimate_semipmetric_erf(formula:str,
+                             family:str,
+                             data:pd.DataFrame) -> any:
+    
+
+    # Convert pandas dataframe to R dataframe
+    with localconverter(robjects.default_converter + pandas2ri.converter):
+        r_data = robjects.conversion.py2rpy(data)
+    
+    # collect the function from R
+    r_estimate_semipmetric_erf = robjects.globalenv['r_estimate_semipmetric_erf']
+
+    # call the function
+    results = r_estimate_semipmetric_erf(formula, 
+                                         family, 
+                                         r_data)
+    
+    # Convert results to python
+    with localconverter(robjects.default_converter + 
+                        robjects.pandas2ri.converter):
+        py_results = robjects.conversion.rpy2py(results)
+
+    return py_results
+    
+#### ---------------------------------------------------------------------------
+
+
+#### locpol function -----------------------------------------------------------
+
+# R
+if 'r_locpol' not in robjects.globalenv:
+        
+    try:
+        r_file_path = os.path.join(os.path.dirname(__file__), 
+                                'r_locpol.r')
+
+        robjects.r(f'source("{r_file_path}")')
+
+    except Exception as e:
+        print('Error in loading the R function: r_locpol')
+        print(e)
+
+# Python
+
+def locpol(data: pd.DataFrame, formula: str, bw: float, w_vals:np.array) -> any:
+
+    # Convert pandas dataframe to R dataframe
+    with localconverter(robjects.default_converter + pandas2ri.converter):
+        r_data = robjects.conversion.py2rpy(data)
+
+    # Convert numpy array to R vector
+    if not isinstance(w_vals, robjects.vectors.FloatVector):
+        w_vals = robjects.FloatVector(w_vals)
+
+    # Convert bw to R vector
+    if not isinstance(bw, robjects.vectors.FloatVector):
+        bw = robjects.FloatVector([bw])
+
+    # collect the function from R
+    r_locpol = robjects.globalenv['r_locpol']
+
+    # call the function
+    results = r_locpol(data = r_data,
+                       formula = formula, 
+                       bw = bw,
+                       w_vals = w_vals)
+
+    # Convert results to python (R vector to numpy array)
+    with localconverter(robjects.default_converter + 
+                        robjects.pandas2ri.converter):
+        py_results = robjects.conversion.rpy2py(results)
+
+    return py_results
 
 
 

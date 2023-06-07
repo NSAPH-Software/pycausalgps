@@ -39,12 +39,15 @@ def generate_syn_pop(sample_size: int, seed_val:int, outcome_sd:int,
     seed_val: int 
         A seed value for generating reproducible data.
     outcome_sd: int
-        TBD
+        Standard deviation used to generate the outcome in the synthetic 
+        data set.
     gps_spec: int
-        TBD
+        A numerical value (1-7) that indicates the GPS model used to generate 
+        synthetic data. See the code for more details.
     cova_spec: int
-        TBD
-
+        A numerical value (1-2) to modify the covariates. See the code for 
+        more details.
+        
     Returns
     -------
     data: pd.DataFrame
@@ -55,6 +58,10 @@ def generate_syn_pop(sample_size: int, seed_val:int, outcome_sd:int,
     100
     """
     
+    if sample_size < 1:
+        raise ValueError("sample_size must be greater than 0")
+
+
     random.seed(seed_val)
 
     mean = [0,0,0,0]
@@ -70,7 +77,6 @@ def generate_syn_pop(sample_size: int, seed_val:int, outcome_sd:int,
                     np.random.normal(loc=0.0, scale = 5, size=sample_size))
 
     elif gps_spec == 2:
-
         treat = ((- 0.8 + 0.1 * cf[0,:] + 0.1 * cf[1,:] - 0.1 * cf[2,:]
                   + 0.2 * cf[3,:] + 0.1 * cf5 + 0.1 * cf6) * 15 + 22 +
                    np.random.standard_t(size=sample_size,df=2))
@@ -82,7 +88,6 @@ def generate_syn_pop(sample_size: int, seed_val:int, outcome_sd:int,
         treat = treat['t'].tolist() 
 
     elif gps_spec == 3:
-        
         treat = ((- 0.8 + 0.1 * cf[ 0, :] + 0.1 * cf[ 1, :]- 0.1 *cf[ 2,:] 
            + 0.2 * cf [3, :]
            + 0.1 * cf5 + 0.1 * cf6) * 9
@@ -90,7 +95,6 @@ def generate_syn_pop(sample_size: int, seed_val:int, outcome_sd:int,
            + np.random.normal(loc=0, scale = 5, size=sample_size) + 15)
 
     elif gps_spec == 4:
-        
         treat = (49 * np.exp((-0.8 + 0.1 * cf[ 0,:] 
                 + 0.1 * cf[ 1, :] - 0.1 * cf[ 2, :]
                 + 0.2 * cf[ 3, :] + 0.1 * cf5 + 0.1 * cf6))
@@ -98,7 +102,6 @@ def generate_syn_pop(sample_size: int, seed_val:int, outcome_sd:int,
                 + 0.1 * cf[ 1, :] - 0.1 * cf[ 3, :]
                 + 0.2 * cf[ 3, :] + 0.1 * cf5 + 0.1 * cf6))) - 6 
                 + np.random.normal(loc=0, scale=5, size=sample_size))
-        
     elif gps_spec == 5:
         treat = (42 / (1 + np.exp((-0.8 + 0.1 * cf[ 0, :] 
                 + 0.1 * cf[ 1, :]- 0.1 * cf[ 3, :]
@@ -129,24 +132,25 @@ def generate_syn_pop(sample_size: int, seed_val:int, outcome_sd:int,
 
 
     if cova_spec == 1:
-        pass
+        raise NotImplementedError("cova_spec 1 not implemented yet.")
     elif cova_spec == 2:
-        cf[1,:] = np.exp(cf[0,:]/2)
-        cf[2,:] = (cf[1,:]/(1+np.exp(cf[0,:])))+10
-        cf[3,:] = (cf[0,:] * cf[2,:]/25 + 0.6) ^ 3
-        cf[4,:] = (cf[1,:] + cf[3,:] + 20) ^ 2
+        cf[0,:] = np.exp(cf[0,:]/2)
+        cf[1,:] = (cf[1,:]/(1+np.exp(cf[0,:])))+10
+        cf[2,:] = (cf[0,:] * cf[2,:]/25 + 0.6) ** 3
+        cf[3,:] = (cf[1,:] + cf[3,:] + 20) ** 2
     else:
         raise ValueError(f"cova_spec:  {cova_spec} is not a valid value.")
 
     
-    data = pd.DataFrame({'Y':Y, 
-                                   'treat':treat,
-                                   'cf1':cf[0,:],
-                                   'cf2':cf[1,:],
-                                   'cf3':cf[2,:],
-                                   'cf4':cf[3,:],
-                                   'cf5':cf5,
-                                   'cf6':cf6})
+    data = pd.DataFrame({'id': range(1,sample_size+1),
+                         'Y':Y, 
+                         'treat':treat,
+                         'cf1':cf[0,:],
+                         'cf2':cf[1,:],
+                         'cf3':cf[2,:],
+                         'cf4':cf[3,:],
+                         'cf5':cf5,
+                         'cf6':cf6})
 
     return data
 
@@ -163,3 +167,8 @@ def human_readible_size(nbytes):
         i += 1
 
     return f"{nbytes:.2f} {suffixes[i]}"
+
+
+
+if __name__ == "__main__":
+    data = generate_syn_pop(sample_size=1000, seed_val=456, outcome_sd=0.25, gps_spec=1, cova_spec=2)

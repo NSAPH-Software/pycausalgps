@@ -4,140 +4,122 @@ pseudo_population.py
 The core module for the PseudoPopulation class.
 """
 
-import json
-import hashlib
 from collections import Counter
+from dataclasses import dataclass
+from concurrent.futures import ProcessPoolExecutor
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 import matplotlib.pyplot as plt
 from scipy.stats import gaussian_kde, norm
 from matplotlib.gridspec import GridSpec
 
+
 from pycausalgps.log import LOGGER
-from pycausalgps.database import Database
 from pycausalgps.base.utils import nested_get
 from pycausalgps.rscripts.rfunctions import (compute_density,
                                              compute_absolute_weighted_corr)
 
 class PseudoPopulation:
+    """
+    The PseudoPopulation class is used to compute the pseudo-population.
 
-    def __init__(self, project_params, gps_params, 
-                       pspop_params, db_path) -> None:
-        self.project_params = project_params
-        self.gps_params = gps_params
-        self.pspop_params = pspop_params
-        self.db_path = db_path
-        self.hash_value = None
-        self.pspop_id = None
+    Parameters
+    ----------
+
+    data: pd.DataFrame
+        The dataframe containing the data (covariate and exposure columns).
+    gps_data: dict
+        The dictionary containing the GPS data. The required keys are:
+        - gps_data: pd.DataFrame
+            The dataframe containing the GPS data, and its auxiliary columns.
+        - gps_model: str
+    params: dict
+        The dictionary containing the parameters for computing the 
+        pseudo-population. The required parameters are:
+        - approach: str
+            The approach to compute the pseudo-population. The available
+            approaches are: "weighting" and "matching".
+        - exposure_column: str  
+            A string that indicates the name of the exposure column.
+        - covariate_column_num: list
+            A list of strings that indicates the names of the numerical
+            covariate columns.
+        - covariate_column_cat: list
+            A list of strings that indicates the names of the categorical
+            covariate columns.
+
+    """
+
+    APPROACH_WEIGHTING = "weighting"
+    APPROACH_MATCHING = "matching"
+    GPS_DENSITY_NORMAL = "normal"
+    GPS_DENSITY_KERNEL = "kernel"
+
+    def __init__(self, data: pd.DataFrame, gps_data: dict, params: dict):
+
+        self.data = data
+        self.params = params
+        self.gps_data = gps_data
+        self.compiling_report = {}
         self.counter_weight = None
-        self.covariate_balance = None
-        self._generate_hash()
-        self._connect_to_database()
+        self.generate_pseudo_population()
 
-
-    def _generate_hash(self) -> None:
-        """
-        Generate a hash value for the pseudo-population object.
-        """
-
-        hash_string = json.dumps(self.pspop_params, sort_keys=True)
-
-        if self.gps_params.get("hash_value"):
-            hash_string = self.gps_params.get("hash_value") + hash_string
-            self.hash_value = hashlib.sha256(
-                hash_string.encode("utf-8")).hexdigest()
-            # generating random id for the pseudo-population
-            self.pspop_id = hashlib.shake_256(self.hash_value.encode()).hexdigest(8)
-            self.pspop_params["hash_value"] = self.hash_value
-        else:
-            LOGGER.warning("Project hash value is not assigned. " +\
-                           "This can happen becuase of running the class individually. " +\
-                           "Hash value cannot be generated. ")
-
-            
-    def _connect_to_database(self):
-        """
-        Connect to the database.
-        """
-        if self.db_path is None:
-            raise Exception("Database is not defined.")
-            
-        self.db = Database(self.db_path)
+    @property
+    def data(self) -> pd.DataFrame:
+        return self.__data
     
+    @data.setter
+    def data(self, value: pd.DataFrame) -> None:
+        if not isinstance(value, pd.DataFrame):
+            raise ValueError("Data must be a pandas DataFrame.")
+        self.__data = value
+
+    @property
+    def params(self) -> dict:
+        return self.__params
+    
+    @params.setter
+    def params(self, value: dict) -> None:
+        #TODO: Check if the params are in the correct format.
+        if not isinstance(value, dict):
+            raise ValueError("Params must be a dictionary.")
+        self.__params = value
+
+    @property
+    def gps_data(self) -> dict:
+        return self.__gps_data
+    
+    @gps_data.setter
+    def gps_data(self, value: dict) -> None:
+        #TODO: check if the gps_data is in the correct format.
+        if not isinstance(value, dict):
+            raise ValueError("GPS data must be a dictionary.")
+        self.__gps_data = value
+
     def generate_pseudo_population(self) -> None:
         """
         Compute the pseudo-population.
         """
+        self.exposure_data_col_name = self.params.get("exposure_column")
+        self.covariate_col_num = self.params.get("covariate_column_num")
+        self.covariate_col_cat = self.params.get("covariate_column_cat")
         
-        # For computing pspop we need to have the following:
-        # 1. gps_params (gps values, estimated exposure, estimated exposure std,
-        #                w_resid)
-        # 2. pspop_params (approach, caliper, scale, 
-
-        if self.pspop_params.get("pspop_params").get("approach") == "weighting":
-            counter_weight = self._compute_pspop_weighting()
-            self.counter_weight = counter_weight["counter_weight"]
+        if self.params.get("approach") == self.APPROACH_WEIGHTING:
+            self.counter_weight = self._compute_pspop_weighting() 
             self._compute_covariate_balance()
-        elif self.pspop_params.get("pspop_params").get("approach") == "matching":
-            counter_weight = self._compute_pspop_matching()
-            self.counter_weight = counter_weight["counter_weight"]
+        elif self.params.get("approach") == self.APPROACH_MATCHING:
+            (
+             self.counter_weight, 
+             self.counter_weight_list
+            ) = self._compute_pspop_matching()
             self._compute_covariate_balance()
         else:
             raise Exception("Approach is not defined.")
-
-
-    def load_exposure(self) -> None:
-        """
-        Load the exposure values.
-        """
-        exposure_path = self.project_params.get("data").get("exposure_path")
-
-        # load exposure values.
-        exposure_data = pd.read_csv(exposure_path)
-        LOGGER.debug(f"Exposure data shape: {exposure_data.shape}")
-
-        if not isinstance(exposure_data, pd.DataFrame):
-            raise Exception("Exposure data is not a dataframe.")
-
-        if "id" not in exposure_data.columns:
-            raise Exception("Exposure data does not have id column.")
-        
-        return exposure_data
-
-    def load_confounders(self) -> tuple:
-        """
-        Load the confounder values.
-        """
-        covariate_path = self.project_params.get("data").get("covariate_path")
-
-        # load confounder values.
-        covariate_data = pd.read_csv(covariate_path)
-        LOGGER.debug(f"Confounder data shape: {covariate_data.shape}")
-        
-        # select the comlumns that are used in the gps
-        covariate_col_num = nested_get(self.gps_params,
-                                            ["gps_params","pred_model",
-                                            "covariate_column_num"])
-        covariate_col_cat = nested_get(self.gps_params,
-                                            ["gps_params", "pred_model", 
-                                            "covariate_column_cat"])
-        
-        if covariate_col_num is not None:
-            covariate_data_num = covariate_data[covariate_col_num]
-        else:
-            covariate_data_num = None
-        
-        if covariate_col_cat is not None:
-            covariate_data_cat = covariate_data[covariate_col_cat]
-        else:
-            covariate_data_cat = None
-
-
-        return covariate_data_num, covariate_data_cat
-
-
-    def _compute_pspop_weighting(self) -> None:
+    
+    
+    def _compute_pspop_weighting(self) -> pd.DataFrame:
         """
         Compute the pseudo-population using weighting.
         """
@@ -149,36 +131,164 @@ class PseudoPopulation:
         # temp test
         compute_density_with_r = True
         
-        # load exposure values. 
-        exposure_data = self.load_exposure()
-
-        exposure_data_col_name = nested_get(self.gps_params,
-                                                ["gps_params", "pred_model", 
-                                                "exposure_column"])
-
         # compute density of the exposure in the data.
         if compute_density_with_r:
             # compute density with R.
-            w_val = exposure_data[exposure_data_col_name].to_numpy()
+            w_val = self.data[self.exposure_data_col_name].to_numpy()
             data_density = compute_density(w_val, w_val)
             print("Density was computed with R.")
         else:
-            exp_data = exposure_data[exposure_data_col_name]
+            exp_data = self.data[self.exposure_data_col_name]
             kde = gaussian_kde(exp_data)
             data_density = kde(exp_data)
+
         
- 
-        # Extract the gps object from the database.
-        gps_obj = self.db.get_value(self.gps_params.get("hash_value"))
-        
-        ipw = data_density / gps_obj._data.get("_data")["gps"].to_numpy()
-        
-        value = pd.DataFrame({"id": exposure_data["id"], "counter_weight": ipw})
+        ipw = data_density / self.gps_data.get("data")["gps"].to_numpy()            
+        value = pd.DataFrame({"id": self.gps_data.get("data")["id"], 
+                              "counter_weight": ipw})
 
         return value
   
+    @staticmethod
+    def compute_min_idx(i, a, b, scale, c_minus_d):
+        tmp_vals = np.abs(a - b[i]) * scale + c_minus_d
+        min_idx = np.argmin(tmp_vals)
+        return min_idx
 
-    def _compute_pspop_matching(self) -> None:
+    @staticmethod
+    def compute_min_idx_proc(args):
+        i, a, b, scale, c_minus_d = args
+        tmp_vals = np.abs(a - b[i]) * scale + c_minus_d
+        min_idx = np.argmin(tmp_vals)
+        return min_idx
+    
+    @staticmethod
+    def compute_min_idx_proc_chunk(args):
+        start_idx, chunk_size, a, b, scale, c_minus_d = args
+        out_chunk = np.full(chunk_size, -1,  dtype=np.int)  # Initialize with np.nan
+        for i in range(chunk_size):
+            idx = start_idx + i
+            if idx >= len(b):
+                break
+            tmp_vals = np.abs(a - b[idx]) * scale + c_minus_d
+            min_idx = np.argmin(tmp_vals)
+            out_chunk[i] = min_idx
+        return out_chunk
+
+
+    def _process_exposure_level(self, w):
+
+        # load gps object from gps_data
+        gps_min, gps_max = self.gps_data.get("gps_minmax")
+        gps_density = self.gps_data.get("gps_density")
+        if gps_density == self.GPS_DENSITY_KERNEL:
+            w_resid = self.gps_data.get("data")["w_resid"]
+     
+        # load exposure values
+        obs_exposure_data = self.data[["id", self.exposure_data_col_name]]
+        w_min, w_max = (min(obs_exposure_data[self.exposure_data_col_name]), 
+                        max(obs_exposure_data[self.exposure_data_col_name]))
+
+        # controlling parameters
+        delta = nested_get(self.params,
+                                ["control_params", 
+                                "caliper"])
+        scale = nested_get(self.params,
+                                ["control_params",
+                                "scale"])
+        
+        dist_measure = nested_get(self.params, 
+                                 ["control_params", 
+                                  "dist_measure"])
+
+        
+        if gps_density == self.GPS_DENSITY_NORMAL:
+            p_w = norm.pdf(w, 
+                           self.gps_data.get("data")["e_gps_pred"], 
+                           self.gps_data.get("data")["e_gps_std_pred"])
+        elif gps_density == self.GPS_DENSITY_KERNEL:
+            w_new = ((w - self.gps_data.get("data")["e_gps_pred"]) 
+                      / self.gps_data.get("data")["e_gps_std_pred"])
+            p_w = compute_density(w_resid, w_new)
+        else:
+            raise Exception("GPS model is not defined.")
+           
+
+        # select subset of data that are within the caliper value.
+        subset_idx = np.where(np.abs(
+            obs_exposure_data[self.exposure_data_col_name] - w) <= delta)[0]
+        subset_row = obs_exposure_data.iloc[subset_idx]["id"]
+
+        if len(subset_row) == 0:
+            LOGGER.debug(f"No data found within the caliper value ({delta}) " 
+                         f"for the requested exposure level: {w}.")
+            return (w, Counter(None))
+
+
+        # standardize GPS and Exposure values.
+        std_w = (w - w_min)/(w_max - w_min)
+        std_gps = (p_w - gps_min)/(gps_max - gps_min)
+
+        # all data (observational data where w is requested w.)
+        # std_w: scaler
+        # std_gps: vector
+        all_curated_data = pd.DataFrame({"id": obs_exposure_data["id"],
+                                         "std_w": std_w,
+                                         "std_gps": std_gps})
+        
+        # subset of data (actual standardized data that are within the caliper value.)
+        # std_w_subset: vector
+        # std_gps_subset: vector
+        std_w_subset = ((obs_exposure_data[obs_exposure_data["id"].
+                        isin(subset_row)][self.exposure_data_col_name] - w_min)) / (w_max - w_min)
+        
+        # TODO: use query.
+        std_gps_subset = (self.gps_data.get("data")[self.gps_data.get("data")["id"].isin(subset_row)]["gps_standardized"])
+
+        # a: subset of data with standardized GPS (std_gps_subset)
+        # b: all data with estimated GPS based on requested exposure level. (std_gps)
+        # c: subset of data with standardized exposure (std_w_subset)
+        # d: the exposure level that is requested. (std_w)
+        
+        a = std_gps_subset.to_numpy()
+        b = std_gps
+        c = std_w_subset.to_numpy()
+        d = std_w
+
+        c_minus_d = abs(c - d)*(1-scale)
+
+        # compute closest sample from subset of data to these hypothetical samples.
+        # TODO: make this a fucntion
+        len_b = len(b)
+        #len_a = len(a)
+        out = np.zeros(len_b)
+
+        # chunk_size = int(nested_get(self.params, ["run_params", "chunk_size"]))
+        # num_chunks = int(np.ceil(len_b / chunk_size))
+
+        # with ProcessPoolExecutor(max_workers=n_thread) as executor:
+        #     args_list = [(i * chunk_size, chunk_size, a, b, scale, c_minus_d) for i in range(num_chunks)]
+        #     results = list(executor.map(self.compute_min_idx_proc_chunk, args_list))
+
+        # # Flatten the results and assign them back to the 'out' array
+        # out = np.concatenate([chunk[chunk != -1] for chunk in results])
+
+    
+        for i in range(len_b):
+            tmp_vals = np.abs(a - b[i]) * scale + c_minus_d
+            min_idx = np.argmin(tmp_vals)
+            out[i] = min_idx
+
+        # Get the id based on the index.
+        selected_id = subset_row.iloc[out].to_numpy()
+        tmp_freq_table = Counter(selected_id)
+        #counter_weight.update(tmp_freq_table)   
+        
+        return (w, tmp_freq_table)
+    
+
+    
+    def _compute_pspop_matching(self):
 
         """ 
         Compute the pseudo-population using matching approach.
@@ -191,186 +301,98 @@ class PseudoPopulation:
         # Caliper value.
         # Scale value.
 
-        
-        # load gps object from the database.
-        gps_obj = self.db.get_value(self.gps_params.get("hash_value"))
-        gps_min, gps_max = gps_obj._data.get("gps_minmax")
-        gps_model = gps_obj.gps_params.get("gps_params").get("model")
-        if gps_model == "non-parametric":
-            w_resid = gps_obj.w_resid
-     
-        # load exposure values
-        obs_exposure_data = self.load_exposure()
-        w_min, w_max = (min(obs_exposure_data["exposure"]), 
-                        max(obs_exposure_data["exposure"]))
-
-        # controlling parameters
-        delta = nested_get(self.pspop_params,
-                               ["pspop_params", 
-                                "controlling_params", 
-                                "caliper"])
-        scale = nested_get(self.pspop_params,
-                                ["pspop_params",
-                                 "controlling_params",
-                                 "scale"])
-        distance_metric = nested_get(self.pspop_params, 
-                                          ["pspop_params",
-                                           "controlling_params", 
-                                           "distance_metric"])
+        obs_exposure_data = self.data[["id", self.exposure_data_col_name]]
+        w_min, w_max = (min(obs_exposure_data[self.exposure_data_col_name]), 
+                max(obs_exposure_data[self.exposure_data_col_name]))
 
         # collect requested exposure level.
-        req_exposure = nested_get(self.pspop_params, 
-                                       ["pspop_params", 
-                                        "controlling_params", 
-                                        "bin_seq"])
+        req_exposure = nested_get(self.params, 
+                                 ["control_params", 
+                                  "bin_seq"])
         
+        delta = nested_get(self.params,
+                                ["control_params", 
+                                "caliper"])
+
         # check if req_exposure is string
         if isinstance(req_exposure, str):
             req_exposure = eval(req_exposure)
 
         if req_exposure is None:
             req_exposure = np.arange(w_min+delta/2, w_max, delta)
-
-
-        for i, w in enumerate(req_exposure):
-            
-            if gps_model == "parametric":
-                p_w = norm.pdf(w, 
-                               gps_obj._data.get("_data")["e_gps_pred"], 
-                               gps_obj._data.get("_data")["e_gps_std_pred"])
-            elif gps_model == "non-parametric":
-                w_new = ((w - gps_obj._data.get("_data")["e_gps_pred"]) 
-                         / gps_obj._data.get("_data")["e_gps_std_pred"])
-                p_w = compute_density(w_resid, w_new)
-            else:
-                raise Exception("GPS model is not defined.")
-           
-
-
-            # select subset of data that are within the caliper value.
-            subset_idx = np.where(np.abs(obs_exposure_data["exposure"] - w) <= delta)[0]
-            subset_row = obs_exposure_data.iloc[subset_idx]["id"]
-
-            # standardize GPS and Exposure values.
-            std_w = (w - w_min)/(w_max - w_min)
-            std_gps = (p_w - gps_min)/(gps_max - gps_min)
-
-            # all data (observational data where w is requested w.)
-            # std_w: scaler
-            # std_gps: vector
-            all_curated_data = pd.DataFrame({"id": obs_exposure_data["id"],
-                                             "std_w": std_w,
-                                             "std_gps": std_gps})
-            
-            # subset of data (actual standardized data that are within the caliper value.)
-            # std_w_subset: vector
-            # std_gps_subset: vector
-            std_w_subset = ((obs_exposure_data[obs_exposure_data["id"].
-                            isin(subset_row)]["exposure"] - w_min)) / (w_max - w_min)
-            
-            # TODO: use query.
-            std_gps_subset = (gps_obj._data.get("_data")[gps_obj.
-                              _data.get("_data")["id"].
-                              isin(subset_row)]["gps_standardized"])
-
-            # a: subset of data with standardized GPS (std_gps_subset)
-            # b: all data with estimated GPS based on requested exposure level. (std_gps)
-            # c: subset of data with standardized exposure (std_w_subset)
-            # d: the exposure level that is requested. (std_w)
-            
-            a = std_gps_subset.to_numpy()
-            b = std_gps
-            c = std_w_subset.to_numpy()
-            d = std_w
-
-            c_minus_d = abs(c - d)*(1-scale)
-
-            # compute closest sample from subset of data to these hypothetical samples.
-            # TODO: make this a fucntion
-            len_b = len(b)
-            len_a = len(a)
-            out = np.zeros(len_b)
-
-            # counter_weight = pd.DataFrame.from_dict({key: 0 for key in 
-            #                                          obs_exposure_data["id"]}, 
-            #                                          orient="index", 
-            #                                          columns=['counter_weight'])
-
-            counter_weight = Counter({key: 0 for key in obs_exposure_data["id"]})
+     
+        counter_weight = Counter({key: 0 for key in obs_exposure_data["id"]})
+        counter_weight_list = []
  
-            # Brute force method.
-            for i in range(len_b):
-                for j in range(len_a):
+        n_thread = int(nested_get(self.params, ["run_params", "n_thread"]))
 
-                    subtract_val = abs(a[j] - b[i])*scale
-
-                    tmp_val = subtract_val + c_minus_d[j]
-
-                    if (j == 0):
-                        min_val = tmp_val
-                        min_idx = j
-                        continue
-
-                    if (tmp_val < min_val):
-                        min_val = tmp_val
-                        min_idx = j
-                out[i] = min_idx
+        with ProcessPoolExecutor(max_workers=n_thread) as executor:
+            results = list(tqdm(executor.map(self._process_exposure_level, 
+                                             req_exposure), 
+                                             total=len(req_exposure), 
+                                             desc="Processing exposure levels"))
             
-            # Solution with numpy, but it will consume more memory.
-            # Keeping this for future reference.
-            out2 = np.argmin(np.abs(np.subtract.outer(a, b))*scale 
-                            + c_minus_d[:, np.newaxis], axis=0)
+        # Process the results and update the counter_weight and counter_weight_list
+        for w, tmp_freq_table in results:
+            counter_weight_list.append(CounterWeightData(w, tmp_freq_table))
+    
+        for i_counter_weight in counter_weight_list:
+            counter_weight.update(i_counter_weight.counter_weight)
+    
 
-            
-
-            # Get the id based on the index.
-            selected_id = subset_row.iloc[out].to_numpy()
-            tmp_freq_table = Counter(selected_id)
-            counter_weight.update(tmp_freq_table)   
-
+        for i_counter_weight in counter_weight_list:
+            counter_weight.update(i_counter_weight.counter_weight)
+        
         counter_weight_dict = dict(counter_weight)
         counter_weight_df = pd.DataFrame(list(counter_weight_dict.items()), 
                                                    columns=["id", "counter_weight"])
 
-        return counter_weight_df
+        return counter_weight_df, counter_weight_list
 
             
-
-
-
     def _compute_covariate_balance(self) -> None:
         """
         Compute covariate balance.
         """
         if self.counter_weight is None:
-            raise Exception("Counter weight is not defined. " +\
-                "Try generating the pseudo-population first.")
+            raise Exception(f"Counter weight is not defined. " 
+                             "Try generating the pseudo-population first.")
 
-        # load exposure values.
-        exposure_data = self.load_exposure()
-        exp_data = exposure_data[self.gps_params.get("gps_params").get("pred_model").get("exposure_column")].to_numpy()
+        
+        # merge the counter weight with the original data.
+        # TODO: warn users if there is a discrepancy in ids.
+        self.merged_data = pd.merge(self.data, self.counter_weight, on="id")
+               
+        # load the exposure data.
+        exp_data = self.merged_data[self.exposure_data_col_name].to_numpy()
 
         # load the confounders.
-        covariate_data_num, covariate_data_cat = self.load_confounders()
+        covariate_data_num = self.merged_data[self.covariate_col_num]
+        covariate_data_cat = self.merged_data[self.covariate_col_cat]
+        counter_weight = self.merged_data["counter_weight"].to_numpy()
 
         # compute weighted correlation between the confounders and the exposure.
         covariate_balance = compute_absolute_weighted_corr(exp_data, 
-                                                           self.counter_weight, 
+                                                           counter_weight, 
                                                            covariate_data_num,
                                                            covariate_data_cat) 
 
-        original_data_covariate_balance = compute_absolute_weighted_corr(exp_data,
-                                                                         np.ones(self.counter_weight.shape),
-                                                                         covariate_data_num,
-                                                                         covariate_data_cat)                    
+        original_data_covariate_balance = compute_absolute_weighted_corr(
+            exp_data,
+            np.ones(counter_weight.shape),
+            covariate_data_num,
+            covariate_data_cat)                    
 
         cov_balance_current = covariate_balance
-        cov_balance_current.rename(columns = {'value':'current'}, inplace = True)
+        cov_balance_current.rename(columns = {'value':'current'}, 
+                                   inplace = True)
         cov_balance_original = original_data_covariate_balance
-        cov_balance_original.rename(columns = {'value':'original'}, inplace = True)
+        cov_balance_original.rename(columns = {'value':'original'}, 
+                                    inplace = True)
 
 
-        cov_balance = pd.merge(cov_balance_current, cov_balance_original, on='name')
+        cov_balance = pd.merge(cov_balance_current, cov_balance_original, 
+                               on='name')
 
         self.covariate_balance = cov_balance
 
@@ -448,18 +470,244 @@ class PseudoPopulation:
         hyper_param_3 = {"fontsize": 8, "ha":"left", "va":"center"}
 
         ax3.text(xlim3[0], ylim3[1]-0.05, 'Data Info', **hyper_param_1)
-        ax3.text(xlim3[0], ylim3[1]-0.15, 
-                 f'GPS Object ID: {self.gps_params.get("gps_id")}', 
-                 **hyper_param_3)
-        ax3.text(xlim3[0], ylim3[1]-0.2,
-                    f'GPS hash value: {self.gps_params.get("hash_value")}',
-                    **hyper_param_3)
-        ax3.text(xlim3[0], ylim3[1]-0.25,
-                    f'Pseudo population ID: {self.pspop_id}',
-                    **hyper_param_3)
-        ax3.text(xlim3[0], ylim3[1]-0.3,
-                    f'Pseudo population hash value: {self.hash_value}',
-                    **hyper_param_3)
+        # ax3.text(xlim3[0], ylim3[1]-0.15, 
+        #          f'GPS Object ID: {self.gps_params.get("gps_id")}', 
+        #          **hyper_param_3)
+        # ax3.text(xlim3[0], ylim3[1]-0.2,
+        #             f'GPS hash value: {self.gps_params.get("hash_value")}',
+        #             **hyper_param_3)
+        # ax3.text(xlim3[0], ylim3[1]-0.25,
+        #             f'Pseudo population ID: {self.pspop_id}',
+        #             **hyper_param_3)
+        # ax3.text(xlim3[0], ylim3[1]-0.3,
+        #             f'Pseudo population hash value: {self.hash_value}',
+        #             **hyper_param_3)
 
         fig.suptitle("Covariate Balance", fontsize=16)
         plt.show()   
+
+
+    def get_results(self) -> dict:
+        """
+        Get the results of generating the pseudo-population.
+        """
+
+        results = {"data": self.merged_data,
+                   "params": self.params,
+                   "compiling_report": self.compiling_report,
+                   "covariate_balance": self.covariate_balance}
+        
+        return results
+
+    def get_individual_counter_weight(self) -> list:
+        """
+        Get the counter-weight for each individual exposure.
+        """
+
+        if self.counter_weight_list is None:
+            raise Exception("Counter-weight is not defined. " +\
+                "Try generating the pseudo-population first.")
+
+        return self.counter_weight_list
+
+
+
+
+
+
+@dataclass    
+class CounterWeightData:
+    w: float
+    counter_weight: np.ndarray
+
+    
+    
+    
+    # Old code 
+
+
+
+# def process_exposure_level_2(w, gps_data, data, 
+#                                   exposure_data_col_name, params,
+#                                   GPS_DENSITY_NORMAL, GPS_DENSITY_KERNEL):
+
+#         # load gps object from gps_data
+#         gps_min, gps_max = gps_data.get("gps_minmax")
+#         gps_density = gps_data.get("gps_density")
+#         if gps_density == GPS_DENSITY_KERNEL:
+#             w_resid = gps_data.get("data")["w_resid"]
+     
+#         # load exposure values
+#         obs_exposure_data = data[["id", exposure_data_col_name]]
+#         w_min, w_max = (min(obs_exposure_data[exposure_data_col_name]), 
+#                         max(obs_exposure_data[exposure_data_col_name]))
+
+#         # controlling parameters
+#         delta = nested_get(params,
+#                                 ["control_params", 
+#                                 "caliper"])
+#         scale = nested_get(params,
+#                                 ["control_params",
+#                                 "scale"])
+        
+#         dist_measure = nested_get(params, 
+#                                  ["control_params", 
+#                                   "dist_measure"])
+
+        
+#         if gps_density == GPS_DENSITY_NORMAL:
+#             p_w = norm.pdf(w, 
+#                            gps_data.get("data")["e_gps_pred"], 
+#                            gps_data.get("data")["e_gps_std_pred"])
+#         elif gps_density == GPS_DENSITY_KERNEL:
+#             w_new = ((w - gps_data.get("data")["e_gps_pred"]) 
+#                       / gps_data.get("data")["e_gps_std_pred"])
+#             p_w = compute_density(w_resid, w)
+#         else:
+#             raise Exception("GPS model is not defined.")
+           
+
+#         # select subset of data that are within the caliper value.
+#         subset_idx = np.where(np.abs(
+#             obs_exposure_data[exposure_data_col_name] - w) <= delta)[0]
+#         subset_row = obs_exposure_data.iloc[subset_idx]["id"]
+
+#         if len(subset_row) == 0:
+#             LOGGER.debug(f"No data found within the caliper value ({delta}) " 
+#                          f"for the requested exposure level: {w}.")
+#             return (w, Counter(None))
+
+
+#         # standardize GPS and Exposure values.
+#         std_w = (w - w_min)/(w_max - w_min)
+#         std_gps = (p_w - gps_min)/(gps_max - gps_min)
+
+#         # all data (observational data where w is requested w.)
+#         # std_w: scaler
+#         # std_gps: vector
+#         all_curated_data = pd.DataFrame({"id": obs_exposure_data["id"],
+#                                             "std_w": std_w,
+#                                             "std_gps": std_gps})
+        
+#         # subset of data (actual standardized data that are within the caliper value.)
+#         # std_w_subset: vector
+#         # std_gps_subset: vector
+#         std_w_subset = ((obs_exposure_data[obs_exposure_data["id"].
+#                         isin(subset_row)][exposure_data_col_name] - w_min)) / (w_max - w_min)
+        
+#         # TODO: use query.
+#         std_gps_subset = (gps_data.get("data")[gps_data.get("data")["id"].isin(subset_row)]["gps_standardized"])
+
+#         # a: subset of data with standardized GPS (std_gps_subset)
+#         # b: all data with estimated GPS based on requested exposure level. (std_gps)
+#         # c: subset of data with standardized exposure (std_w_subset)
+#         # d: the exposure level that is requested. (std_w)
+        
+#         a = std_gps_subset.to_numpy()
+#         b = std_gps
+#         c = std_w_subset.to_numpy()
+#         d = std_w
+
+#         c_minus_d = abs(c - d)*(1-scale)
+
+#         # compute closest sample from subset of data to these hypothetical samples.
+#         # TODO: make this a fucntion
+#         len_b = len(b)
+#         #len_a = len(a)
+#         out = np.zeros(len_b)
+
+#         # chunk_size = int(nested_get(self.params, ["run_params", "chunk_size"]))
+        
+#         # num_chunks = int(np.ceil(len_b / chunk_size))
+
+#         # with ProcessPoolExecutor(max_workers=n_thread) as executor:
+#         #     args_list = [(i * chunk_size, chunk_size, a, b, scale, c_minus_d) for i in range(num_chunks)]
+#         #     results = list(executor.map(self.compute_min_idx_proc_chunk, args_list))
+
+#         # # Flatten the results and assign them back to the 'out' array
+#         # out = np.concatenate([chunk[chunk != -1] for chunk in results])
+
+    
+#         for i in range(len_b):
+#             tmp_vals = np.abs(a - b[i]) * scale + c_minus_d
+#             min_idx = np.argmin(tmp_vals)
+#             out[i] = min_idx
+
+#         # Get the id based on the index.
+#         selected_id = subset_row.iloc[out].to_numpy()
+#         tmp_freq_table = Counter(selected_id)
+#         #counter_weight.update(tmp_freq_table)   
+        
+#         return (w, tmp_freq_table)
+    
+
+# if __name__ == "__main__":
+
+#     from pycausalgps.base.utils import generate_syn_pop
+#     from pycausalgps.gps import GeneralizedPropensityScore
+
+#     gps_params = {"gps_density": "normal",
+#                   "exposure_column": "treat",
+#                   "covariate_column_num": ["cf1", 
+#                                            "cf2", 
+#                                            "cf3", 
+#                                            "cf4", 
+#                                            "cf6"],
+#                   "covariate_column_cat": ["cf5"],
+#                   "libs":{
+#                           "xgboost":{
+#                                  "n_estimators": 100,
+#                                  "max_depth": 3,
+#                                  "learning_rate": 0.1,
+#                                  "test_rate": 0.2,
+#                                  "random_state": 42
+#                                  }
+#                              }
+#     }
+    
+#     data = generate_syn_pop(sample_size=1000, 
+#                             seed_val=456, 
+#                             outcome_sd=0.25, 
+#                             gps_spec=1, 
+#                             cova_spec=2)
+        
+#     gps = GeneralizedPropensityScore(data, gps_params)
+#     results = gps.get_results()
+#     gps_data = {
+#         'data' : results.get("data"),
+#         'gps_density' : results.get("gps_density"),
+#         'gps_minmax': results.get("gps_minmax")}
+
+#     # merged_df = pd.merge(data, gps_data, on='id')
+#     # merged_df
+
+#     # pspop_params = {"approach" : "weighting", 
+#     #                 "exposure_column": "treat",
+#     #                 "covariate_column_num": ["cf1", 
+#     #                                          "cf2", 
+#     #                                          "cf3", 
+#     #                                          "cf4", 
+#     #                                          "cf6"],
+#     #                 "covariate_column_cat": ["cf5"]}
+    
+
+#     pspop_params = {"approach" : "matching", 
+#                 "exposure_column": "treat",
+#                 "covariate_column_num": ["cf1", 
+#                                          "cf2", 
+#                                          "cf3", 
+#                                          "cf4", 
+#                                          "cf6"],
+#                 "covariate_column_cat": ["cf5"],
+#                 "control_params": {"caliper": 1.0,
+#                                    "scale": 0.5,
+#                                    "dist_measure": "l1",
+#                                    "bin_seq": None},
+#                 "run_params": {"n_thread": 12,
+#                                "chunk_size": 500}}
+
+#     pspop = PseudoPopulation(data=data, 
+#                             gps_data=gps_data, 
+#                             params=pspop_params)
+    
+

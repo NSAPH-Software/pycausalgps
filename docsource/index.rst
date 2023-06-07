@@ -41,8 +41,8 @@ pycausalgps is a Python library for implementing matching on generalized propens
 
    setup_env
    quickstart
-   gps
    faq
+
 
 .. toctree::
    :glob:
@@ -61,10 +61,6 @@ pycausalgps is a Python library for implementing matching on generalized propens
    
    contact
    CHANGELOG
-
-
-
-
 
 
 Indices and tables

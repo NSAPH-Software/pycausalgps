@@ -47,13 +47,9 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Setting Up Environment</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#conda">Conda</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#pipenv">pipenv</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gps.html">Estimating Generalized Propensity Score (GPS)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="gps.html#computing-gps-values">Computing GPS Values</a></li>
-<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Developers</span></p>
 <ul>
@@ -133,7 +129,7 @@ lightweight version of anaconda.</p>
 <ul class="simple">
 <li><p>Step 1: Create a virtual environment</p></li>
 </ul>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda create --name your_venv <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.7
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda create --name your_venv <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.10
 </pre></div>
 </div>
 <p>Type ‘y’ (yes) for popup questions.</p>
@@ -143,11 +139,13 @@ lightweight version of anaconda.</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>conda activate your_venv
 </pre></div>
 </div>
-<p>Install <strong>PyCausalGPS</strong> (Step 3 or Step 4)</p>
+<p>Install <strong>pycausalgps</strong> (Step 3 or Step 4)</p>
 <ul class="simple">
 <li><p>Step 3: Directly from PyPI</p></li>
 </ul>
-<p>TBD</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip3 install pycausalgps
+</pre></div>
+</div>
 <ul class="simple">
 <li><p>Step 4: Install from Github package in developement mode</p></li>
 </ul>
@@ -188,10 +186,6 @@ open terminal and fire up notebook:</p>
 <p>At the top right corner, there is a button labeled <cite>New</cite> key. Choose your
 recently created kernel (in this example: your_venv_name). Choosing a kernel
 will open a new tab that you can work on.</p>
-</div>
-<div class="section" id="pipenv">
-<h2>pipenv<a class="headerlink" href="#pipenv" title="Permalink to this headline"></a></h2>
-<p>TBD</p>
 </div>
 </div>
 

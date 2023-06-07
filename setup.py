@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="pycausalgps", 
-    version="0.0.2",
+    version="0.0.3",
     author="Naeem Khoshnevis, Xiao Wu, Danielle Braun",
     author_email="nkhoshnevis@g.harvard.edu, xw2892@cumc.columbia.edu, dbraun@mail.harvard.edu",
     maintainer="Naeem Khoshnevis",
