@@ -4,8 +4,10 @@ exposure_response_function.py
 The core module for the ExposureResponseFunction class.
 """
 
+from pycausalgps.erf_helper import estimate_npmetric_erf
 from pycausalgps.rscripts.rfunctions import (estimate_pmetric_erf, 
                                              estimate_semipmetric_erf)
+
 
 
 
@@ -66,8 +68,6 @@ class ExposureResponseFunction:
                             f"supported. Available options: "
                             f"parametric, semiparametric, or nonparametric.")
 
-       
-
     def _erf_parametric(self):
 
         if "formula" not in self.params:
@@ -98,6 +98,31 @@ class ExposureResponseFunction:
         
 
     def _erf_nonparametric(self):
-        pass
+
+        if "bw_seq" not in self.params:
+            raise Exception("bw_seq is required for nonparametric erf.")
+        
+        if "w_vals" not in self.params:
+            raise Exception("w_vals is required for nonparametric erf.")
+        
+        m_Y = self.data.get("Y").to_numpy()
+        m_w = self.data.get("w").to_numpy()
+        counter_weight = self.data.get("counter_weight").to_numpy()
+        bw_seq = self.params.get("bw_seq")
+        w_vals = self.params.get("w_vals")
+
+        if "nthread" not in self.params:
+            nthread = 1
+        else:
+            nthread = self.params.get("nthread")
+
+        results = estimate_npmetric_erf(m_Y, 
+                                        m_w, 
+                                        counter_weight, 
+                                        bw_seq, 
+                                        w_vals, 
+                                        nthread)
+        
+        return results
 
 

@@ -4,12 +4,9 @@ pseudo_population.py
 The core module for the PseudoPopulation class.
 """
 
-import json
-import hashlib
-import timeit
 from collections import Counter
 from dataclasses import dataclass
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 
 import numpy as np
 import pandas as pd
@@ -98,7 +95,7 @@ class PseudoPopulation:
     def gps_data(self, value: dict) -> None:
         #TODO: check if the gps_data is in the correct format.
         if not isinstance(value, dict):
-            raise ValueError("Data must be a pandas DataFrame.")
+            raise ValueError("GPS data must be a dictionary.")
         self.__gps_data = value
 
     def generate_pseudo_population(self) -> None:
@@ -134,7 +131,6 @@ class PseudoPopulation:
         # temp test
         compute_density_with_r = True
         
-        
         # compute density of the exposure in the data.
         if compute_density_with_r:
             # compute density with R.
@@ -153,7 +149,6 @@ class PseudoPopulation:
 
         return value
   
-
     @staticmethod
     def compute_min_idx(i, a, b, scale, c_minus_d):
         tmp_vals = np.abs(a - b[i]) * scale + c_minus_d
@@ -183,7 +178,7 @@ class PseudoPopulation:
 
     def _process_exposure_level(self, w):
 
-        # load gps object from the database.
+        # load gps object from gps_data
         gps_min, gps_max = self.gps_data.get("gps_minmax")
         gps_density = self.gps_data.get("gps_density")
         if gps_density == self.GPS_DENSITY_KERNEL:
@@ -238,8 +233,8 @@ class PseudoPopulation:
         # std_w: scaler
         # std_gps: vector
         all_curated_data = pd.DataFrame({"id": obs_exposure_data["id"],
-                                            "std_w": std_w,
-                                            "std_gps": std_gps})
+                                         "std_w": std_w,
+                                         "std_gps": std_gps})
         
         # subset of data (actual standardized data that are within the caliper value.)
         # std_w_subset: vector
@@ -291,8 +286,9 @@ class PseudoPopulation:
         #counter_weight.update(tmp_freq_table)   
         
         return (w, tmp_freq_table)
+    
 
-
+    
     def _compute_pspop_matching(self):
 
         """ 
@@ -331,11 +327,12 @@ class PseudoPopulation:
  
         n_thread = int(nested_get(self.params, ["run_params", "n_thread"]))
 
-
-        # for _, w in tqdm(enumerate(req_exposure), total=len(req_exposure), desc="Processing exposure levels"):
         with ProcessPoolExecutor(max_workers=n_thread) as executor:
-            results = list(tqdm(executor.map(self._process_exposure_level, req_exposure), total=len(req_exposure), desc="Processing exposure levels"))
-
+            results = list(tqdm(executor.map(self._process_exposure_level, 
+                                             req_exposure), 
+                                             total=len(req_exposure), 
+                                             desc="Processing exposure levels"))
+            
         # Process the results and update the counter_weight and counter_weight_list
         for w, tmp_freq_table in results:
             counter_weight_list.append(CounterWeightData(w, tmp_freq_table))
@@ -515,6 +512,10 @@ class PseudoPopulation:
         return self.counter_weight_list
 
 
+
+
+
+
 @dataclass    
 class CounterWeightData:
     w: float
@@ -524,53 +525,190 @@ class CounterWeightData:
     
     
     # Old code 
-    
-    
 
-if __name__ == "__main__":
 
-    from pycausalgps.base.utils import generate_syn_pop
-    from pycausalgps.gps import GeneralizedPropensityScore
 
-    gps_params = {"gps_density": "normal",
-                  "exposure_column": "treat",
-                  "covariate_column_num": ["cf1", 
-                                           "cf2", 
-                                           "cf3", 
-                                           "cf4", 
-                                           "cf6"],
-                  "covariate_column_cat": ["cf5"],
-                  "libs":{
-                          "xgboost":{
-                                 "n_estimators": 100,
-                                 "max_depth": 3,
-                                 "learning_rate": 0.1,
-                                 "test_rate": 0.2,
-                                 "random_state": 42
-                                 }
-                             }
-    }
-    
-    data = generate_syn_pop(sample_size=1000, 
-                            seed_val=456, 
-                            outcome_sd=0.25, 
-                            gps_spec=1, 
-                            cova_spec=2)
+# def process_exposure_level_2(w, gps_data, data, 
+#                                   exposure_data_col_name, params,
+#                                   GPS_DENSITY_NORMAL, GPS_DENSITY_KERNEL):
+
+#         # load gps object from gps_data
+#         gps_min, gps_max = gps_data.get("gps_minmax")
+#         gps_density = gps_data.get("gps_density")
+#         if gps_density == GPS_DENSITY_KERNEL:
+#             w_resid = gps_data.get("data")["w_resid"]
+     
+#         # load exposure values
+#         obs_exposure_data = data[["id", exposure_data_col_name]]
+#         w_min, w_max = (min(obs_exposure_data[exposure_data_col_name]), 
+#                         max(obs_exposure_data[exposure_data_col_name]))
+
+#         # controlling parameters
+#         delta = nested_get(params,
+#                                 ["control_params", 
+#                                 "caliper"])
+#         scale = nested_get(params,
+#                                 ["control_params",
+#                                 "scale"])
         
-    gps = GeneralizedPropensityScore(data, gps_params)
-    results = gps.get_results()
-    gps_data = results.get("data")    
+#         dist_measure = nested_get(params, 
+#                                  ["control_params", 
+#                                   "dist_measure"])
 
-    merged_df = pd.merge(data, gps_data, on='id')
-    merged_df
+        
+#         if gps_density == GPS_DENSITY_NORMAL:
+#             p_w = norm.pdf(w, 
+#                            gps_data.get("data")["e_gps_pred"], 
+#                            gps_data.get("data")["e_gps_std_pred"])
+#         elif gps_density == GPS_DENSITY_KERNEL:
+#             w_new = ((w - gps_data.get("data")["e_gps_pred"]) 
+#                       / gps_data.get("data")["e_gps_std_pred"])
+#             p_w = compute_density(w_resid, w)
+#         else:
+#             raise Exception("GPS model is not defined.")
+           
 
-    pspop_params = {"approach" : "weighting", 
-                    "exposure_column": "treat",
-                    "covariate_column_num": ["cf1", 
-                                             "cf2", 
-                                             "cf3", 
-                                             "cf4", 
-                                             "cf6"],
-                    "covariate_column_cat": ["cf5"]}
+#         # select subset of data that are within the caliper value.
+#         subset_idx = np.where(np.abs(
+#             obs_exposure_data[exposure_data_col_name] - w) <= delta)[0]
+#         subset_row = obs_exposure_data.iloc[subset_idx]["id"]
+
+#         if len(subset_row) == 0:
+#             LOGGER.debug(f"No data found within the caliper value ({delta}) " 
+#                          f"for the requested exposure level: {w}.")
+#             return (w, Counter(None))
+
+
+#         # standardize GPS and Exposure values.
+#         std_w = (w - w_min)/(w_max - w_min)
+#         std_gps = (p_w - gps_min)/(gps_max - gps_min)
+
+#         # all data (observational data where w is requested w.)
+#         # std_w: scaler
+#         # std_gps: vector
+#         all_curated_data = pd.DataFrame({"id": obs_exposure_data["id"],
+#                                             "std_w": std_w,
+#                                             "std_gps": std_gps})
+        
+#         # subset of data (actual standardized data that are within the caliper value.)
+#         # std_w_subset: vector
+#         # std_gps_subset: vector
+#         std_w_subset = ((obs_exposure_data[obs_exposure_data["id"].
+#                         isin(subset_row)][exposure_data_col_name] - w_min)) / (w_max - w_min)
+        
+#         # TODO: use query.
+#         std_gps_subset = (gps_data.get("data")[gps_data.get("data")["id"].isin(subset_row)]["gps_standardized"])
+
+#         # a: subset of data with standardized GPS (std_gps_subset)
+#         # b: all data with estimated GPS based on requested exposure level. (std_gps)
+#         # c: subset of data with standardized exposure (std_w_subset)
+#         # d: the exposure level that is requested. (std_w)
+        
+#         a = std_gps_subset.to_numpy()
+#         b = std_gps
+#         c = std_w_subset.to_numpy()
+#         d = std_w
+
+#         c_minus_d = abs(c - d)*(1-scale)
+
+#         # compute closest sample from subset of data to these hypothetical samples.
+#         # TODO: make this a fucntion
+#         len_b = len(b)
+#         #len_a = len(a)
+#         out = np.zeros(len_b)
+
+#         # chunk_size = int(nested_get(self.params, ["run_params", "chunk_size"]))
+        
+#         # num_chunks = int(np.ceil(len_b / chunk_size))
+
+#         # with ProcessPoolExecutor(max_workers=n_thread) as executor:
+#         #     args_list = [(i * chunk_size, chunk_size, a, b, scale, c_minus_d) for i in range(num_chunks)]
+#         #     results = list(executor.map(self.compute_min_idx_proc_chunk, args_list))
+
+#         # # Flatten the results and assign them back to the 'out' array
+#         # out = np.concatenate([chunk[chunk != -1] for chunk in results])
+
+    
+#         for i in range(len_b):
+#             tmp_vals = np.abs(a - b[i]) * scale + c_minus_d
+#             min_idx = np.argmin(tmp_vals)
+#             out[i] = min_idx
+
+#         # Get the id based on the index.
+#         selected_id = subset_row.iloc[out].to_numpy()
+#         tmp_freq_table = Counter(selected_id)
+#         #counter_weight.update(tmp_freq_table)   
+        
+#         return (w, tmp_freq_table)
+    
+
+# if __name__ == "__main__":
+
+#     from pycausalgps.base.utils import generate_syn_pop
+#     from pycausalgps.gps import GeneralizedPropensityScore
+
+#     gps_params = {"gps_density": "normal",
+#                   "exposure_column": "treat",
+#                   "covariate_column_num": ["cf1", 
+#                                            "cf2", 
+#                                            "cf3", 
+#                                            "cf4", 
+#                                            "cf6"],
+#                   "covariate_column_cat": ["cf5"],
+#                   "libs":{
+#                           "xgboost":{
+#                                  "n_estimators": 100,
+#                                  "max_depth": 3,
+#                                  "learning_rate": 0.1,
+#                                  "test_rate": 0.2,
+#                                  "random_state": 42
+#                                  }
+#                              }
+#     }
+    
+#     data = generate_syn_pop(sample_size=1000, 
+#                             seed_val=456, 
+#                             outcome_sd=0.25, 
+#                             gps_spec=1, 
+#                             cova_spec=2)
+        
+#     gps = GeneralizedPropensityScore(data, gps_params)
+#     results = gps.get_results()
+#     gps_data = {
+#         'data' : results.get("data"),
+#         'gps_density' : results.get("gps_density"),
+#         'gps_minmax': results.get("gps_minmax")}
+
+#     # merged_df = pd.merge(data, gps_data, on='id')
+#     # merged_df
+
+#     # pspop_params = {"approach" : "weighting", 
+#     #                 "exposure_column": "treat",
+#     #                 "covariate_column_num": ["cf1", 
+#     #                                          "cf2", 
+#     #                                          "cf3", 
+#     #                                          "cf4", 
+#     #                                          "cf6"],
+#     #                 "covariate_column_cat": ["cf5"]}
+    
+
+#     pspop_params = {"approach" : "matching", 
+#                 "exposure_column": "treat",
+#                 "covariate_column_num": ["cf1", 
+#                                          "cf2", 
+#                                          "cf3", 
+#                                          "cf4", 
+#                                          "cf6"],
+#                 "covariate_column_cat": ["cf5"],
+#                 "control_params": {"caliper": 1.0,
+#                                    "scale": 0.5,
+#                                    "dist_measure": "l1",
+#                                    "bin_seq": None},
+#                 "run_params": {"n_thread": 12,
+#                                "chunk_size": 500}}
+
+#     pspop = PseudoPopulation(data=data, 
+#                             gps_data=gps_data, 
+#                             params=pspop_params)
     
 
