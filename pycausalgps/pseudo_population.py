@@ -264,7 +264,6 @@ class PseudoPopulation:
         out = np.zeros(len_b)
 
         # chunk_size = int(nested_get(self.params, ["run_params", "chunk_size"]))
-        
         # num_chunks = int(np.ceil(len_b / chunk_size))
 
         # with ProcessPoolExecutor(max_workers=n_thread) as executor:
