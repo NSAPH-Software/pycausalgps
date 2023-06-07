@@ -1,7 +1,5 @@
 # pycausalgps
 
-_[This packages is under development. Some of the features are not yet implemented.]_
-
 [![Test Status](https://github.com/nsaph-software/pycausalgps/workflows/Python%20package/badge.svg?branch=develop&event=push)](https://github.com/nsaph-software/pycausalgps/actions)
 [![PyPI version](https://img.shields.io/pypi/v/pycausalgps.svg)](https://pypi.org/project/pycausalgps)
 [![codecov](https://codecov.io/gh/NSAPH-Software/pycausalgps/branch/develop/graph/badge.svg)](https://codecov.io/gh/NSAPH-Software/pycausalgps)
