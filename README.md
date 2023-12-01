@@ -199,6 +199,10 @@ pspop = PseudoPopulation(data=data,
                          params=pspop_params)
 ```
 
+## Code of Conduct
+
+Please note that the CausalGPS project is released with a [Contributor Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct.html). By contributing to this project, you agree to abide by its terms.
+
 ## Documentation
 
 Documentation is hosted at https://nsaph-software.github.io/pycausalgps/
