@@ -29,6 +29,7 @@ jobs:
         pip install sphinxcontrib-jsmath==1.0.1 
         pip install sphinxcontrib-qthelp==1.0.3 
         pip install sphinxcontrib-serializinghtml==1.1.5
+        pip install recommonmark
 
     - name: Run Makefile Command
       run: |
