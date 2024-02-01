@@ -37,6 +37,8 @@ jobs:
         set -e
         cd docsource  # Navigate to the docs directory
         make github
+        echo "Listing contents of docs directory:"
+        ls ../docs
         if [ $? -ne 0 ]; then
           echo "Failed to build the documentation"
           exit 1
