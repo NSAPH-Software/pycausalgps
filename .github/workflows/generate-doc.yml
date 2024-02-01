@@ -39,6 +39,7 @@ jobs:
         make github
         echo "Listing contents of docs directory:"
         ls ../docs
+        cat ../docs/index.html
         if [ $? -ne 0 ]; then
           echo "Failed to build the documentation"
           exit 1
@@ -48,4 +49,4 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: docsource/_build/html
+        publish_dir: docs
