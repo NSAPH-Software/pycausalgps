@@ -1,0 +1,42 @@
+name: Build and Deploy Documentation
+
+on:
+  push:
+    branches:
+      - develop  # Set this to the branch containing your Sphinx docs
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check Out Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'  
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install Sphinx==4.4.0 
+        pip install sphinx-rtd-theme==1.0.0 
+        pip install sphinxcontrib-applehelp==1.0.2 
+        pip install sphinxcontrib-devhelp==1.0.2 
+        pip install sphinxcontrib-htmlhelp==2.0.0 
+        pip install sphinxcontrib-jsmath==1.0.1 
+        pip install sphinxcontrib-qthelp==1.0.3 
+        pip install sphinxcontrib-serializinghtml==1.1.5
+
+    - name: Run Makefile Command
+      run: |
+        cd docs  # Navigate to the docs directory
+        make github
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs
