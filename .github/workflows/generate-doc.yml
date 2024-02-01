@@ -43,9 +43,10 @@ jobs:
           echo "Failed to build the documentation"
           exit 1
         fi
+        ce ..
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs
+        publish_dir: docsource/_build/html
