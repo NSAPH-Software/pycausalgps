@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Modules &mdash; pycausalgps 0.0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -55,7 +54,10 @@
 <li class="toctree-l1"><a class="reference internal" href="setup_env_dev.html">Development Environment</a></li>
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="git_branching.html">Git Branching Model</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Modules</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#gps-py">gps.py</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Community</span></p>
 <ul>
@@ -87,10 +89,209 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="modules">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="modules">
 <h1>Modules<a class="headerlink" href="#modules" title="Permalink to this headline"></a></h1>
 <p>This section includes modules that are used in this project.</p>
-</section>
+<span class="target" id="module-pycausalgps.gps"></span><div class="section" id="gps-py">
+<h2>gps.py<a class="headerlink" href="#gps-py" title="Permalink to this headline"></a></h2>
+<p>The core module for the GeneralizedPropensityScore class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pycausalgps.gps.</span></span><span class="sig-name descname"><span class="pre">GeneralizedPropensityScore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore" title="Permalink to this definition"></a></dt>
+<dd><p>Create a GPS object based on provided parameters.</p>
+<p>GPS object supports continuous treatment with numerical or categorical
+confounders.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>pd.DataFrame</em>) – A pandas DataFrame that contains the data for the GPS computation.</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – <p>A dictionary of gps parameters. This includes the folowing required
+parameters:</p>
+<blockquote>
+<div><ul>
+<li><dl class="simple">
+<dt>gps_density: str</dt><dd><p>A string that indicates the density estimation method to be
+used. Available options are “normal” and “kernel”.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>exposure_column: str</dt><dd><p>A string that indicates the name of the exposure column.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>covariate_column_num: list</dt><dd><p>A list of strings that indicates the names of the numerical
+covariate columns.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>covariate_column_cat: list</dt><dd><p>A list of strings that indicates the names of the categorical
+covariate columns.</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>libs: dict</dt><dd><p>A dictionary of libraries and their parameters. Currently only
+xgboost is supported. Any parameters for hypertuning the
+xgboost model can be passed including:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>n_estimators: int</dt><dd><p>Number of trees to fit.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>learning_rate: float</dt><dd><p>Learning rate for the xgboost model.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>max_depth: int</dt><dd><p>Maximum depth of a tree.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>test_rate: float</dt><dd><p>The proportion of the data to be used for testing.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>random_state: int</dt><dd><p>Random state for the xgboost model.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><dl class="simple">
+<dt>data: pd.DataFrame</dt><dd><p>The gps and auxilary columns.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>gps_minmax: list</dt><dd><p>A list of the minimum and maximum gps values.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>training_report: dict</dt><dd><p>A dictionary of the training report for the xgboost model.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>GeneralizedPropensityScore object that includes the following attributes</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore._check_data">
+<span class="sig-name descname"><span class="pre">_check_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore._check_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore._check_data" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the data is in the correct format.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore._check_params">
+<span class="sig-name descname"><span class="pre">_check_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore._check_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore._check_params" title="Permalink to this definition"></a></dt>
+<dd><p>Check if the params are in the correct format.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore._compute_gps">
+<span class="sig-name descname"><span class="pre">_compute_gps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore._compute_gps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore._compute_gps" title="Permalink to this definition"></a></dt>
+<dd><p>Compute GPS based on the provided parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.compute_gps">
+<span class="sig-name descname"><span class="pre">compute_gps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.compute_gps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.compute_gps" title="Permalink to this definition"></a></dt>
+<dd><p>Returns Generalized Propensity Score (GPS) value based on input
+parameters.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.compute_gps_xgboost">
+<span class="sig-name descname"><span class="pre">compute_gps_xgboost</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.compute_gps_xgboost"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.compute_gps_xgboost" title="Permalink to this definition"></a></dt>
+<dd><p>Compute GPS using XGBoost library.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.get_results">
+<span class="sig-name descname"><span class="pre">get_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.get_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.get_results" title="Permalink to this definition"></a></dt>
+<dd><p>Return results of GPS computation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary of results</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pycausalgps.gps.GeneralizedPropensityScore.xgb_train_it">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">xgb_train_it</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pandas.core.series.Series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="_modules/pycausalgps/gps.html#GeneralizedPropensityScore.xgb_train_it"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pycausalgps.gps.GeneralizedPropensityScore.xgb_train_it" title="Permalink to this definition"></a></dt>
+<dd><p>Create XGBoost regressor model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>pd.DataFrame</em>) – Covariate data</p></li>
+<li><p><strong>target</strong> (<em>pd.Series</em>) – Exposure data</p></li>
+<li><p><strong>params</strong> (<em>dict</em>) – Dictionary of parameters</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>predict_all</strong> (<em>np.ndarray</em>) – Predicted exposure for all data</p></li>
+<li><p><strong>training_report</strong> (<em>dict</em>) – Dictionary of training report</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
 
 
            </div>

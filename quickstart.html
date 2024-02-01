@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Quickstart &mdash; pycausalgps 0.0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -107,17 +106,41 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="quickstart">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="quickstart">
 <h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline"></a></h1>
-<section id="installing-the-package">
+<div class="section" id="installing-the-package">
 <h2>Installing the Package<a class="headerlink" href="#installing-the-package" title="Permalink to this headline"></a></h2>
 <p>Install the package using pip:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>pycausalgps
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pip install pycausalgps
 </pre></div>
 </div>
 <p>See the <a class="reference external" href="installation.html">Setting Up Environment</a> for more details.</p>
-</section>
-<section id="generating-synthetic-data">
+</div>
+<div class="section" id="generating-synthetic-data">
 <h2>Generating Synthetic Data<a class="headerlink" href="#generating-synthetic-data" title="Permalink to this headline"></a></h2>
 <p>The package provides a function to generate synthetic data.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pycausalgps.base.utils</span> <span class="kn">import</span> <span class="n">generate_syn_pop</span>
@@ -128,12 +151,12 @@
 <span class="go">                            cova_spec=2)</span>
 </pre></div>
 </div>
-</section>
-<section id="estimating-gps-values">
+</div>
+<div class="section" id="estimating-gps-values">
 <h2>Estimating GPS values<a class="headerlink" href="#estimating-gps-values" title="Permalink to this headline"></a></h2>
 <p>Two approaches are provided to estimate GPS values. These approaches are different
 based on the type of gps_denisty specified. These approaches are <cite>normal</cite> and <cite>kernel</cite>.</p>
-<section id="example-of-normal-approach">
+<div class="section" id="example-of-normal-approach">
 <h3>Example of <cite>normal</cite> approach:<a class="headerlink" href="#example-of-normal-approach" title="Permalink to this headline"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pycausalgps.base.utils</span> <span class="kn">import</span> <span class="n">generate_syn_pop</span>
 <span class="kn">from</span> <span class="nn">pycausalgps.base</span> <span class="kn">import</span> <span class="n">GeneralizedPropensityScore</span>
@@ -165,8 +188,8 @@ based on the type of gps_denisty specified. These approaches are <cite>normal</c
 <span class="n">gps</span> <span class="o">=</span> <span class="n">GeneralizedPropensityScore</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="example-of-kernel-approach">
+</div>
+<div class="section" id="example-of-kernel-approach">
 <h3>Example of <cite>kernel</cite> approach:<a class="headerlink" href="#example-of-kernel-approach" title="Permalink to this headline"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pycausalgps.base.utils</span> <span class="kn">import</span> <span class="n">generate_syn_pop</span>
 <span class="kn">from</span> <span class="nn">pycausalgps.base</span> <span class="kn">import</span> <span class="n">GeneralizedPropensityScore</span>
@@ -198,13 +221,13 @@ based on the type of gps_denisty specified. These approaches are <cite>normal</c
 <span class="n">gps</span> <span class="o">=</span> <span class="n">GeneralizedPropensityScore</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
-<section id="generating-pseudo-population">
+</div>
+</div>
+<div class="section" id="generating-pseudo-population">
 <h2>Generating Pseudo-population<a class="headerlink" href="#generating-pseudo-population" title="Permalink to this headline"></a></h2>
 <p>There are two implemented methdos to generate pseudo-population. These methods
 are: <cite>weighting</cite> and <cite>matching</cite>.</p>
-<section id="example-of-weighting-approach">
+<div class="section" id="example-of-weighting-approach">
 <h3>Example of <cite>weighting</cite> approach:<a class="headerlink" href="#example-of-weighting-approach" title="Permalink to this headline"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">generate_syn_pop</span><span class="p">(</span><span class="n">sample_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
                         <span class="n">seed_val</span><span class="o">=</span><span class="mi">456</span><span class="p">,</span>
@@ -255,8 +278,8 @@ are: <cite>weighting</cite> and <cite>matching</cite>.</p>
                          <span class="n">params</span><span class="o">=</span><span class="n">pspop_params</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="example-of-matching-approach">
+</div>
+<div class="section" id="example-of-matching-approach">
 <h3>Example of <cite>matching</cite> approach:<a class="headerlink" href="#example-of-matching-approach" title="Permalink to this headline"></a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pycausalgps.base.utils</span> <span class="kn">import</span> <span class="n">generate_syn_pop</span>
 <span class="kn">from</span> <span class="nn">pycausalgps.gps</span> <span class="kn">import</span> <span class="n">GeneralizedPropensityScore</span>
@@ -328,14 +351,14 @@ are: <cite>weighting</cite> and <cite>matching</cite>.</p>
 uses multiprocessing. If you encounter any runtime error, try put the code
 inside a <cite>if __name__ == ‘__main__’:</cite> block.</p>
 </div>
-</section>
-</section>
-<section id="exposure-response-function">
+</div>
+</div>
+<div class="section" id="exposure-response-function">
 <h2>Exposure Response Function<a class="headerlink" href="#exposure-response-function" title="Permalink to this headline"></a></h2>
 <p>The package provides a function to estimate exposure response function. There
 are three implemented methods to estimate exposure response function. These
 methods are: <cite>parametric</cite>, <cite>semiparametric</cite> and <cite>nonparametric</cite>.</p>
-<section id="example-of-parametric-approach">
+<div class="section" id="example-of-parametric-approach">
 <h3>Example of <cite>parametric</cite> approach:<a class="headerlink" href="#example-of-parametric-approach" title="Permalink to this headline"></a></h3>
 <p>The parametric approach estimates the hazard ratios using a parametric
 regression model. In the backend we us gnm R package to implement generalized
@@ -399,8 +422,8 @@ additive models.</p>
                                    <span class="n">data</span> <span class="o">=</span> <span class="n">ps_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
-</section>
-<section id="example-of-semiparametric-approach">
+</div>
+<div class="section" id="example-of-semiparametric-approach">
 <h3>Example of <cite>semiparametric</cite> approach:<a class="headerlink" href="#example-of-semiparametric-approach" title="Permalink to this headline"></a></h3>
 <p>The semiparametric approach estimates the smoothed exposure-response function
 using generalized additive model with splines. In the backend we us <cite>gam</cite> R
@@ -413,8 +436,8 @@ package to implement generalized additive models.</p>
                                        <span class="n">data</span> <span class="o">=</span> <span class="n">ps_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
-</section>
-<section id="example-of-nonparametric-approach">
+</div>
+<div class="section" id="example-of-nonparametric-approach">
 <h3>Example of <cite>nonparametric</cite> approach:<a class="headerlink" href="#example-of-nonparametric-approach" title="Permalink to this headline"></a></h3>
 <p>The nonparametric approach estimates the smoothed exposure-response function
 using kernel smoothing approach. In the backend we us <cite>locpol</cite> R package to
@@ -486,9 +509,9 @@ bandwidth selection is implemented.</p>
                                 <span class="n">bw_seq</span><span class="p">,</span> <span class="n">w_vals</span><span class="p">,</span> <span class="n">nthread</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
            </div>

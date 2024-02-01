@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About &mdash; pycausalgps 0.0.1 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -87,10 +86,34 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="about">
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="about">
 <h1>About<a class="headerlink" href="#about" title="Permalink to this headline"></a></h1>
 <p>pycausalgps is a Python library designed for implementing matching on Generalized Propensity Scores (GPS) in scenarios involving continuous exposures. The approach enables estimating causal effects using observational data tailored explicitly for settings with continuous exposures. By introducing a novel framework for GPS caliper matching, we provide a method that simultaneously matches on both the estimated GPS and exposure levels, ensuring comprehensive adjustment for confounding bias. This library offers a reliable and efficient solution for researchers and data scientists seeking to analyze causal relationships in the presence of continuous treatment variables under potential outcome framework.</p>
-</section>
+</div>
 
 
            </div>
