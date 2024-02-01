@@ -32,7 +32,7 @@ jobs:
 
     - name: Run Makefile Command
       run: |
-        cd docs  # Navigate to the docs directory
+        cd docsource  # Navigate to the docs directory
         make github
 
     - name: Deploy to GitHub Pages
