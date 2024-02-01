@@ -30,11 +30,17 @@ jobs:
         pip install sphinxcontrib-qthelp==1.0.3 
         pip install sphinxcontrib-serializinghtml==1.1.5
         pip install recommonmark
+        pip install nbsphinx
 
     - name: Run Makefile Command
       run: |
+        set -e
         cd docsource  # Navigate to the docs directory
         make github
+        if [ $? -ne 0 ]; then
+          echo "Failed to build the documentation"
+          exit 1
+        fi
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
